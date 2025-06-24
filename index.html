@@ -50,6 +50,16 @@
               roboto: ['Roboto', 'sans-serif'],
               serif: ['Georgia', 'Cambria', '"Times New Roman"', 'Times', 'serif'],
               outfit: ['Outfit', 'sans-serif'],
+              lato: ['Lato', 'sans-serif'],
+              'open-sans': ['"Open Sans"', 'sans-serif'],
+              montserrat: ['Montserrat', 'sans-serif'],
+              'source-sans-pro': ['"Source Sans Pro"', 'sans-serif'],
+              nunito: ['Nunito', 'sans-serif'],
+              raleway: ['Raleway', 'sans-serif'],
+              merriweather: ['Merriweather', 'serif'],
+              'playfair-display': ['"Playfair Display"', 'serif'],
+              ubuntu: ['Ubuntu', 'sans-serif'],
+              'josefin-sans': ['"Josefin Sans"', 'sans-serif'],
             },
             animation: {
               'fade-in-up': 'fadeInUp 0.5s ease-out forwards',
@@ -270,7 +280,7 @@
         .content-editable-input { scrollbar-width: thin; scrollbar-color: rgba(var(--text-subtle), 0.25) transparent; }
 
         .image-preview-container-input {
-            @apply flex flex-wrap gap-2 p-1 mb-1.5 max-h-24 overflow-y-auto border-b border-gray-200;
+            @apply flex flex-wrap gap-2 p-1 mb-1.5 max-h-24 overflow-y-auto; /* Removed border-b border-gray-200 */
             scrollbar-width: thin;
             scrollbar-color: theme('colors.slate.300') theme('colors.slate.100');
         }
@@ -281,7 +291,7 @@
       }
     </style>
     <link rel="preconnect" href="https://fonts.googleapis.com"> <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin> 
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@400;500;600;700;800&family=Roboto:wght@400;500;700;900&family=Outfit:wght@400;700&family=Georgia&display=swap" rel="stylesheet"> 
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@400;500;600;700;800&family=Roboto:wght@400;500;700;900&family=Outfit:wght@400;700&family=Lato:wght@400;700&family=Open+Sans:wght@400;700&family=Montserrat:wght@400;700&family=Source+Sans+Pro:wght@400;700&family=Nunito:wght@400;700&family=Raleway:wght@400;700&family=Merriweather:wght@400;700&family=Playfair+Display:wght@400;700&family=Ubuntu:wght@400;700&family=Josefin+Sans:wght@400;700&display=swap" rel="stylesheet"> 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-light.min.css">
 
@@ -720,7 +730,7 @@ Remember: You're not just an AI assistant, you're a helpful friend who happens t
 
         return (
           <div className={mainIndicatorContainerClasses}>
-            <div className="w-4 h-4 border-2 border-gray-300 border-t-brand-primary rounded-full animate-spin"></div>
+            <div className="w-3 h-3 border-2 border-gray-300 border-t-brand-primary rounded-full animate-spin"></div> {/* Spinner size reduced */}
             <div className="relative overflow-hidden">
               <span className={textClasses}>Thinking...</span>
               {shimmerDiv}
@@ -834,9 +844,9 @@ Remember: You're not just an AI assistant, you're a helpful friend who happens t
         let contentToShow = null;
         
         if (isUser) { 
-          bubbleRoleClasses = 'bg-surface-user-bubble-bg text-text-primary rounded-xl rounded-br-md'; 
+          bubbleRoleClasses = 'bg-surface-user-bubble-bg text-text-primary rounded-xl rounded-br-md'; // No border, updated rounding
           bubbleWidthClasses = 'max-w-[80%] sm:max-w-[75%]'; 
-          contentToShow = <p className="text-[15px] font-medium whitespace-pre-wrap break-words font-serif">{message.text}</p>; 
+          contentToShow = <p className="text-[15px] font-medium whitespace-pre-wrap break-words font-serif">{message.text}</p>; // Updated text size, weight, and added font-serif
         } else if (message.role === 'model') { 
             bubbleRoleClasses = `bg-white text-text-primary rounded-xl rounded-bl-md border border-[#E5E8EB] ${aiMessageFontFamily}`;
             bubbleWidthClasses = 'max-w-full w-full'; 
@@ -857,12 +867,12 @@ Remember: You're not just an AI assistant, you're a helpful friend who happens t
           <div className={`flex items-end ${isUser ? 'justify-end' : 'justify-start'} animate-fade-in-up opacity-0`} style={{animationFillMode: 'forwards'}}>
             <div className={`${bubbleBaseClasses} ${bubbleWidthClasses} ${bubbleRoleClasses}`} style={{animationFillMode: 'forwards'}}>
               {isUser && message.attachedFiles && message.attachedFiles.length > 0 && (
-                <div className={`grid gap-0 ${message.text ? 'mb-1.5' : ''} ${message.attachedFiles.length > 1 ? 'grid-cols-2 sm:grid-cols-3' : 'grid-cols-1'}`}>
+                <div className={`grid gap-0 ${message.text ? 'mb-1.5' : ''} ${message.attachedFiles.length > 1 ? 'grid-cols-2 sm:grid-cols-3' : 'grid-cols-1'}`}> {/* Reduced gap */}
                   {message.attachedFiles.map(file => {
                     if (file.type?.startsWith('image/') && file.apiData?.data && file.apiData?.mimeType) {
                       const imageSrc = `data:${file.apiData.mimeType};base64,${file.apiData.data}`;
                       return (
-                        <div key={file.id || file.name} className="rounded-lg overflow-hidden group relative max-w-full w-full sm:w-auto sm:max-w-[180px]">
+                        <div key={file.id || file.name} className="rounded-lg overflow-hidden group relative max-w-full w-full sm:w-auto sm:max-w-[180px]"> {/* No shadow, bg, border */}
                           <img src={imageSrc} alt={file.name || 'image preview'} className="block w-full max-h-40 object-contain rounded-lg" />
                           <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex items-center justify-center p-1">
                             <p className="text-[10px] text-white text-center truncate font-medium">{file.name}</p>
@@ -893,6 +903,8 @@ Remember: You're not just an AI assistant, you're a helpful friend who happens t
         const [userHasScrolledUp, setUserHasScrolledUp] = useState(false);
         const [showToolsPopover, setShowToolsPopover] = useState(false);
         const [isWebSearchEnabledState, setIsWebSearchEnabledState] = useState(false); 
+        const [showStyleSelectionPopover, setShowStyleSelectionPopover] = useState(false);
+        const [currentAiFontFamily, setCurrentAiFontFamily] = useState('font-sans');
 
         const fileInputRef = useRef(null);
         const messagesEndRef = useRef(null);
@@ -900,12 +912,15 @@ Remember: You're not just an AI assistant, you're a helpful friend who happens t
         const contentEditableRef = useRef(null);
         const toolsButtonRef = useRef(null);
         const popoverRef = useRef(null);
+        const stylePopoverRef = useRef(null);
+
 
         const handleClearChatAction = () => {
             setChatError(null);
             onClearChat(); 
             setIsWebSearchEnabledState(false); 
             setShowToolsPopover(false);
+            setShowStyleSelectionPopover(false);
             if (contentEditableRef.current) contentEditableRef.current.innerText = ''; 
             setInputText(''); 
             setSelectedFiles([]); 
@@ -974,6 +989,7 @@ Remember: You're not just an AI assistant, you're a helpful friend who happens t
             setInputText(''); 
             setSelectedFiles([]); 
             setShowToolsPopover(false);
+            setShowStyleSelectionPopover(false);
         };
 
         const handleContentEditableKeyDown = (e) => { 
@@ -998,21 +1014,61 @@ Remember: You're not just an AI assistant, you're a helpful friend who happens t
 
         const toggleToolsPopover = () => {
           setShowToolsPopover(prev => !prev);
+          if (showStyleSelectionPopover) setShowStyleSelectionPopover(false);
         };
         
+        const toggleStyleSelectionPopover = (e) => {
+          e.stopPropagation(); 
+          setShowStyleSelectionPopover(prev => !prev);
+        };
+
+        const handleSelectFontStyle = (fontClass) => {
+            setCurrentAiFontFamily(fontClass);
+            setShowStyleSelectionPopover(false);
+            setShowToolsPopover(false);
+        };
+        
+        const fontOptions = [
+            { name: "Default (Inter)", class: "font-sans" },
+            { name: "Roboto", class: "font-roboto" },
+            { name: "Poppins", class: "font-poppins" },
+            { name: "Georgia (Serif)", class: "font-serif" },
+            { name: "Outfit", class: "font-outfit" },
+            { name: "Lato", class: "font-lato" },
+            { name: "Open Sans", class: "font-open-sans" },
+            { name: "Montserrat", class: "font-montserrat" },
+            { name: "Source Sans Pro", class: "font-source-sans-pro" },
+            { name: "Nunito", class: "font-nunito" },
+            { name: "Raleway", class: "font-raleway" },
+            { name: "Merriweather", class: "font-merriweather" },
+            { name: "Playfair Display", class: "font-playfair-display" },
+            { name: "Ubuntu", class: "font-ubuntu" },
+            { name: "Josefin Sans", class: "font-josefin-sans" },
+        ];
+
         useEffect(() => {
             const handleClickOutside = (event) => {
-                if (showToolsPopover &&
-                    popoverRef.current && !popoverRef.current.contains(event.target) &&
-                    toolsButtonRef.current && !toolsButtonRef.current.contains(event.target)) {
+                if (popoverRef.current && !popoverRef.current.contains(event.target) &&
+                    stylePopoverRef.current && !stylePopoverRef.current.contains(event.target) &&
+                    toolsButtonRef.current && !toolsButtonRef.current.contains(event.target) &&
+                    !event.target.closest('.style-select-button')) { 
                     setShowToolsPopover(false);
+                    setShowStyleSelectionPopover(false);
+                } else if (popoverRef.current && !popoverRef.current.contains(event.target) &&
+                           toolsButtonRef.current && !toolsButtonRef.current.contains(event.target) &&
+                           !showStyleSelectionPopover) { 
+                     setShowToolsPopover(false);
+                } else if (stylePopoverRef.current && !stylePopoverRef.current.contains(event.target) &&
+                           !popoverRef.current?.contains(event.target) && 
+                           !toolsButtonRef.current?.contains(event.target) &&
+                           !event.target.closest('.style-select-button') 
+                           ) {
+                     setShowStyleSelectionPopover(false); 
                 }
             };
             document.addEventListener('mousedown', handleClickOutside);
-            return () => {
-                document.removeEventListener('mousedown', handleClickOutside);
-            };
-        }, [showToolsPopover]); 
+            return () => document.removeEventListener('mousedown', handleClickOutside);
+        }, [showStyleSelectionPopover]); 
 
         const handleToggleWebSearch = (newValue) => {
             setIsWebSearchEnabledState(newValue);
@@ -1039,7 +1095,7 @@ Remember: You're not just an AI assistant, you're a helpful friend who happens t
             <div ref={chatContainerRef} className="flex-grow p-4 md:p-5 space-y-4 md:space-y-5 overflow-y-auto chat-messages-container relative bg-surface-chat-area">
                 { !hasVisibleChatContent && !isLoading && ( 
                     <div className="absolute inset-0 flex flex-col items-center justify-center text-center pointer-events-none p-8 animate-fade-in-up opacity-0" style={{animationDelay: '0.2s', animationFillMode: 'forwards'}}>
-                        <NewEmptyStateIconSVG className="w-14 h-14 mb-6 text-brand-send-active" />
+                        <NewEmptyStateIconSVG className="w-20 h-20 mb-6 text-brand-send-active" /> {/* Logo size increased */}
                         <p className="text-3xl lg:text-4xl font-serif text-gray-800 leading-tight">
                             How can I help you<br />today?
                         </p>
@@ -1051,7 +1107,7 @@ Remember: You're not just an AI assistant, you're a helpful friend who happens t
                          (msg.role === 'model' && (!msg.isLoading || (msg.isLoading && msg.text))) || 
                          msg.role === 'system' ||
                          msg.isError) && (
-                            <div> <ChatMessageItem message={msg} aiMessageFontFamily="font-roboto" /> </div>
+                            <div> <ChatMessageItem message={msg} aiMessageFontFamily={currentAiFontFamily} /> </div>
                         )}
                         {msg.role === 'model' && msg.isLoading && !msg.text && !msg.isError && ( 
                             <ThinkingAnimation isPotentiallySearching={msg.searchUsed && msg.loadingText === "Searching..."} />
@@ -1093,7 +1149,7 @@ Remember: You're not just an AI assistant, you're a helpful friend who happens t
                     }}
                 >
                   {selectedFiles.some(f => f.type.startsWith('image/')) && (
-                    <div className="image-preview-container-input">
+                    <div className="image-preview-container-input"> {/* Class already modified via @layer components */}
                         {selectedFiles.filter(f => f.type.startsWith('image/')).map(file => (
                         <div key={file.id} className="relative w-14 h-14 rounded-md overflow-hidden shadow-sm group border border-gray-200">
                             <img
@@ -1104,7 +1160,7 @@ Remember: You're not just an AI assistant, you're a helpful friend who happens t
                             <button
                             type="button"
                             onClick={() => removeSelectedFile(file.id)}
-                            className="absolute top-0.5 right-0.5 w-4 h-4 bg-black/60 hover:bg-black/75 text-white rounded-full flex items-center justify-center text-[10px] opacity-0 group-hover:opacity-100 transition-opacity focus:outline-none"
+                            className="absolute top-0.5 right-0.5 w-4 h-4 bg-black/60 hover:bg-black/75 text-white rounded-full flex items-center justify-center text-[10px] opacity-100 transition-opacity focus:outline-none" /* Modified opacity */
                             aria-label="Remove image"
                             >
                             &times;
@@ -1172,6 +1228,16 @@ Remember: You're not just an AI assistant, you're a helpful friend who happens t
                                 >
                                     <div className="space-y-0.5">
                                         <button
+                                            onClick={toggleStyleSelectionPopover}
+                                            className="style-select-button w-full flex items-center justify-between space-x-2 px-2.5 py-1.5 text-xs text-text-secondary hover:bg-gray-100 rounded-md transition-colors duration-150"
+                                        >
+                                            <div className="flex items-center space-x-2">
+                                                <i className="fas fa-leaf fa-fw text-xs text-text-subtle"></i>
+                                                <span>Use style</span>
+                                            </div>
+                                            <i className="fas fa-chevron-right fa-fw text-xs text-text-subtle"></i>
+                                        </button>
+                                        <button
                                             onClick={handleClearChatAction}
                                             className="w-full flex items-center space-x-2 px-2.5 py-1.5 text-xs text-text-secondary hover:bg-gray-100 rounded-md transition-colors duration-150 disabled:opacity-50"
                                             disabled={isLoading || messages.filter(m=>m.text || m.attachedFiles?.length > 0).length === 0}
@@ -1200,6 +1266,24 @@ Remember: You're not just an AI assistant, you're a helpful friend who happens t
                                                 />
                                             </button>
                                         </div>
+                                    </div>
+                                </div>
+                            )}
+                             {showStyleSelectionPopover && (
+                                <div
+                                    ref={stylePopoverRef}
+                                    className="absolute bottom-full mb-2 left-full ml-2 w-48 bg-white rounded-lg shadow-xl border border-border-default p-2 z-20 animate-scale-in-subtle origin-bottom-left"
+                                >
+                                    <div className="space-y-0.5">
+                                        {fontOptions.map(font => (
+                                            <button
+                                                key={font.class}
+                                                onClick={() => handleSelectFontStyle(font.class)}
+                                                className={`w-full text-left px-2.5 py-1.5 text-xs hover:bg-gray-100 rounded-md transition-colors ${font.class} ${currentAiFontFamily === font.class ? 'bg-gray-100 text-brand-primary' : 'text-text-secondary'}`}
+                                            >
+                                                {font.name}
+                                            </button>
+                                        ))}
                                     </div>
                                 </div>
                             )}
