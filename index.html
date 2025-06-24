@@ -132,6 +132,9 @@
                 'input-focus': '0 0 0 1px rgb(var(--focus-ring-color) / 1)', 
                 'chat-window': '0 15px 50px -8px rgba(var(--text-primary), 0.08), 0 8px 25px -8px rgba(var(--text-primary),0.05)',
                 'input-active-glow': '0 0 6px rgba(var(--text-secondary),0.15)',
+            },
+             maxWidth: { /* Added for modal sizing */
+              '18rem': '18rem', // Approx 288px
             }
           },
         },
@@ -302,8 +305,6 @@
         storageBucket: "fx-todo-69aa3.firebasestorage.app",
         messagingSenderId: "924128604086",
         appId: "1:924128604086:web:9606a2a0faa198688fdb17"
-        // measurementId is optional, you can include it if you use Analytics
-        // measurementId: "G-L8R5G7JYFY" 
       };
 
       let firebaseApp;
@@ -319,7 +320,6 @@
         database = firebase.database();
       } catch (e) {
         console.error("Firebase initialization error:", e);
-        // Consider rendering an error message to the user here
       }
 
 
@@ -334,12 +334,11 @@
 
 
       const GEMINI_MAIN_MODEL = 'gemini-2.5-flash-preview-05-20';
-      // IMPORTANT: Replace with your ACTUAL Gemini API Key
-      const API_KEY = "AIzaSyDgEdgBX2VWf2PO4X29haQzISTDTemzuW4"; 
+      const API_KEY = "AIzaSyDgEdgBX2VWf2PO4X29haQzISTDTemzuW4"; // From original file
 
       const MAX_FILE_SIZE_MB = 5; const MAX_TOTAL_FILES_SIZE_MB = 20;
 
-      if (!API_KEY || API_KEY === "YOUR_GEMINI_API_KEY" /* Check against your actual placeholder if different */) {
+      if (!API_KEY || API_KEY === "YOUR_GEMINI_API_KEY") {
          console.error(" ERROR: Gemini API Key is not set or is still the placeholder.");
       }
       const genAI = new GoogleGenerativeAI(API_KEY);
@@ -1046,7 +1045,7 @@ Remember: You're not just an AI assistant, you're a helpful friend who happens t
     
         return (
           <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4 animate-modal-fade-in">
-            <div className="bg-white p-5 rounded-lg shadow-xl w-full max-w-xs relative"> {/* Reduced padding from p-6 to p-5 */}
+            <div className="bg-white p-4 sm:p-5 rounded-lg shadow-xl w-full max-w-[18rem] sm:max-w-xs relative"> {/* Adjusted size and padding */}
               <button 
                 onClick={onClose}
                 className="absolute top-2 right-2 text-gray-500 hover:text-gray-700 p-1 rounded-full"
@@ -1054,7 +1053,7 @@ Remember: You're not just an AI assistant, you're a helpful friend who happens t
               >
                 <NewCloseIconSVG className="w-5 h-5" />
               </button>
-              <h2 className="text-lg font-semibold text-text-primary mb-4 text-center">Enter PIN to Unlock</h2>
+              <h2 className="text-md sm:text-lg font-semibold text-text-primary mb-3 sm:mb-4 text-center">Enter PIN to Unlock</h2>
               <form onSubmit={handleSubmit}>
                 <input
                   ref={pinInputRef}
@@ -1067,7 +1066,7 @@ Remember: You're not just an AI assistant, you're a helpful friend who happens t
                 {pinError && <p className="text-red-500 text-xs text-center mb-3">{pinError}</p>}
                 <button
                   type="submit"
-                  className="w-full bg-brand-send-active text-white py-2 px-4 rounded-md hover:bg-brand-send-hover transition-colors font-medium"
+                  className="w-full bg-brand-send-active text-white py-2 px-4 rounded-md hover:bg-brand-send-hover transition-colors font-medium text-sm sm:text-base"
                 >
                   Unlock Sidebar
                 </button>
@@ -1114,8 +1113,7 @@ Remember: You're not just an AI assistant, you're a helpful friend who happens t
 
         return (
             <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4 animate-modal-fade-in">
-                 {/* Adjusted max-width and padding for responsiveness */}
-                <div className="bg-white p-5 sm:p-6 rounded-lg shadow-xl w-full max-w-xs sm:max-w-sm relative">
+                <div className="bg-white p-4 sm:p-6 rounded-lg shadow-xl w-full max-w-[18rem] sm:max-w-sm relative"> {/* Adjusted size and padding */}
                     <button
                         onClick={onClose}
                         className="absolute top-2 right-2 text-gray-500 hover:text-gray-700 p-1 rounded-full"
@@ -1123,10 +1121,10 @@ Remember: You're not just an AI assistant, you're a helpful friend who happens t
                     >
                          <NewCloseIconSVG className="w-5 h-5" />
                     </button>
-                    <h2 className="text-lg font-semibold text-text-primary mb-1 text-center">
+                    <h2 className="text-md sm:text-lg font-semibold text-text-primary mb-1 text-center">
                         {currentPin ? 'Change PIN' : 'Set PIN'}
                     </h2>
-                    {currentPin && <p className="text-xs text-text-subtle text-center mb-4">Current PIN is set. Enter new PIN to change.</p>}
+                    {currentPin && <p className="text-xs text-text-subtle text-center mb-3 sm:mb-4">Current PIN is set. Enter new PIN to change.</p>}
                     
                     <form onSubmit={handleSubmit} className="space-y-3">
                         <div>
@@ -1158,9 +1156,82 @@ Remember: You're not just an AI assistant, you're a helpful friend who happens t
                         )}
                         <button
                             type="submit"
-                            className="w-full bg-brand-send-active text-white py-2 px-4 rounded-md hover:bg-brand-send-hover transition-colors font-medium"
+                            className="w-full bg-brand-send-active text-white py-2 px-4 rounded-md hover:bg-brand-send-hover transition-colors font-medium text-sm sm:text-base"
                         >
                             {currentPin ? 'Change PIN' : 'Set PIN'}
+                        </button>
+                    </form>
+                </div>
+            </div>
+        );
+    };
+
+    const ForgotPasswordModal = ({ isOpen, onClose, onSendResetEmail, statusMessage, statusType }) => {
+        const [email, setEmail] = useState('');
+        const [loading, setLoading] = useState(false);
+        const emailInputRef = useRef(null);
+
+        useEffect(() => {
+            if (isOpen) {
+                setEmail('');
+                setLoading(false);
+                setTimeout(() => emailInputRef.current?.focus(), 100);
+            }
+        }, [isOpen]);
+
+        const handleSubmit = async (e) => {
+            e.preventDefault();
+            if (!email) {
+                onSendResetEmail(email, true, "Email address is required."); // Pass error directly
+                return;
+            }
+            setLoading(true);
+            await onSendResetEmail(email);
+            setLoading(false);
+            // setEmail(''); // Keep email in case of retry, or clear on success
+        };
+
+        if (!isOpen) return null;
+
+        return (
+            <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4 animate-modal-fade-in">
+                <div className="bg-white p-4 sm:p-6 rounded-lg shadow-xl w-full max-w-[18rem] sm:max-w-sm relative">
+                    <button
+                        onClick={onClose}
+                        className="absolute top-2 right-2 text-gray-500 hover:text-gray-700 p-1 rounded-full"
+                        aria-label="Close Forgot Password modal"
+                    >
+                        <NewCloseIconSVG className="w-5 h-5" />
+                    </button>
+                    <h2 className="text-md sm:text-lg font-semibold text-text-primary mb-3 sm:mb-4 text-center">Forgot Password?</h2>
+                    <p className="text-xs text-text-subtle text-center mb-3">Enter your email to receive a password reset link.</p>
+                    <form onSubmit={handleSubmit} className="space-y-3">
+                        <div>
+                            <label htmlFor="resetEmail" className="block text-sm font-medium text-text-secondary">Email Address</label>
+                            <input
+                                id="resetEmail"
+                                ref={emailInputRef}
+                                type="email"
+                                value={email}
+                                onChange={(e) => setEmail(e.target.value)}
+                                className="mt-1 w-full px-3 py-2 border border-border-default rounded-md focus:ring-2 focus:ring-brand-primary/50 focus:border-brand-primary/80 outline-none"
+                                placeholder="your.email@example.com"
+                                required
+                            />
+                        </div>
+                        {statusMessage && (
+                            <p className={`text-xs text-center ${statusType === 'success' ? 'text-green-600' : 'text-red-600'}`}>{statusMessage}</p>
+                        )}
+                        <button
+                            type="submit"
+                            disabled={loading}
+                            className="w-full bg-brand-send-active text-white py-2 px-4 rounded-md hover:bg-brand-send-hover transition-colors font-medium text-sm sm:text-base disabled:opacity-70"
+                        >
+                            {loading ? (
+                                <div className="flex justify-center items-center">
+                                    <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin-continuous"></div>
+                                </div>
+                            ) : "Send Reset Link"}
                         </button>
                     </form>
                 </div>
@@ -1794,7 +1865,7 @@ Remember: You're not just an AI assistant, you're a helpful friend who happens t
           </div>);
       };
 
-      const AuthPage = ({ onAuthSuccess }) => {
+      const AuthPage = ({ onAuthSuccess, onShowForgotPassword }) => { // Added onShowForgotPassword prop
         const [isLogin, setIsLogin] = useState(true);
         const [email, setEmail] = useState('');
         const [password, setPassword] = useState('');
@@ -1817,7 +1888,7 @@ Remember: You're not just an AI assistant, you're a helpful friend who happens t
                 setLoading(false);
                 return;
             }
-            if (!isLogin && password.length < 6) {
+             if (!isLogin && password.length < 6) {
                 setError("Password must be at least 6 characters long.");
                 setLoading(false);
                 return;
@@ -1839,9 +1910,9 @@ Remember: You're not just an AI assistant, you're a helpful friend who happens t
         
         return (
             <div className="min-h-screen flex flex-col items-center justify-center bg-surface-main p-4">
-                <div className="w-full max-w-xs sm:max-w-sm bg-white p-6 sm:p-8 rounded-xl shadow-chat-window"> {/* Adjusted max-width and padding */}
-                    <h1 className="text-2xl sm:text-3xl font-bold text-center text-brand-primary mb-1 sm:mb-2">AlphaGPT</h1> {/* Adjusted font size and margin */}
-                    <p className="text-center text-text-subtle mb-6 sm:mb-8">{isLogin ? "Login to continue" : "Create an account"}</p> {/* Adjusted margin */}
+                <div className="w-full max-w-xs sm:max-w-sm bg-white p-6 sm:p-8 rounded-xl shadow-chat-window"> 
+                    <h1 className="text-2xl sm:text-3xl font-bold text-center text-brand-primary mb-1 sm:mb-2">AlphaGPT</h1>
+                    <p className="text-center text-text-subtle mb-6 sm:mb-8">{isLogin ? "Login to continue" : "Create an account"}</p>
                     
                     <form onSubmit={handleSubmit} className="space-y-4">
                         <div>
@@ -1853,7 +1924,18 @@ Remember: You're not just an AI assistant, you're a helpful friend who happens t
                             />
                         </div>
                         <div>
-                            <label htmlFor="password" className="block text-sm font-medium text-text-secondary">Password</label>
+                            <div className="flex justify-between items-center">
+                                <label htmlFor="password" className="block text-sm font-medium text-text-secondary">Password</label>
+                                {isLogin && (
+                                    <button 
+                                        type="button" 
+                                        onClick={onShowForgotPassword} 
+                                        className="text-xs text-brand-primary hover:text-brand-send-hover font-medium"
+                                    >
+                                        Forgot?
+                                    </button>
+                                )}
+                            </div>
                             <input 
                                 type="password" id="password" value={password} onChange={(e) => setPassword(e.target.value)} 
                                 className="mt-1 w-full px-3 py-2 sm:py-2.5 border border-border-default rounded-lg focus:ring-2 focus:ring-brand-primary/50 focus:border-brand-primary/80 outline-none transition-shadow"
@@ -1911,6 +1993,9 @@ Remember: You're not just an AI assistant, you're a helpful friend who happens t
 
         const [isPinSettingsModalOpen, setIsPinSettingsModalOpen] = useState(false);
         const [pinSettingsStatus, setPinSettingsStatus] = useState({ message: '', type: '' });
+        
+        const [isForgotPasswordModalOpen, setIsForgotPasswordModalOpen] = useState(false);
+        const [forgotPasswordStatus, setForgotPasswordStatus] = useState({ message: '', type: '' });
 
 
         const initialLoadDoneRef = useRef(false);
@@ -1920,9 +2005,8 @@ Remember: You're not just an AI assistant, you're a helpful friend who happens t
         
         useEffect(() => {
             if (!auth) {
-                 setAuthLoading(false); // Firebase not initialized, stop auth loading
+                 setAuthLoading(false); 
                  console.error("Firebase Auth is not initialized. Authentication will not work.");
-                 // Potentially display an error to the user that the app cannot connect to auth services
                  return;
             }
             const unsubscribe = auth.onAuthStateChanged(user => {
@@ -1932,7 +2016,7 @@ Remember: You're not just an AI assistant, you're a helpful friend who happens t
                     loadUserPin(user.uid);
                     setIsPinVerifiedForSession(false); 
                     setPinUnlockError(null);
-                    initialLoadDoneRef.current = false; // Reset for loading user-specific data
+                    initialLoadDoneRef.current = false; 
                 } else {
                     setChatMessages([]);
                     setChatHistoryList([]);
@@ -1949,7 +2033,7 @@ Remember: You're not just an AI assistant, you're a helpful friend who happens t
             if (!database || !uid) return;
             try {
                 const snapshot = await database.ref(`userPins/${uid}/pin`).once('value');
-                setUserPinFromDb(snapshot.val()); // Can be null if not set
+                setUserPinFromDb(snapshot.val());
             } catch (err) {
                 console.error("Error loading user PIN:", err);
                 setChatError("Could not load PIN settings.");
@@ -1968,7 +2052,7 @@ Remember: You're not just an AI assistant, you're a helpful friend who happens t
                 setPinSettingsStatus({ message: 'PIN updated successfully!', type: 'success' });
                 setTimeout(() => {
                     setIsPinSettingsModalOpen(false);
-                    setPinSettingsStatus({ message: '', type: '' }); // Clear status after closing
+                    setPinSettingsStatus({ message: '', type: '' }); 
                 }, 1500);
             } catch (err) {
                 console.error("Error saving user PIN:", err);
@@ -1992,10 +2076,9 @@ Remember: You're not just an AI assistant, you're a helpful friend who happens t
         useEffect(() => {
           if (!database || !currentUser) {
             setChatHistoryList([]); 
-            if (!currentUser && !authLoading) initialLoadDoneRef.current = false; // Reset if logged out
+            if (!currentUser && !authLoading) initialLoadDoneRef.current = false; 
             return;
           }
-          // Only proceed if currentUser is available
           const chatsRef = database.ref(`userChats/${currentUser.uid}`).orderByChild('createdAt');
           const listener = chatsRef.on('value', (snapshot) => {
             const chats = [];
@@ -2025,7 +2108,7 @@ Remember: You're not just an AI assistant, you're a helpful friend who happens t
             setChatError("Could not load chat history.");
           });
           return () => chatsRef.off('value', listener);
-        }, [currentUser, database, handleNewChat, currentChatId]); // Added handleNewChat and currentChatId to dependencies
+        }, [currentUser, database, handleNewChat, currentChatId]); 
 
 
         const handleNewChat = useCallback(async () => {
@@ -2707,6 +2790,33 @@ Remember: You're not just an AI assistant, you're a helpful friend who happens t
             }
         };
 
+        const handleSendPasswordReset = async (email, isErrorDirect = false, directMessage = "") => {
+            if (isErrorDirect) {
+                setForgotPasswordStatus({ message: directMessage, type: 'error' });
+                return;
+            }
+            if (!auth) {
+                 setForgotPasswordStatus({ message: "Authentication service unavailable.", type: 'error' });
+                return;
+            }
+            try {
+                await auth.sendPasswordResetEmail(email);
+                setForgotPasswordStatus({ message: "Password reset email sent. Check your inbox (and spam folder).", type: 'success' });
+                // Optionally close the modal after a delay
+                // setTimeout(() => setIsForgotPasswordModalOpen(false), 3000); 
+            } catch (error) {
+                console.error("Forgot password error:", error);
+                let message = "Failed to send reset email. Please try again.";
+                if (error.code === 'auth/user-not-found') {
+                    message = "No user found with this email address.";
+                } else if (error.code === 'auth/invalid-email') {
+                    message = "The email address is not valid.";
+                }
+                setForgotPasswordStatus({ message, type: 'error' });
+            }
+        };
+
+
         if (authLoading) {
             return (
                 <div className="h-full flex items-center justify-center bg-surface-main">
@@ -2716,7 +2826,21 @@ Remember: You're not just an AI assistant, you're a helpful friend who happens t
         }
         
         if (!currentUser) {
-            return <AuthPage />;
+            return (
+                <>
+                    <AuthPage onShowForgotPassword={() => {
+                        setForgotPasswordStatus({ message: '', type: ''}); // Clear previous status
+                        setIsForgotPasswordModalOpen(true);
+                    }} />
+                    <ForgotPasswordModal
+                        isOpen={isForgotPasswordModalOpen}
+                        onClose={() => setIsForgotPasswordModalOpen(false)}
+                        onSendResetEmail={handleSendPasswordReset}
+                        statusMessage={forgotPasswordStatus.message}
+                        statusType={forgotPasswordStatus.type}
+                    />
+                </>
+            );
         }
 
 
@@ -2735,6 +2859,13 @@ Remember: You're not just an AI assistant, you're a helpful friend who happens t
                     currentPin={userPinFromDb}
                     statusMessage={pinSettingsStatus.message}
                     statusType={pinSettingsStatus.type}
+                />
+                 <ForgotPasswordModal
+                    isOpen={isForgotPasswordModalOpen} // This state would now be managed in App if needed here, or AuthPage handles its own.
+                    onClose={() => setIsForgotPasswordModalOpen(false)}
+                    onSendResetEmail={handleSendPasswordReset}
+                    statusMessage={forgotPasswordStatus.message}
+                    statusType={forgotPasswordStatus.type}
                 />
                 {currentUser && ( 
                     <Sidebar 
