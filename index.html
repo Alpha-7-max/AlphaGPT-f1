@@ -46,10 +46,10 @@
               'brand-send-hover': '#BE6241', 
             },
             fontSize: {
-                'ai-message-text': '15px', // Custom size for AI message text
+                'ai-message-text': '15px', 
             },
             fontFamily: {
-              sans: ['Inter', 'sans-serif'], // Default
+              sans: ['Inter', 'sans-serif'], 
               poppins: ['Poppins', 'sans-serif'],
               roboto: ['Roboto', 'sans-serif'],
               serif: ['Georgia', 'Cambria', '"Times New Roman"', 'Times', 'serif'],
@@ -124,7 +124,7 @@
             spacing: { 
               '1.5': '0.375rem', 
               '2.5': '0.625rem',
-              '3.5': '0.875rem', // for spinner
+              '3.5': '0.875rem', 
             },
             boxShadow: {
                 'card': '0 6px 20px rgba(var(--text-primary), 0.04), 0 3px 8px rgba(var(--text-primary),0.02)', 
@@ -132,7 +132,6 @@
                 'input-focus': '0 0 0 1px rgb(var(--focus-ring-color) / 1)', 
                 'chat-window': '0 15px 50px -8px rgba(var(--text-primary), 0.08), 0 8px 25px -8px rgba(var(--text-primary),0.05)',
                 'input-active-glow': '0 0 6px rgba(var(--text-secondary),0.15)',
-                // 'sidebar': '4px 0px 10px -3px rgba(0,0,0,0.1)', // Removed sidebar specific shadow from main component
             }
           },
         },
@@ -180,7 +179,7 @@
       }
       @layer components {
         .markdown-content { @apply font-normal font-source-sans-pro; }
-        .markdown-content p { @apply mb-3 last:mb-0 text-ai-message-text font-medium; } /* AI p: 15px, medium weight */
+        .markdown-content p { @apply mb-3 last:mb-0 text-ai-message-text font-medium; }
         .markdown-content ul, .markdown-content ol { @apply list-inside mb-3 pl-4 text-ai-message-text; } 
         .markdown-content ul { @apply list-disc; } .markdown-content ul ul { @apply list-[circle] ml-4;}
         .markdown-content ol { @apply list-decimal; } .markdown-content ol ol { @apply list-[lower-alpha] ml-4;}
@@ -270,7 +269,9 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-light.min.css">
 
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script> {/* Added Firebase Auth */}
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+
 
     <script type="importmap">
       {
@@ -305,6 +306,8 @@
 
       let firebaseApp;
       let database;
+      let auth; // Firebase Auth instance
+
       try {
         if (!firebase.apps.length) {
           firebaseApp = firebase.initializeApp(firebaseConfig);
@@ -312,6 +315,7 @@
           firebaseApp = firebase.app(); 
         }
         database = firebase.database();
+        auth = firebase.auth(); // Initialize auth
       } catch (e) {
         console.error("Firebase initialization error:", e);
       }
@@ -558,7 +562,8 @@ You MUST use Markdown for ALL your responses. This is not optional. Every explan
 
 Prioritize Markdown formatting over plain text for every single part of your answer. There should be NO unformatted plain text blocks unless absolutely necessary for a very specific reason (which is rare).
 
-Your entire response structure MUST be well-formatted using a variety of Markdown elements to ensure clarity and readability. This includes, but is not limited to:
+Your entire response structure MUST be well-formatted using a variety of Markdown elements to ensure clarity and readability. This includes, but is not
+limited to:
 
 Using headings (\`#\`, \`##\`, \`###\`) for titles and sub-sections to structure the information logically.
 
@@ -939,7 +944,7 @@ Remember: You're not just an AI assistant, you're a helpful friend who happens t
       const FileImageIcon = (props) => (<i className={`fa-solid fa-file-image ${props.className || ''}`}></i>);
 
       const GlobeIcon = (props) => (
-        <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" fill="currentColor" viewBox="0 0 16 16" {...props} className={`relative z-10 ${props.className || 'w-4 h-4'}`}> {/* Removed default text-text-secondary */}
+        <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" fill="currentColor" viewBox="0 0 16 16" {...props} className={`relative z-10 ${props.className || 'w-4 h-4'}`}>
           <path d="M0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8m7.5-6.923c-.67.204-1.335.82-1.887 1.855A8 8 0 0 0 5.145 4H7.5zM4.09 4a9.3 9.3 0 0 1 .64-1.539 7 7 0 0 1 .597-.933A7.03 7.03 0 0 0 2.255 4zm-.582 3.5c.03-.877.138-1.718.312-2.5H1.674a7 7 0 0 0-.656 2.5zM4.847 5a12.5 12.5 0 0 0-.338 2.5H7.5V5zM8.5 5v2.5h2.99a12.5 12.5 0 0 0-.337-2.5zM4.51 8.5a12.5 12.5 0 0 0 .337 2.5H7.5V8.5zm3.99 0V11h2.653c.187-.765.306-1.608.338-2.5zM5.145 12q.208.58.468 1.068c.552 1.035 1.218 1.65 1.887 1.855V12zm.182 2.472a7 7 0 0 1-.597-.933A9.3 9.3 0 0 1 4.09 12H2.255a7 7 0 0 0 3.072 2.472M3.82 11a13.7 13.7 0 0 1-.312-2.5h-2.49c.062.89.291 1.733.656 2.5zm6.853 3.472A7 7 0 0 0 13.745 12H11.91a9.3 9.3 0 0 1-.64 1.539 7 7 0 0 1-.597.933M8.5 12v2.923c.67-.204 1.335.82 1.887-1.855q.26-.487.468-1.068zm3.68-1h2.146c.365-.767.594-1.61.656-2.5h-2.49a13.7 13.7 0 0 1-.312 2.5m2.802-3.5a7 7 0 0 0-.656-2.5H12.18c.174.782.282 1.623.312 2.5zM11.27 2.461c.247.464.462.98.64 1.539h1.835a7 7 0 0 0-3.072-2.472c.218.284.418.598.597.933M10.855 4a8 8 0 0 0-.468-1.068C9.835 1.897 9.17 1.282 8.5 1.077V4z"/>
         </svg>
       );
@@ -958,7 +963,7 @@ Remember: You're not just an AI assistant, you're a helpful friend who happens t
         if (isPotentiallySearching) {
           return (
             <div className={mainIndicatorContainerClasses}>
-              <GlobeIcon className="w-4 h-4 text-text-secondary" /> {/* Added default color here */}
+              <GlobeIcon className="w-4 h-4 text-text-secondary" />
               <div className="relative overflow-hidden">
                 <span className={textClasses}>Searching web...</span>
                 {shimmerDiv}
@@ -969,7 +974,7 @@ Remember: You're not just an AI assistant, you're a helpful friend who happens t
 
         return (
           <div className={mainIndicatorContainerClasses}>
-            <div className="w-3.5 h-3.5 border-2 border-gray-300 border-t-brand-primary rounded-full animate-spin"></div> {/* Spinner size increased */}
+            <div className="w-3.5 h-3.5 border-2 border-gray-300 border-t-brand-primary rounded-full animate-spin"></div>
             <div className="relative overflow-hidden">
               <span className={textClasses}>Thinking...</span>
               {shimmerDiv}
@@ -1014,7 +1019,35 @@ Remember: You're not just an AI assistant, you're a helpful friend who happens t
         </svg>
       );
 
-      const Sidebar = ({ chatHistory, onSelectChat, currentChatId, onNewChat, isOpen, setIsOpen, onDeleteChat }) => {
+      const GoogleIcon = () => (
+        <svg className="w-5 h-5 mr-2.5" viewBox="0 0 48 48">
+          <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"></path>
+          <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"></path>
+          <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"></path>
+          <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"></path>
+          <path fill="none" d="M0 0h48v48H0z"></path>
+        </svg>
+      );
+      
+      const AuthScreen = ({ onSignIn }) => {
+        return (
+          <div className="flex flex-col items-center justify-center h-full bg-surface-main p-8 animate-fade-in-up">
+            <NewEmptyStateIconSVG className="w-24 h-24 md:w-28 md:h-28 mb-6 text-brand-send-active animate-pulse-gentle" />
+            <h1 className="text-3xl font-poppins font-semibold text-gray-800 mb-2 text-center">Welcome to AlphaGPT</h1>
+            <p className="text-text-secondary mb-10 text-center max-w-md">Your intelligent and friendly chat companion. Sign in to start your personalized experience.</p>
+            <button
+              onClick={onSignIn}
+              className="flex items-center justify-center px-6 py-3 bg-white border border-border-default rounded-lg shadow-md hover:shadow-lg transition-all duration-150 ease-in-out focus:outline-none focus:ring-2 focus:ring-brand-primary focus:ring-opacity-50 group active:animate-button-press"
+            >
+              <GoogleIcon />
+              <span className="text-base font-medium text-text-secondary group-hover:text-text-primary transition-colors">Sign in with Google</span>
+            </button>
+          </div>
+        );
+      };
+
+
+      const Sidebar = ({ chatHistory, onSelectChat, currentChatId, onNewChat, isOpen, setIsOpen, onDeleteChat, onSignOut, currentUserEmail }) => {
         const [confirmDeleteId, setConfirmDeleteId] = useState(null);
         const deletePopoverRef = useRef(null);
 
@@ -1037,16 +1070,19 @@ Remember: You're not just an AI assistant, you're a helpful friend who happens t
                 onClick={() => setIsOpen(false)}
               ></div>
             )}
-            <div className={`fixed md:static top-0 left-0 h-full w-64 bg-surface-sidebar text-text-primary p-4 flex flex-col z-40 transform ${isOpen ? 'animate-slide-in-left' : '-translate-x-full md:translate-x-0'} md:!translate-x-0 transition-transform duration-300 ease-in-out border-r border-border-light`}> {/* Added border-r */}
-              <h2 className="text-lg font-semibold mb-3 pb-2 border-b border-border-light">Chat History</h2>
+            <div className={`fixed md:static top-0 left-0 h-full w-64 bg-surface-sidebar text-text-primary p-4 flex flex-col z-40 transform ${isOpen ? 'animate-slide-in-left' : '-translate-x-full md:translate-x-0'} md:!translate-x-0 transition-transform duration-300 ease-in-out border-r border-border-light`}>
+              <div className="flex items-center justify-between mb-3 pb-2 border-b border-border-light">
+                <h2 className="text-lg font-semibold">Chat History</h2>
+                {/* Placeholder for potential logo or title if needed */}
+              </div>
               <button
                 onClick={() => { onNewChat(); setIsOpen(false); setConfirmDeleteId(null); }}
-                className="w-full bg-brand-send-active text-white py-2 px-3 rounded-md hover:bg-brand-send-hover transition-colors mb-4 text-sm font-medium flex items-center justify-center space-x-2"
+                className="w-full bg-brand-send-active text-white py-2 px-3 rounded-md hover:bg-brand-send-hover transition-colors mb-3 text-sm font-medium flex items-center justify-center space-x-2"
               >
                 <i className="fas fa-plus-circle"></i>
                 <span>New Chat</span>
               </button>
-              <ul className="flex-grow overflow-y-auto space-y-1 sidebar-chat-list">
+              <ul className="flex-grow overflow-y-auto space-y-1 sidebar-chat-list mb-3">
                 {chatHistory.map(chat => (
                   <li key={chat.id} className="relative group">
                     <button
@@ -1068,7 +1104,6 @@ Remember: You're not just an AI assistant, you're a helpful friend who happens t
                         <button
                           onClick={(e) => { 
                             e.stopPropagation();
-                            // Removed window.confirm
                             onDeleteChat(chat.id);
                             setConfirmDeleteId(null);
                           }}
@@ -1083,6 +1118,20 @@ Remember: You're not just an AI assistant, you're a helpful friend who happens t
                 ))}
                  {chatHistory.length === 0 && <li className="text-xs text-text-subtle text-center py-4">No chats yet.</li>}
               </ul>
+              <div className="mt-auto border-t border-border-light pt-3">
+                {currentUserEmail && (
+                  <p className="text-xs text-text-subtle mb-2 truncate" title={currentUserEmail}>
+                    Signed in as: <span className="font-medium">{currentUserEmail}</span>
+                  </p>
+                )}
+                <button
+                    onClick={onSignOut}
+                    className="w-full text-sm bg-gray-100 hover:bg-gray-200 text-text-secondary py-2 px-3 rounded-md transition-colors flex items-center justify-center space-x-2"
+                >
+                    <i className="fas fa-sign-out-alt"></i>
+                    <span>Sign Out</span>
+                </button>
+              </div>
             </div>
           </>
         );
@@ -1177,7 +1226,6 @@ Remember: You're not just an AI assistant, you're a helpful friend who happens t
         if (isUser) { 
           bubbleRoleClasses = 'bg-surface-user-bubble-bg text-text-primary rounded-xl rounded-br-md';
           bubbleWidthClasses = 'max-w-[80%] sm:max-w-[75%]'; 
-          // `attachedFiles` comes from Firebase, `uiOnlyAttachedFiles` is for temporary UI preview before send.
           const userFilesToDisplay = message.attachedFiles || (message.uiOnlyAttachedFiles || []);
 
           contentToShow = (
@@ -1240,10 +1288,10 @@ Remember: You're not just an AI assistant, you're a helpful friend who happens t
         isLoading, 
         onStopGeneration, 
         onRegenerateLastTextMessage, 
-        onNewChat, 
         setChatError,
         currentChatId, 
-        toggleSidebar
+        toggleSidebar,
+        currentUser // Added currentUser prop
       }) => {
         const [inputText, setInputText] = useState('');
         const [selectedFiles, setSelectedFiles] = useState([]); 
@@ -1314,8 +1362,8 @@ Remember: You're not just an AI assistant, you're a helpful friend who happens t
         
         const handleSubmit = (e) => { 
             if(e) e.preventDefault(); 
-            if (!currentChatId) {
-                setChatError("Please select or start a new chat first.");
+            if (!currentUser || !currentChatId) { // Check currentUser as well
+                setChatError("Please sign in and select or start a new chat first.");
                 return;
             }
             const currentText = contentEditableRef.current?.innerText.trim() || '';
@@ -1333,7 +1381,7 @@ Remember: You're not just an AI assistant, you're a helpful friend who happens t
                 const isLikelyDesktop = window.innerWidth > 768; 
                 if (isLikelyDesktop) { 
                     e.preventDefault();
-                    if (!isSendButtonDisabled && currentChatId) { 
+                    if (!isSendButtonDisabled && currentUser && currentChatId) { // Check currentUser
                         handleSubmit(e); 
                     }
                 }
@@ -1342,7 +1390,7 @@ Remember: You're not just an AI assistant, you're a helpful friend who happens t
 
         const isAiCurrentlyProcessing = messages.some(m => m.role === 'model' && m.isLoading && !m.isError);
         const currentInputTextFromEditable = contentEditableRef.current?.innerText?.trim() || '';
-        const isSendButtonDisabled = (!isAiCurrentlyProcessing && (isLoading || (currentInputTextFromEditable === '' && selectedFiles.length === 0)));
+        const isSendButtonDisabled = (!currentUser || !isAiCurrentlyProcessing && (isLoading || (currentInputTextFromEditable === '' && selectedFiles.length === 0))); // Check currentUser
         
         const hasVisibleChatContent = messages.some( msg => (msg.parts?.[0]?.text || msg.text || msg.attachedFiles?.length > 0 || msg.uiOnlyAttachedFiles?.length > 0) && !(msg.role === 'system' && !msg.isError && msg.id !== 'loading_chat') );
 
@@ -1371,7 +1419,7 @@ Remember: You're not just an AI assistant, you're a helpful friend who happens t
         }
 
         const handleToggleWebSearch = (newValue) => {
-            if (!(isLoading || isAiCurrentlyProcessing || !currentChatId)) {
+            if (!(isLoading || isAiCurrentlyProcessing || !currentUser || !currentChatId)) { // Check currentUser
                 setIsWebSearchEnabledState(newValue);
             }
         };
@@ -1381,7 +1429,7 @@ Remember: You're not just an AI assistant, you're a helpful friend who happens t
 
         if (isAiCurrentlyProcessing) { 
             sendOrStopButtonDynamicClasses = "bg-slate-500 hover:bg-slate-600 text-white"; 
-        } else if (isSendButtonDisabled || !currentChatId) { 
+        } else if (isSendButtonDisabled || !currentUser || !currentChatId) { // Check currentUser
             sendOrStopButtonDynamicClasses = "bg-brand-send-active opacity-60 text-white cursor-not-allowed"; 
         } else { 
             sendOrStopButtonDynamicClasses = "bg-brand-send-active hover:bg-brand-send-hover text-white focus:ring-2 focus:ring-offset-1 focus:ring-brand-send-active/50";
@@ -1394,7 +1442,11 @@ Remember: You're not just an AI assistant, you're a helpful friend who happens t
           setInputText('');
           setSelectedFiles([]);
           setIsWebSearchEnabledState(false); 
-        }, [currentChatId]);
+        }, [currentChatId, currentUser]); // Added currentUser
+
+        const placeholderText = !currentUser ? "Please sign in" : (!currentChatId ? "Select or start a new chat" : "Ask AlphaGPT...");
+        const isInputAreaDisabled = !currentUser || !currentChatId || isLoading || isAiCurrentlyProcessing;
+
 
         return (
           <div className="w-full h-full flex flex-col bg-white md:rounded-xl shadow-chat-window overflow-hidden">
@@ -1407,20 +1459,20 @@ Remember: You're not just an AI assistant, you're a helpful friend who happens t
                   <HamburgerIcon className="w-6 h-6" />
                 </button>
                 <h1 className="text-xl font-sans font-semibold text-gray-800 text-center flex-grow md:flex-grow-0">AlphaGPT</h1>
-                <div className="w-8 md:hidden"></div>
+                <div className="w-8 md:hidden"></div> {/* Spacer for mobile */}
             </header>
             
             <div ref={chatContainerRef} className="flex-grow p-4 md:p-5 space-y-4 md:space-y-5 overflow-y-auto chat-messages-container relative bg-surface-chat-area">
-                { !currentChatId && !isLoading && !hasVisibleChatContent && ( 
+                { !currentChatId && currentUser && !isLoading && !hasVisibleChatContent && ( 
                     <div className="absolute inset-0 flex flex-col items-center justify-center text-center pointer-events-none p-8 animate-fade-in-up opacity-0" style={{animationDelay: '0.2s', animationFillMode: 'forwards'}}>
                         <NewEmptyStateIconSVG className="w-20 h-20 mb-6 text-brand-send-active" />
                         <p className="text-3xl lg:text-4xl font-serif text-gray-800 leading-tight">
-                            How can I help you<br />today?
+                            How can I help you<br />today, {currentUser.displayName ? currentUser.displayName.split(' ')[0] : 'friend'}?
                         </p>
                          <p className="text-sm text-text-subtle mt-4">Start a new chat or select one from the history.</p>
                     </div> 
                 )}
-                 { currentChatId && !isLoading && messages.filter(m => m.role !== 'system' || m.isError).length === 0 && ( 
+                 { currentChatId && currentUser && !isLoading && messages.filter(m => m.role !== 'system' || m.isError).length === 0 && ( 
                     <div className="absolute inset-0 flex flex-col items-center justify-center text-center pointer-events-none p-8 animate-fade-in-up opacity-0" style={{animationDelay: '0.2s', animationFillMode: 'forwards'}}>
                         <NewEmptyStateIconSVG className="w-16 h-16 mb-4 text-brand-send-active/70" />
                         <p className="text-xl font-serif text-gray-700 leading-tight">
@@ -1442,7 +1494,7 @@ Remember: You're not just an AI assistant, you're a helpful friend who happens t
                         )}
                     </React.Fragment>
                 ))}
-                {canRegenerateLastAiAsText && (
+                {canRegenerateLastAiAsText && currentUser && ( // Check currentUser
                     <div className={`flex mt-1.5 justify-start`}>
                         <button 
                             onClick={() => { 
@@ -1463,13 +1515,13 @@ Remember: You're not just an AI assistant, you're a helpful friend who happens t
             <form onSubmit={handleSubmit} className="bg-surface-chat-area flex-shrink-0">
               <div className="p-2 md:p-3">
                 <div
-                    className="flex flex-col bg-white border border-gray-200 rounded-xl p-2.5 shadow-sm focus-within:border-gray-300 focus-within:shadow-input-active-glow transition-all duration-150"
+                    className={`flex flex-col bg-white border border-gray-200 rounded-xl p-2.5 shadow-sm focus-within:border-gray-300 focus-within:shadow-input-active-glow transition-all duration-150 ${isInputAreaDisabled ? 'opacity-70' : ''}`}
                     onClick={(e) => {
-                        if (currentChatId && contentEditableRef.current && 
+                        if (!isInputAreaDisabled && contentEditableRef.current && 
                             !contentEditableRef.current.contains(e.target) && 
                             e.target.tagName !== 'BUTTON' && 
                             !e.target.closest('button') &&
-                           !e.target.closest('[aria-label="Attach file"]') && // Prevent focus shift when clicking attach/globe
+                           !e.target.closest('[aria-label="Attach file"]') && 
                            !e.target.closest('[aria-label="Toggle Web Search"]') 
                            ) {
                            contentEditableRef.current.focus();
@@ -1513,12 +1565,12 @@ Remember: You're not just an AI assistant, you're a helpful friend who happens t
 
                   <div
                     ref={contentEditableRef}
-                    contentEditable={currentChatId && !(isLoading || isAiCurrentlyProcessing)}
+                    contentEditable={!isInputAreaDisabled}
                     onInput={handleInputFromContentEditable}
                     onPaste={handlePaste}
                     onKeyDown={handleContentEditableKeyDown}
-                    data-placeholder={currentChatId ? "Ask AlphaGPT..." : "Select or start a new chat"}
-                    className={`content-editable-input w-full flex-1 text-sm md:text-[15px] focus:outline-none resize-none overflow-y-auto relative ${!currentChatId ? 'cursor-not-allowed' : ''}`}
+                    data-placeholder={placeholderText}
+                    className={`content-editable-input w-full flex-1 text-sm md:text-[15px] focus:outline-none resize-none overflow-y-auto relative ${isInputAreaDisabled ? 'cursor-not-allowed' : ''}`}
                     style={{ maxHeight: '100px', minHeight: '40px' }}
                     suppressContentEditableWarning={true}
                   >
@@ -1526,14 +1578,14 @@ Remember: You're not just an AI assistant, you're a helpful friend who happens t
 
                   <div className="flex justify-between items-end w-full pt-2.5 mt-auto">
                     <div className="flex items-center">
-                        <input type="file" ref={fileInputRef} onChange={handleFileChange} className="hidden" multiple accept="image/*,.txt,text/plain" disabled={isLoading || isAiCurrentlyProcessing || !currentChatId} />
+                        <input type="file" ref={fileInputRef} onChange={handleFileChange} className="hidden" multiple accept="image/*,.txt,text/plain" disabled={isInputAreaDisabled} />
                         
                         <button
                           type="button"
                           onClick={() => fileInputRef.current?.click()}
                           className="w-8 h-8 flex items-center justify-center text-gray-500 hover:text-gray-700 rounded-full hover:bg-gray-200/70 border border-gray-300 transition-colors duration-150 disabled:opacity-50 flex-shrink-0 focus:outline-none"
                           aria-label="Attach file"
-                          disabled={isLoading || isAiCurrentlyProcessing || !currentChatId}
+                          disabled={isInputAreaDisabled}
                         >
                           <PlusIcon />
                         </button>
@@ -1543,15 +1595,15 @@ Remember: You're not just an AI assistant, you're a helpful friend who happens t
                           onClick={() => handleToggleWebSearch(!isWebSearchEnabledState)}
                           className={`w-8 h-8 flex items-center justify-center rounded-full border transition-colors duration-150 disabled:opacity-50 flex-shrink-0 focus:outline-none ml-1.5
                             ${isWebSearchEnabledState
-                              ? 'bg-blue-500/10 border-blue-500/30 text-blue-500 hover:bg-blue-500/20' // Active state
-                              : 'border-gray-300 text-gray-500 hover:text-gray-700 hover:bg-gray-200/70' // Inactive state
+                              ? 'bg-blue-500/10 border-blue-500/30 text-blue-500 hover:bg-blue-500/20' 
+                              : 'border-gray-300 text-gray-500 hover:text-gray-700 hover:bg-gray-200/70' 
                             }
                           `}
                           aria-label="Toggle Web Search"
                           aria-pressed={isWebSearchEnabledState}
-                          disabled={isLoading || isAiCurrentlyProcessing || !currentChatId}
+                          disabled={isInputAreaDisabled}
                         >
-                          <GlobeIcon className="w-4 h-4" /> {/* Inherits color from button's text-* class */}
+                          <GlobeIcon className="w-4 h-4" />
                         </button>
 
                     </div>
@@ -1559,7 +1611,7 @@ Remember: You're not just an AI assistant, you're a helpful friend who happens t
                     <button
                         type={isAiCurrentlyProcessing ? "button" : "submit"}
                         onClick={isAiCurrentlyProcessing ? onStopGeneration : undefined }
-                        disabled={isSendButtonDisabled || !currentChatId}
+                        disabled={isSendButtonDisabled || !currentChatId || !currentUser} // Check currentUser
                         className={`${sendOrStopButtonBaseClasses} ${sendOrStopButtonDynamicClasses}`}
                         style={{ overflow: 'hidden' }} 
                         aria-label={isAiCurrentlyProcessing ? "Stop generation" : "Send message"}
@@ -1584,6 +1636,8 @@ Remember: You're not just an AI assistant, you're a helpful friend who happens t
         const [currentChatId, setCurrentChatId] = useState(null);
         const [chatHistoryList, setChatHistoryList] = useState([]);
         const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+        const [currentUser, setCurrentUser] = useState(null);
+        const [authLoading, setAuthLoading] = useState(true);
         const initialLoadDoneRef = useRef(false);
 
 
@@ -1600,15 +1654,45 @@ Remember: You're not just an AI assistant, you're a helpful friend who happens t
                     if(lastMessage && lastMessage.id.includes('_sys_validation_err') && lastMessage.text === chatError) return prev; 
                     return [...prev, newErrorMsg]; 
                 }); 
+                 const timer = setTimeout(() => setChatError(null), 5000); // Clear error after 5s
+                 return () => clearTimeout(timer);
             }
         }, [chatError]); 
 
+
         useEffect(() => {
-          if (!database) {
-            setChatError("Firebase not initialized. Features may be limited.");
+          if (!auth) {
+            console.error("Firebase Auth module not available.");
+            setAuthLoading(false);
+            setChatError("Authentication service is not available.");
             return;
           }
-          const chatsRef = database.ref('chats').orderByChild('createdAt');
+          const unsubscribe = auth.onAuthStateChanged(user => {
+            setCurrentUser(user);
+            setAuthLoading(false);
+            if (!user) {
+              setCurrentChatId(null);
+              setChatMessages([]);
+              setChatHistoryList([]);
+              initialLoadDoneRef.current = false; 
+            } else {
+              initialLoadDoneRef.current = false; // Reset for new user login sequence
+            }
+          });
+          return () => unsubscribe();
+        }, []);
+      
+        // Load Chat History
+        useEffect(() => {
+          if (!database || !currentUser || !currentUser.uid) {
+            if (!authLoading && !currentUser) { // Explicitly clear if signed out and auth check done
+                setChatHistoryList([]);
+                setCurrentChatId(null); // Ensure no chat is selected
+            }
+            return;
+          }
+      
+          const chatsRef = database.ref(`chats/${currentUser.uid}`).orderByChild('createdAt');
           const listener = chatsRef.on('value', (snapshot) => {
             const chats = [];
             snapshot.forEach((childSnapshot) => {
@@ -1619,19 +1703,23 @@ Remember: You're not just an AI assistant, you're a helpful friend who happens t
             });
             const reversedChats = chats.reverse();
             setChatHistoryList(reversedChats);
-
-            // Logic to set initial chat or create new one if history is empty
-            if (!initialLoadDoneRef.current) {
-                if (reversedChats.length > 0) {
-                    if (!currentChatId || !reversedChats.find(chat => chat.id === currentChatId)) {
-                        setCurrentChatId(reversedChats[0].id);
-                    }
-                } else {
-                     handleNewChat().then(newId => {
-                         if(newId) setCurrentChatId(newId); // Set only if new chat creation was successful
-                     });
+      
+            if (!initialLoadDoneRef.current && currentUser && currentUser.uid) { // Ensure user is set
+              if (reversedChats.length > 0) {
+                if (!currentChatId || !reversedChats.find(chat => chat.id === currentChatId)) {
+                  setCurrentChatId(reversedChats[0].id);
                 }
-                initialLoadDoneRef.current = true;
+              } else {
+                handleNewChat(currentUser.uid).then(newId => { // Pass UID
+                  if (newId) setCurrentChatId(newId);
+                });
+              }
+              initialLoadDoneRef.current = true;
+            } else if (reversedChats.length === 0 && currentUser && currentUser.uid && !currentChatId) {
+                // If history is empty and no current chat ID, attempt to create new chat
+                 handleNewChat(currentUser.uid).then(newId => {
+                   if (newId) setCurrentChatId(newId);
+                 });
             }
 
           }, (error) => {
@@ -1639,22 +1727,53 @@ Remember: You're not just an AI assistant, you're a helpful friend who happens t
             setChatError("Could not load chat history.");
           });
           return () => chatsRef.off('value', listener);
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-        }, [database]); // Removed handleNewChat and currentChatId to avoid loops
+        }, [database, currentUser, authLoading, currentChatId]); // Added currentChatId to potentially re-evaluate if it gets reset
 
 
-        const handleNewChat = useCallback(async () => {
-            if (!database) {
-              setChatError("Firebase not initialized. Cannot create new chat.");
+        // Load Messages for Current Chat
+        useEffect(() => {
+          if (!currentChatId || !database || !currentUser || !currentUser.uid) {
+             if (!authLoading && currentUser && !currentChatId && chatHistoryList.length === 0){
+                // This case handles if the user has no chats and new chat creation might be pending
+             } else {
+                setChatMessages([]); // Clear messages if no current chat or user
+             }
+            return;
+          }
+          setChatMessages([{id: 'loading_chat_indicator', role: 'system', text: 'Loading chat...', timestamp: Date.now()}]); 
+      
+          const messagesRef = database.ref(`chats/${currentUser.uid}/${currentChatId}/messages`).orderByChild('timestamp');
+          const listener = messagesRef.on('value', (snapshot) => {
+            const messages = [];
+            snapshot.forEach((msgSnapshot) => {
+              messages.push({
+                id: msgSnapshot.key,
+                ...msgSnapshot.val()
+              });
+            });
+            setChatMessages(messages);
+          }, (error) => {
+            console.error(`Error loading messages for chat ${currentChatId}:`, error);
+            setChatMessages([{id: 'error_loading_messages', role: 'system', text: 'Error loading messages.', isError: true, timestamp: Date.now()}]);
+          });
+          return () => messagesRef.off('value', listener);
+        }, [currentChatId, database, currentUser, authLoading]);
+
+
+        const handleNewChat = useCallback(async (uidForChat) => {
+            const effectiveUid = uidForChat || (currentUser && currentUser.uid);
+            if (!database || !effectiveUid) {
+              setChatError(!database ? "Firebase not initialized." : "Please sign in to create a new chat.");
+              setIsChatLoading(false);
               return null;
             }
             setIsChatLoading(true);
             try {
-              const newChatRef = database.ref('chats').push();
+              const newChatRef = database.ref(`chats/${effectiveUid}`).push();
               const newChatId = newChatRef.key;
         
               await newChatRef.set({
-                title: "New Chat", // Set initial title to "New Chat"
+                title: "New Chat", 
                 createdAt: firebase.database.ServerValue.TIMESTAMP,
                 messages: {} 
               });
@@ -1671,37 +1790,8 @@ Remember: You're not just an AI assistant, you're a helpful friend who happens t
             } finally {
               setIsChatLoading(false);
             }
-          }, []); 
+          }, [currentUser]); 
         
-
-
-        useEffect(() => {
-          if (!currentChatId || !database) {
-            if (currentChatId !== null || (currentChatId === null && initialLoadDoneRef.current)) { 
-                setChatMessages([]);
-            }
-            return;
-          }
-          // Add a loading indicator to chatMessages specific to chat loading
-          setChatMessages([{id: 'loading_chat_indicator', role: 'system', text: 'Loading chat...', timestamp: Date.now()}]); 
-
-          const messagesRef = database.ref(`chats/${currentChatId}/messages`).orderByChild('timestamp');
-          const listener = messagesRef.on('value', (snapshot) => {
-            const messages = [];
-            snapshot.forEach((msgSnapshot) => {
-              messages.push({
-                id: msgSnapshot.key,
-                ...msgSnapshot.val()
-              });
-            });
-            setChatMessages(messages);
-          }, (error) => {
-            console.error(`Error loading messages for chat ${currentChatId}:`, error);
-            setChatMessages([{id: 'error_loading_messages', role: 'system', text: 'Error loading messages.', isError: true, timestamp: Date.now()}]);
-          });
-          return () => messagesRef.off('value', listener);
-        }, [currentChatId]);
-
 
         const getGeminiHistory = (currentMessagesFromDb) => { 
             const geminiMessages = currentMessagesFromDb
@@ -1709,12 +1799,12 @@ Remember: You're not just an AI assistant, you're a helpful friend who happens t
                 .map(msg => {
                     let partsForGemini = [];
                     if (msg.parts && Array.isArray(msg.parts)) { 
-                        partsForGemini = msg.parts;
+                        partsForGemini = msg.parts.map(p => ({text: p.text, inlineData: p.inlineData})).filter(p => p.text || p.inlineData); // Ensure only valid parts
                     } else if (msg.text) { 
                         partsForGemini = [{text: msg.text}];
                     }
                     
-                    if(msg.uiOnlyAttachedFiles && msg.uiOnlyAttachedFiles.length > 0){ // Add files prepared for Gemini from UI state
+                    if(msg.uiOnlyAttachedFiles && msg.uiOnlyAttachedFiles.length > 0){
                         msg.uiOnlyAttachedFiles.forEach(file => {
                             if (file.type.startsWith('image/') && file.apiData?.mimeType && file.apiData?.data) {
                                 partsForGemini.push({ inlineData: file.apiData });
@@ -1722,16 +1812,13 @@ Remember: You're not just an AI assistant, you're a helpful friend who happens t
                                 partsForGemini.push({ text: `\n[Content of attached file: ${file.name}]\n${file.apiData.textContent}\n[End of file: ${file.name}]\n` });
                             }
                         });
-                    } else if (msg.attachedFiles && msg.attachedFiles.length > 0 && msg.role === 'user') { // Reconstruct from DB if needed for user messages
+                    } else if (msg.attachedFiles && msg.attachedFiles.length > 0 && msg.role === 'user') {
                         msg.attachedFiles.forEach(fileMeta => {
                             if(fileMeta.type?.startsWith('image/') && fileMeta.apiData) { 
                                 partsForGemini.push({ inlineData: fileMeta.apiData });
                             }
-                             // Text file content is part of main user text, not re-added here from metadata
                         });
                     }
-
-
                     return { role: msg.role, parts: partsForGemini }; 
                 }).filter(entry => entry.parts && entry.parts.length > 0 && entry.parts.some(p => (p.text && p.text.trim()) || p.inlineData ));
 
@@ -1740,7 +1827,12 @@ Remember: You're not just an AI assistant, you're a helpful friend who happens t
                 if (firstUserIndex === -1) return []; 
                 const slicedHistory = geminiMessages.slice(firstUserIndex);
                 if (slicedHistory.length > 1 && slicedHistory[0].role === slicedHistory[1].role) {
-                    return [slicedHistory[0]];
+                     // This could happen if history starts model, model, user. We only want user, model, user, model...
+                    const secondMessageRole = slicedHistory[1].role;
+                    if(slicedHistory[0].role === 'model' && secondMessageRole === 'model') { // model, model
+                        return slicedHistory.slice(1); // take the second model onwards if it was model, model...
+                    }
+                    return [slicedHistory[0]]; // fallback
                 }
                 return slicedHistory;
             }
@@ -1785,30 +1877,23 @@ Remember: You're not just an AI assistant, you're a helpful friend who happens t
         }, []); 
         
         const handleDeleteChat = async (chatIdToDelete) => {
-            if (!database) {
-                setChatError("Firebase not initialized. Cannot delete chat.");
+            if (!database || !currentUser || !currentUser.uid) {
+                setChatError("Please sign in to delete chats.");
                 return;
             }
             if (!chatIdToDelete) return;
         
             try {
-                await database.ref(`chats/${chatIdToDelete}`).remove();
+                await database.ref(`chats/${currentUser.uid}/${chatIdToDelete}`).remove();
+                setChatHistoryList(prev => prev.filter(chat => chat.id !== chatIdToDelete)); // Optimistic UI update
+                
                 if (currentChatId === chatIdToDelete) {
-                    const remainingChats = chatHistoryList.filter(chat => chat.id !== chatIdToDelete);
+                    const remainingChats = chatHistoryList.filter(chat => chat.id !== chatIdToDelete); // Use state before optimistic update for finding next
                     if (remainingChats.length > 0) {
-                        let nextChatId = remainingChats[0].id;
-                        // Ensure the next chat ID is not the one just deleted if list update is slow
-                        if (nextChatId === chatIdToDelete && remainingChats.length > 1) {
-                            nextChatId = remainingChats[1].id;
-                        } else if (nextChatId === chatIdToDelete) { // Only one left, and it was the deleted one somehow
-                            setCurrentChatId(null);
-                            await handleNewChat();
-                            return;
-                        }
-                        setCurrentChatId(nextChatId);
+                        setCurrentChatId(remainingChats[0].id);
                     } else {
                         setCurrentChatId(null); 
-                        await handleNewChat(); 
+                        handleNewChat(currentUser.uid); // Create a new one if all are deleted
                     }
                 }
             } catch (error) {
@@ -1824,23 +1909,21 @@ Remember: You're not just an AI assistant, you're a helpful friend who happens t
             return [...(existingSources || []), ...uniqueNewSources];
         };
 
-        const saveMessageToDb = async (chatIdToSaveTo, role, text, filesForDb, aiSpecificData = {}) => {
-            if (!chatIdToSaveTo || !database) {
-              console.error("Cannot save message: No active chat ID or Firebase not ready.");
+        const saveMessageToDb = async (uid, chatIdToSaveTo, role, text, filesForDb, aiSpecificData = {}) => {
+            if (!uid || !chatIdToSaveTo || !database) {
+              console.error("Cannot save message: Missing user/chat ID or Firebase not ready.");
               return null;
             }
             const messagePartsForDb = [];
             if (text) messagePartsForDb.push({ text: text });
             
             const attachedFilesForFirebase = filesForDb.map(f => {
-                if (f.type.startsWith('image/') && f.apiData) { // For images, store the base64 data
+                if (f.type.startsWith('image/') && f.apiData) {
                     return { name: f.name, type: f.type, apiData: { mimeType: f.apiData.mimeType, data: f.apiData.data } }; 
                 } else if (f.type.startsWith('text/plain') && f.apiData?.textContent) {
-                    // Text file content is already part of main `text` for Gemini.
-                    // Store metadata for potential display.
                     return { name: f.name, type: f.type, textPreview: f.apiData.textContent.substring(0,100)+"..."};
                 }
-                return { name: f.name, type: f.type }; // Default metadata
+                return { name: f.name, type: f.type };
             });
 
             const messageData = {
@@ -1853,12 +1936,15 @@ Remember: You're not just an AI assistant, you're a helpful friend who happens t
             };
             
             try {
-              const newMessageRef = await database.ref(`chats/${chatIdToSaveTo}/messages`).push(messageData);
-              const chatSnapshot = await database.ref(`chats/${chatIdToSaveTo}/title`).once('value');
+              const messagesPath = `chats/${uid}/${chatIdToSaveTo}/messages`;
+              const titlePath = `chats/${uid}/${chatIdToSaveTo}/title`;
+
+              const newMessageRef = await database.ref(messagesPath).push(messageData);
+              const chatSnapshot = await database.ref(titlePath).once('value');
               const currentTitle = chatSnapshot.val();
-              if (role === 'user' && text && (currentTitle === "New Chat" || currentTitle.startsWith("New Chat -"))) {
+              if (role === 'user' && text && (currentTitle === "New Chat" || String(currentTitle).startsWith("New Chat -"))) { // Ensure title check is robust
                 const shortTitle = text.substring(0, 35) + (text.length > 35 ? "..." : "");
-                await database.ref(`chats/${chatIdToSaveTo}/title`).set(shortTitle);
+                await database.ref(titlePath).set(shortTitle);
               }
               return newMessageRef.key; 
             } catch (error) {
@@ -1868,27 +1954,26 @@ Remember: You're not just an AI assistant, you're a helpful friend who happens t
             }
         };
 
-        const updateMessageInDb = async (chatId, messageKey, role, text, aiSpecificData = {}) => {
-            if (!chatId || !messageKey || !database) {
+        const updateMessageInDb = async (uid, chatId, messageKey, role, text, aiSpecificData = {}) => {
+            if (!uid || !chatId || !messageKey || !database) {
               console.error("Cannot update message: Missing info or Firebase not ready.");
               setChatError("Failed to update message: Connection issue.");
               return null;
             }
-            // role is passed but not used in updates as AI message role doesn't change
             const updates = {
               parts: text ? [{ text: text }] : [{text: ""}],
-              timestamp: firebase.database.ServerValue.TIMESTAMP, // Essential for ordering and showing update
+              timestamp: firebase.database.ServerValue.TIMESTAMP,
             };
         
             if (aiSpecificData.sources !== undefined) {
-              updates['sources'] = aiSpecificData.sources; // Allows setting to null to remove if needed
+              updates['sources'] = aiSpecificData.sources;
             }
             if (aiSpecificData.searchUsed !== undefined) {
               updates['searchUsed'] = aiSpecificData.searchUsed;
             }
         
             try {
-              await database.ref(`chats/${chatId}/messages/${messageKey}`).update(updates);
+              await database.ref(`chats/${uid}/${chatId}/messages/${messageKey}`).update(updates);
               return messageKey;
             } catch (error) {
               console.error("Error updating message in Firebase:", error);
@@ -1899,13 +1984,19 @@ Remember: You're not just an AI assistant, you're a helpful friend who happens t
         
         const _streamAiResponse = async (
             originalPromptPartsForGemini, 
-            targetAiMessageUiId, // This is the Firebase key for regenerations, temp UI id for new messages
+            targetAiMessageUiId, 
             historyForGeminiInit, 
             useSearchForThisTurn,
             currentLoadingText,
+            uidForSaving, // Added UID
             chatIdForSaving,
-            isRegeneration = false // New parameter
+            isRegeneration = false
         ) => {
+            if (!uidForSaving) {
+                setChatError("User not identified for saving response.");
+                setIsChatLoading(false);
+                return;
+            }
             setIsChatLoading(true);
             streamTextBuffer.current = "";
             streamSourcesBuffer.current = []; 
@@ -1915,17 +2006,16 @@ Remember: You're not just an AI assistant, you're a helpful friend who happens t
                 return;
             }
 
-            // This initial UI update is crucial for regeneration to clear old text and show loading on the correct card.
             setChatMessages(prev => prev.map(m => m.id === targetAiMessageUiId ? { 
                 ...m, 
                 isLoading: true, 
                 isError: false, 
                 searchUsed: useSearchForThisTurn,
-                loadingText: currentLoadingText, // "Thinking..." or "Searching..."
-                text: "", // Clear previous text for regeneration
-                parts: [{text: ""}], // Clear previous parts
-                sources: null, // Clear previous sources
-                timestamp: new Date().getTime() // Update timestamp for this attempt
+                loadingText: currentLoadingText, 
+                text: "", 
+                parts: [{text: ""}], 
+                sources: null, 
+                timestamp: new Date().getTime()
             } : m));
 
 
@@ -1939,7 +2029,7 @@ Remember: You're not just an AI assistant, you're a helpful friend who happens t
                         isError: false, 
                         sources: streamSourcesBuffer.current.length > 0 ? [...streamSourcesBuffer.current] : null, 
                         searchUsed: useSearchForThisTurn,
-                        loadingText: isLoading ? (firstChunkReceived ? "" : currentLoadingText) : ""  // Clear loading text once first chunk received
+                        loadingText: isLoading ? (firstChunkReceived ? "" : currentLoadingText) : ""
                     } : m));
                 }
             };
@@ -1963,9 +2053,8 @@ Remember: You're not just an AI assistant, you're a helpful friend who happens t
 
                 for await (const chunk of result.stream) { 
                     if (isStoppingGenerationRef.current) break;
-                    if(!firstChunkReceived && chunk.text()?.trim()){ // Check if actual text content is in the chunk
+                    if(!firstChunkReceived && chunk.text()?.trim()){
                          firstChunkReceived = true;
-                         // UI update to clear "Thinking..." will happen in performUiUpdateWithText
                     }
                     
                     const rawChunkText = chunk.text();
@@ -2004,10 +2093,10 @@ Remember: You're not just an AI assistant, you're a helpful friend who happens t
                             if (part.length === 0) continue;
                             streamTextBuffer.current += part;
                             performUiUpdateWithText(); 
-                            await new Promise(resolve => setTimeout(resolve, Math.min(60, Math.max(15, part.length * 10)))); // Adjusted delay
+                            await new Promise(resolve => setTimeout(resolve, Math.min(60, Math.max(15, part.length * 10))));
                         }
                     } else if (sourcesDeltaProcessed) {
-                        if(streamTextBuffer.current || firstChunkReceived) performUiUpdateWithText(); // Update if sources changed, even with no new text
+                        if(streamTextBuffer.current || firstChunkReceived) performUiUpdateWithText();
                     }
                     
                     if (isStoppingGenerationRef.current) break;
@@ -2033,12 +2122,15 @@ Remember: You're not just an AI assistant, you're a helpful friend who happens t
 
                 if (finalText.trim() && !isStoppingGenerationRef.current) { 
                      if (isRegeneration) {
-                        await updateMessageInDb(chatIdForSaving, targetAiMessageUiId, 'model', finalText, {
+                        await updateMessageInDb(uidForSaving, chatIdForSaving, targetAiMessageUiId, 'model', finalText, {
                             sources: streamSourcesBuffer.current.length > 0 ? [...streamSourcesBuffer.current] : null,
                             searchUsed: useSearchForThisTurn
                         });
                     } else {
-                        await saveMessageToDb(chatIdForSaving, 'model', finalText, [], {
+                        // For new messages, the targetAiMessageUiId was a temp UI ID. 
+                        // The Firebase listener will handle updating the UI with the actual DB key.
+                        // We just need to save it.
+                        await saveMessageToDb(uidForSaving, chatIdForSaving, 'model', finalText, [], {
                             sources: streamSourcesBuffer.current.length > 0 ? [...streamSourcesBuffer.current] : null,
                             searchUsed: useSearchForThisTurn
                         });
@@ -2065,9 +2157,9 @@ Remember: You're not just an AI assistant, you're a helpful friend who happens t
                     loadingText: ""
                 } : m));
                  if (isRegeneration) {
-                    await updateMessageInDb(chatIdForSaving, targetAiMessageUiId, 'model', `Error: ${errorTextForUser}`, { searchUsed: useSearchForThisTurn, sources: null });
+                    await updateMessageInDb(uidForSaving, chatIdForSaving, targetAiMessageUiId, 'model', `Error: ${errorTextForUser}`, { searchUsed: useSearchForThisTurn, sources: null });
                 } else {
-                    await saveMessageToDb(chatIdForSaving, 'model', `Error: ${errorTextForUser}`, [], { searchUsed: useSearchForThisTurn });
+                    await saveMessageToDb(uidForSaving, chatIdForSaving, 'model', `Error: ${errorTextForUser}`, [], { searchUsed: useSearchForThisTurn });
                 }
             } finally {
                 setIsChatLoading(false);
@@ -2075,9 +2167,13 @@ Remember: You're not just an AI assistant, you're a helpful friend who happens t
         };
 
         const handleSendChatMessage = useCallback(async (messageText, filesToSendFromInput, userWebSearchPreference) => {
+            if (!currentUser || !currentUser.uid) {
+                setChatError("Please sign in to send messages.");
+                return;
+            }
             let activeChatId = currentChatId;
             if (!activeChatId) {
-                const newChatIdAttempt = await handleNewChat();
+                const newChatIdAttempt = await handleNewChat(currentUser.uid); // Pass UID
                 if (!newChatIdAttempt) {
                      setChatError("Please select or start a new chat first.");
                      return;
@@ -2094,53 +2190,51 @@ Remember: You're not just an AI assistant, you're a helpful friend who happens t
                 return;
             }
             
-            // User message for DB (filesForDb contains apiData for images)
-            const userMessageDbId = await saveMessageToDb(activeChatId, 'user', messageText, filesToSendFromInput);
+            const userMessageDbId = await saveMessageToDb(currentUser.uid, activeChatId, 'user', messageText, filesToSendFromInput);
             if (!userMessageDbId) {
                 setChatError("Failed to save your message. Please try again.");
                 return;
             }
             
-            // Temporary UI message (uses uiOnlyAttachedFiles which also has apiData)
-            const tempUserUiId = 'user_msg_temp_' + Date.now();
-            const tempUserMessageForUi = {
-                id: tempUserUiId,
-                role: 'user',
-                text: messageText, 
-                parts: [{text: messageText}],
-                timestamp: new Date().getTime(),
-                uiOnlyAttachedFiles: filesToSendFromInput, // Used by ChatMessageItem for rendering preview
-            };
-            // Add to UI immediately, Firebase listener will eventually replace/confirm it
-            setChatMessages(prev => [...prev.filter(m => m.id !== 'loading_chat_indicator' && m.id !== 'error_loading_messages'), tempUserMessageForUi]);
+            // UI message already handled by Firebase listener, no need for tempUserMessageForUi
+            // The Firebase listener will pick up the new message from DB.
 
-
-            const aiPlaceholderUiId = Date.now().toString() + '_model_resp_ui';
+            const aiPlaceholderUiId = Date.now().toString() + '_model_resp_ui_placeholder'; // Unique ID for placeholder
             const needsSearch = userWebSearchPreference;
             const finalLoadingText = needsSearch ? "Searching..." : "Thinking...";
             
-            // Use a snapshot of messages *before* adding the AI placeholder for Gemini history
-            const currentMessagesForHistory = [...chatMessages.filter(m => m.id !== 'loading_chat_indicator' && m.id !== 'error_loading_messages'), tempUserMessageForUi];
-            const historyForGemini = getGeminiHistory(currentMessagesForHistory); 
+            // Get history *before* adding the AI placeholder.
+            // We need to fetch the latest state of messages directly from DB or a reliable snapshot.
+            // For simplicity with Firebase listeners, we rely on the `chatMessages` state *just before* adding the placeholder.
+            // This assumes chatMessages is up-to-date due to Firebase listeners.
+            const currentMessagesForHistory = [...chatMessages.filter(m => m.id !== 'loading_chat_indicator' && m.id !== 'error_loading_messages')]; 
+            // Add the user message part that was just saved to DB, so Gemini has it.
+            // It might not be in chatMessages state yet if DB listener is slow.
+            const justSentUserMessageForHistory = {
+                 role: 'user', 
+                 text: messageText, 
+                 parts: [{text:messageText}], // Simplified, can be expanded if files are complex for history
+                 uiOnlyAttachedFiles: filesToSendFromInput // For getGeminiHistory logic
+            };
 
-            // Add AI placeholder. This placeholder will be updated during streaming by its temp ID (aiPlaceholderUiId).
-            // After saving to DB, the Firebase listener will replace this temp entry with the actual DB entry.
-            setChatMessages(prev => {
-                const filteredPrev = prev.filter(msg => msg.id !== tempUserUiId && msg.id !== 'loading_chat_indicator' && msg.id !== 'error_loading_messages'); 
-                const preliminaryAiPlaceholder = { 
-                    id: aiPlaceholderUiId, 
-                    role: 'model', 
-                    text: '', 
-                    parts: [{text:''}],
-                    loadingText: finalLoadingText, 
-                    timestamp: new Date().getTime(), 
-                    isLoading: true, 
-                    isError: false, 
-                    sources: null, 
-                    searchUsed: needsSearch, 
-                };
-                return [...filteredPrev, preliminaryAiPlaceholder];
-            });
+
+            const historyForGemini = getGeminiHistory([...currentMessagesForHistory, justSentUserMessageForHistory]); 
+
+
+            const preliminaryAiPlaceholder = { 
+                id: aiPlaceholderUiId, 
+                role: 'model', 
+                text: '', 
+                parts: [{text:''}],
+                loadingText: finalLoadingText, 
+                timestamp: new Date().getTime(), 
+                isLoading: true, 
+                isError: false, 
+                sources: null, 
+                searchUsed: needsSearch, 
+            };
+            setChatMessages(prev => [...prev.filter(m => m.id !== 'loading_chat_indicator' && m.id !== 'error_loading_messages'), preliminaryAiPlaceholder]);
+
 
             const promptPartsForGemini = [];
             if (messageText.trim()) promptPartsForGemini.push({ text: messageText.trim() });
@@ -2159,30 +2253,32 @@ Remember: You're not just an AI assistant, you're a helpful friend who happens t
             if (promptPartsForGemini.length > 0) {
                 await _streamAiResponse(
                     promptPartsForGemini, 
-                    aiPlaceholderUiId, // Temp UI ID for this new AI message
+                    aiPlaceholderUiId, 
                     historyForGemini, 
                     needsSearch, 
                     finalLoadingText,
+                    currentUser.uid, // Pass UID
                     activeChatId,
-                    false // Not a regeneration
+                    false 
                 );
             } else { 
-                 setChatMessages(prev => {
-                     const filteredPrev = prev.filter(msg => msg.id !== tempUserUiId && msg.id !== 'loading_chat_indicator' && msg.id !== 'error_loading_messages');
-                     return filteredPrev.map(m => {
-                        if (m.id === aiPlaceholderUiId) {
-                            return { ...m, role: 'model', text: "No content to send.", parts: [{text: "No content to send."}], isLoading: false, isError: true, loadingText: "" };
-                        }
-                        return m;
-                    }).filter(msg => msg.id !== aiPlaceholderUiId || msg.isError); // Remove placeholder if no content, or keep if error
-                 });
+                 setChatMessages(prev => prev.map(m => {
+                    if (m.id === aiPlaceholderUiId) {
+                        return { ...m, role: 'model', text: "No content to send.", parts: [{text: "No content to send."}], isLoading: false, isError: true, loadingText: "" };
+                    }
+                    return m;
+                }).filter(m => m.id !== aiPlaceholderUiId || m.isError ) // remove placeholder if no error
+                );
                 setIsChatLoading(false);
             }
             
-        }, [chatMessages, currentChatId, handleNewChat]); 
+        }, [chatMessages, currentChatId, currentUser, handleNewChat]); 
 
         const handleRegenerateLastTextMessage = useCallback(async (aiMessageIdToRegenerate, userWebSearchPreference) => { 
-            // aiMessageIdToRegenerate is the Firebase key (which is also the .id) of the AI message.
+            if (!currentUser || !currentUser.uid) {
+                setChatError("Please sign in to regenerate messages.");
+                return;
+            }
             if (!currentChatId) {
                 setChatError("No active chat to regenerate from.");
                 return;
@@ -2198,17 +2294,14 @@ Remember: You're not just an AI assistant, you're a helpful friend who happens t
             let userPromptMsgForRegen = null;
             let historyUpToUserPrompt = [];
             
-            // Find the AI message to regenerate and its preceding user prompt
             let aiMsgIndex = messagesForCurrentChat.findIndex(m => m.id === aiMessageIdToRegenerate && m.role === 'model');
             if (aiMsgIndex === -1) {
-                console.warn("Regen: AI message not found in current UI state. ID:", aiMessageIdToRegenerate);
                 setChatError("Cannot regenerate: Original AI message not found.");
                 return;
             }
 
             for (let i = aiMsgIndex - 1; i >= 0; i--) {
                 if (messagesForCurrentChat[i].role === 'user') {
-                    // Check if there's another user message between this one and the AI message
                     let interveningUserMessage = false;
                     for (let j = i + 1; j < aiMsgIndex; j++) {
                         if (messagesForCurrentChat[j].role === 'user') {
@@ -2218,14 +2311,13 @@ Remember: You're not just an AI assistant, you're a helpful friend who happens t
                     }
                     if (!interveningUserMessage) {
                         userPromptMsgForRegen = messagesForCurrentChat[i];
-                        historyUpToUserPrompt = getGeminiHistory(messagesForCurrentChat.slice(0, i)); // History *before* the user prompt
+                        historyUpToUserPrompt = getGeminiHistory(messagesForCurrentChat.slice(0, i));
                         break;
                     }
                 }
             }
             
             if (!userPromptMsgForRegen) {
-                console.warn("Regen: User prompt not found for AI msg. AI ID:", aiMessageIdToRegenerate);
                 setChatError("Cannot regenerate: Original user prompt not found.");
                 return;
             }
@@ -2233,8 +2325,6 @@ Remember: You're not just an AI assistant, you're a helpful friend who happens t
             const needsSearch = userWebSearchPreference;
             const finalLoadingText = needsSearch ? "Searching..." : "Thinking...";
             
-            // The initial UI update (clearing old text, setting loading) is now handled inside _streamAiResponse.
-
             const promptPartsForRegen = [];
              if(userPromptMsgForRegen.parts && Array.isArray(userPromptMsgForRegen.parts)){
                 promptPartsForRegen.push(...userPromptMsgForRegen.parts.filter(p => p.text || p.inlineData)); 
@@ -2246,7 +2336,6 @@ Remember: You're not just an AI assistant, you're a helpful friend who happens t
                     if(fileMeta.type?.startsWith('image/') && fileMeta.apiData) { 
                         promptPartsForRegen.push({ inlineData: fileMeta.apiData });
                     }
-                     // Text file content is assumed to be part of .parts or .text from the original user message saving logic
                 });
             }
 
@@ -2254,12 +2343,13 @@ Remember: You're not just an AI assistant, you're a helpful friend who happens t
             if (promptPartsForRegen.length > 0) {
                 await _streamAiResponse(
                     promptPartsForRegen, 
-                    aiMessageIdToRegenerate, // Pass the actual Firebase key (which is .id) of the AI message
+                    aiMessageIdToRegenerate, 
                     historyUpToUserPrompt, 
                     needsSearch, 
                     finalLoadingText,
+                    currentUser.uid, // Pass UID
                     currentChatId,
-                    true // Mark as regeneration
+                    true 
                 );
             } else { 
                  setChatMessages(prev => prev.map(m => {
@@ -2268,8 +2358,49 @@ Remember: You're not just an AI assistant, you're a helpful friend who happens t
                 }));
                 setIsChatLoading(false);
             }
-        }, [chatMessages, currentChatId]); 
+        }, [chatMessages, currentChatId, currentUser]); 
 
+
+        const handleSignIn = async () => {
+          if (!auth) { setChatError("Authentication service not available."); return; }
+          const provider = new firebase.auth.GoogleAuthProvider();
+          try {
+            setAuthLoading(true);
+            await auth.signInWithPopup(provider);
+            setChatError(null); 
+          } catch (error) {
+            console.error("Error signing in with Google:", error);
+            setChatError(`Sign-in failed: ${error.message}`);
+            setAuthLoading(false);
+          }
+        };
+      
+        const handleSignOut = async () => {
+          if (!auth) { setChatError("Authentication service not available."); return; }
+          try {
+            setAuthLoading(true);
+            await auth.signOut();
+            // Auth listener will handle state cleanup
+          } catch (error) {
+            console.error("Error signing out:", error);
+            setChatError(`Sign-out failed: ${error.message}`);
+            setAuthLoading(false);
+          }
+        };
+
+
+        if (authLoading) {
+          return (
+            <div className="flex items-center justify-center h-full bg-surface-main">
+              <div className="w-10 h-10 border-4 border-gray-300 border-t-brand-primary rounded-full animate-spin"></div>
+              <p className="ml-3 text-text-secondary">Loading...</p>
+            </div>
+          );
+        }
+      
+        if (!currentUser) {
+          return <AuthScreen onSignIn={handleSignIn} />;
+        }
 
         return (
             <div className="h-full text-text-primary flex font-sans bg-surface-main">
@@ -2277,22 +2408,24 @@ Remember: You're not just an AI assistant, you're a helpful friend who happens t
                     chatHistory={chatHistoryList}
                     onSelectChat={setCurrentChatId}
                     currentChatId={currentChatId}
-                    onNewChat={handleNewChat}
+                    onNewChat={() => handleNewChat(currentUser.uid)} // Pass UID
                     isOpen={isSidebarOpen}
                     setIsOpen={setIsSidebarOpen}
                     onDeleteChat={handleDeleteChat}
+                    onSignOut={handleSignOut}
+                    currentUserEmail={currentUser.email}
                 />
-                <div className="flex-grow h-full flex flex-col min-w-0"> {/* Removed shadow-sidebar */}
+                <div className="flex-grow h-full flex flex-col min-w-0">
                     <ChatInterface 
                         messages={chatMessages} 
                         onSendMessage={handleSendChatMessage} 
                         isLoading={isChatLoading} 
                         onStopGeneration={handleStopGeneration} 
                         onRegenerateLastTextMessage={handleRegenerateLastTextMessage} 
-                        onNewChat={handleNewChat} 
                         setChatError={setChatError} 
                         currentChatId={currentChatId}
                         toggleSidebar={() => setIsSidebarOpen(prev => !prev)}
+                        currentUser={currentUser} // Pass currentUser
                     />
                 </div>
             </div>
