@@ -546,7 +546,7 @@ User:Socho meri 1 khubsoort queet si wife hoti jiski saath main apni zindgai ki 
 AI (Inspired):Wah! Kya khoobsurat soch hai — ek aisi zindagi jisme har pal kisi apne ke saath jeeya jaaye.
 Chalo zara aankhein band karo aur socho…
 
-Ek shaam hai, halki thandi hawa chal rahi hai. Tum aur tumhari khubsurat, qute si wife terrace pe baithe ho.
+Ek shaam hai, halki thandi hawa chal rahi hai. Tum aur tumhari khubsoort, qute si wife terrace pe baithe ho.
 
 Uske haathon mein tumhaari pasand ki chai hai, aur tum dono ek hi mug se peete ho, muskurate hue. Tum dono ke beech mein woh silence hai jo sirf gehre pyaar mein hoti hai — jahan bolne ki zarurat nahi hoti.
 
@@ -1005,10 +1005,16 @@ Remember: You're not just an AI assistant, you're a helpful friend who happens t
 
         const handleContentEditableKeyDown = (e) => { 
             if (e.key === 'Enter' && !e.shiftKey) { 
-                e.preventDefault();
-                if (!isSendButtonDisabled) { 
-                    handleSubmit(e); 
+                const isLikelyDesktop = window.innerWidth > 768; // Threshold for desktop-like screen
+
+                if (isLikelyDesktop) { // Only submit on Enter for desktop
+                    e.preventDefault();
+                    if (!isSendButtonDisabled) { 
+                        handleSubmit(e); 
+                    }
                 }
+                // On mobile (or smaller screens), Enter key will insert a newline by default
+                // because we don't call e.preventDefault()
             }
         };
 
@@ -1129,7 +1135,7 @@ Remember: You're not just an AI assistant, you're a helpful friend who happens t
                             <button
                                 type="button"
                                 onClick={() => removeSelectedFile(file.id)}
-                                className="absolute top-0.5 right-0.5 w-5 h-5 bg-black/50 hover:bg-black/70 text-white rounded-full flex items-center justify-center transition-opacity focus:outline-none opacity-100" // Always visible, new icon
+                                className="absolute top-0.5 right-0.5 w-5 h-5 bg-black/50 hover:bg-black/70 text-white rounded-full flex items-center justify-center transition-opacity focus:outline-none opacity-100"
                                 aria-label="Remove image"
                             >
                                 <NewCloseIconSVG className="w-3 h-3"/>
@@ -1196,7 +1202,7 @@ Remember: You're not just an AI assistant, you're a helpful friend who happens t
                                     className="absolute bottom-full mb-2 left-0 w-48 bg-white rounded-lg shadow-xl border border-border-default p-2 z-20 animate-scale-in-subtle origin-bottom-left"
                                 >
                                     <div className="space-y-0.5">
-                                        {/* Font Style Selection Removed */}
+                                        {/* Font Style Selection Removed from UI */}
                                         <button
                                             onClick={handleClearChatAction}
                                             className="w-full flex items-center space-x-2 px-2.5 py-1.5 text-xs text-text-secondary hover:bg-gray-100 rounded-md transition-colors duration-150 disabled:opacity-50"
