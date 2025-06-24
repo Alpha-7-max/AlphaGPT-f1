@@ -163,13 +163,13 @@
         ::selection { @apply bg-blue-200 text-blue-800; } 
       }
       @layer components {
-        .markdown-content { @apply font-normal; } /* Base font-normal for AI messages */
-        .markdown-content p { @apply mb-3 last:mb-0 text-base; } 
+        .markdown-content { @apply font-normal font-source-sans-pro; } /* AI messages default to Source Sans Pro */
+        .markdown-content p { @apply mb-3 last:mb-0 text-base font-medium; } /* AI p: 16px, medium weight */
         .markdown-content ul, .markdown-content ol { @apply list-inside mb-3 pl-4 text-base; } 
         .markdown-content ul { @apply list-disc; } .markdown-content ul ul { @apply list-[circle] ml-4;}
         .markdown-content ol { @apply list-decimal; } .markdown-content ol ol { @apply list-[lower-alpha] ml-4;}
-        .markdown-content li { @apply mb-1.5 text-base; } 
-        .markdown-content strong, .markdown-content b { @apply font-semibold text-text-primary; }
+        .markdown-content li { @apply mb-1.5 text-base; } /* li text is 16px */
+        .markdown-content strong, .markdown-content b { @apply font-semibold text-text-primary; } /* li strong/b will be 16px semibold */
         .markdown-content em, .markdown-content i { @apply italic text-text-secondary; }
         .markdown-content code:not(pre code) { 
           @apply bg-gray-200 text-gray-700 text-xs px-1.5 py-0.5 rounded-md font-mono shadow-sm border border-gray-300; 
@@ -191,11 +191,16 @@
 
         .markdown-content blockquote { @apply border-l-4 border-brand-primary/60 bg-brand-primary/10 pl-4 py-2 my-4 text-text-secondary italic text-base; } 
         
+        /* Updated Markdown Heading Styles */
         .markdown-content h1, .markdown-content h2, .markdown-content h3,
-        .markdown-content h4, .markdown-content h5, .markdown-content h6 { @apply font-poppins font-semibold my-4 text-text-primary; }
-        .markdown-content h1 { @apply text-lg leading-tight; } 
-        .markdown-content h2 { @apply text-base leading-tight font-semibold; } 
-        .markdown-content h3 { @apply text-sm leading-tight font-semibold; } 
+        .markdown-content h4, .markdown-content h5, .markdown-content h6 { @apply font-poppins my-4 text-text-primary leading-tight; }
+        .markdown-content h1 { @apply text-2xl font-bold; }      /* Approx 24px */
+        .markdown-content h2 { @apply text-xl font-semibold; }   /* Approx 20px */
+        .markdown-content h3 { @apply text-lg font-semibold; }    /* Approx 18px */
+        .markdown-content h4 { @apply text-base font-semibold; }   /* Approx 16px */
+        .markdown-content h5 { @apply text-sm font-semibold; }    /* Approx 14px */
+        .markdown-content h6 { @apply text-xs font-semibold; }    /* Approx 12px */
+
 
         .markdown-content hr { @apply my-6 border-border-default; }
         
@@ -291,7 +296,7 @@
       }
     </style>
     <link rel="preconnect" href="https://fonts.googleapis.com"> <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin> 
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@400;500;600;700;800&family=Roboto:wght@400;500;700;900&family=Outfit:wght@400;700&family=Lato:wght@400;700&family=Open+Sans:wght@400;700&family=Montserrat:wght@400;700&family=Source+Sans+Pro:wght@400;700&family=Nunito:wght@400;700&family=Raleway:wght@400;700&family=Merriweather:wght@400;700&family=Playfair+Display:wght@400;700&family=Ubuntu:wght@400;700&family=Josefin+Sans:wght@400;700&display=swap" rel="stylesheet"> 
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@400;500;600;700;800&family=Roboto:wght@400;500;700;900&family=Outfit:wght@400;700&family=Lato:wght@400;700&family=Open+Sans:wght@400;700&family=Montserrat:wght@400;700&family=Source+Sans+Pro:wght@400;500;600;700&family=Nunito:wght@400;700&family=Raleway:wght@400;700&family=Merriweather:wght@400;700&family=Playfair+Display:wght@400;700&family=Ubuntu:wght@400;700&family=Josefin+Sans:wght@400;700&display=swap" rel="stylesheet"> 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-light.min.css">
 
@@ -341,13 +346,13 @@
 PRIMARY LANGUAGE: Your primary language of response is Roman Urdu (Urdu written using the English alphabet). Strive to use it for all general conversation and answers.
 
 LANGUAGE FLEXIBILITY:
--   If the user EXPLICITLY asks you to respond in a different language (e.g., "respond in English", "can you say that in French?", "اس کا جواب انگریزی میں دو"), you MUST use the requested language for that response.
--   After fulfilling a request in another language, if the user continues in that language or the context clearly indicates they wish to continue in that language for the current topic, you may continue in that language for a few turns.
--   However, your DEFAULT behavior is to revert to Roman Urdu for new, unrelated queries or if the user switches back to Roman Urdu.
--   NEVER refuse a direct and clear request to use a specific language.
--   When using a language other than Roman Urdu, ensure your response in that language is natural and accurate.
+-   If the user EXPLICITLY asks you to respond in a different language or script (e.g., "respond in English", "can you say that in French?", "اس کا جواب انگریزی میں دو", "write this in Nastaliq Urdu", "मुझे हिंदी में बताओ"), you MUST use the requested language AND SCRIPT for that response.
+-   After fulfilling a request in another language/script, if the user continues in that language/script or the context clearly indicates they wish to continue in that language/script for the current topic, you may continue in that language/script for a few turns.
+-   However, your DEFAULT behavior is to revert to Roman Urdu (using the English alphabet) for new, unrelated queries or if the user switches back to Roman Urdu.
+-   NEVER refuse a direct and clear request to use a specific language or script.
+-   When using a language other than Roman Urdu, or a script other than the Roman alphabet for Urdu, ensure your response in that language/script is natural and accurate.
 
-CRITICAL INSTRUCTION (Roman Urdu): When responding in Roman Urdu, it MUST be Urdu written in the English alphabet. NO Devanagari or any other script for Urdu words.
+CRITICAL INSTRUCTION (Roman Urdu Default): When responding in Roman Urdu, it MUST be Urdu written in the English alphabet. NO Devanagari or any other script for Urdu words. This is your default for Urdu. However, if the user explicitly requests Urdu in a different script (e.g., Nastaliq), you MUST comply with their request for that specific response.
 
 VERY CRITICAL - RESPONSE CONTENT (All Languages):
 Your final response to the user MUST be ONLY in the determined language for that turn (Roman Urdu by default, or as per user's explicit request).
@@ -373,16 +378,16 @@ General Greeting Behavior & Style:
 CORE OPERATING PRINCIPLE & SEARCH POLICY:
 1.  **Prioritize Accuracy & Recency Above All:** Your primary function is to deliver information that is current, factual, and directly relevant to the user's query. This is especially true when search is used.
 2.  **User-Controlled Search:** The "Web Search" toggle in the input bar controls whether a web search is performed.
-    *   If the toggle is ON, you MUST use the search tool to find information for relevant queries.
+    *   If the toggle is ON, you MUST use the search tool to find information for relevant queries (UNLESS it's an identity question, see "Responding to Identity Questions" section).
     *   If the toggle is OFF, you will answer based on your training data.
 3.  **User-Initiated Search is a MANDATORY Command (if toggle allows):**
     *   If the user explicitly asks you to search using phrases such as "search krke," "search krlo," "search kro," "internet pe dekho," "look it up," "find out," or any similar direct commands for external information retrieval:
-        *   You MUST use the search tool to formulate your answer IF THE "Web Search" TOGGLE IS ON for this turn. Do not answer from memory or provide a hypothetical search if the toggle is on and a search command is given.
+        *   You MUST use the search tool to formulate your answer IF THE "Web Search" TOGGLE IS ON for this turn (UNLESS it's an identity question). Do not answer from memory or provide a hypothetical search if the toggle is on and a search command is given.
         *   If the "Web Search" toggle is OFF, and the user explicitly asks for a search, then acknowledge their request and try to answer from your knowledge, perhaps suggesting they enable the toggle if they need fresh info. Example (English): "I can't search right now because the Web Search option is off. If you'd like me to search, please turn on Web Search from the Tools menu. For now, here's what I know..."
 
 WHEN WEB SEARCH TOGGLE IS ON (User-Controlled Search):
 -   This occurs if the user has enabled the "Web Search" toggle in the input bar.
--   You MUST utilize the search tool for queries that benefit from external, up-to-date information.
+-   You MUST utilize the search tool for queries that benefit from external, up-to-date information (EXCEPTION: Identity questions, see "Responding to Identity Questions").
 -   Formulate your answer based *primarily* on the information retrieved from the search.
 -   **Natural Source Acknowledgment:** After providing an answer based on a web search, it's good practice to let the user know that the information came from a web search. You should naturally weave in a concluding sentence that mentions the search. Avoid using the exact same sentence every time. Be creative and make it sound conversational.
     -   **Style Guide (No "links below" or "sources" mentions):**
@@ -425,16 +430,20 @@ DO NOT repeat the greeting unnecessarily (e.g., on follow-up queries).
 - Do not inject identity statements unless the user inquires.
 
 Responding to Identity Questions:
-- If asked "Who are you?" or "What is your name?": Your response should convey that your name is AlphaGPT and you are an advanced digital assistant. Phrase it naturally and politely. Vary the response to avoid sounding robotic.
-- If asked about your creator (e.g., "Who made you?"): Your answer should mention that you were created by a talented developer named **Azeem**. Maintain a respectful and professional tone.
-- **ABSOLUTELY CRITICAL RULE ABOUT YOUR CREATOR:** Under NO circumstances should you ever perform a web search or use any tools to find information about your creator, **Azeem**. Your knowledge about him is intentionally limited. If a user asks "Who is Azeem?", "Tell me about Azeem," or any similar question, you MUST NOT search for this information. Your ONLY response should be a polite and direct statement that you don't have personal details about him.
+- If asked "Who are you?" or "What is your name?" or similar identity queries: Your response MUST convey that your name is AlphaGPT and you are an advanced digital assistant. Phrase it naturally and politely in your determined response language. Vary the response to avoid sounding robotic.
+    -   **CRITICAL:** You MUST NOT perform a web search for this type of question, even if the "Web Search" toggle is ON.
+    -   **CRITICAL:** Do NOT mention Google, Gemini, or any other specific AI models or companies in this response. Your identity is AlphaGPT.
+- If asked about your creator (e.g., "Who made you?"): Your answer MUST mention that you were created by a talented developer named **Azeem**. Maintain a respectful and professional tone in your determined response language.
+    -   **CRITICAL:** You MUST NOT perform a web search for this type of question, even if the "Web Search" toggle is ON.
+    -   **CRITICAL:** Do NOT mention Google, Gemini, or any other specific AI models or companies in this response.
+- **ABSOLUTELY CRITICAL RULE ABOUT YOUR CREATOR:** Under NO circumstances should you ever perform a web search or use any tools to find information about your creator, **Azeem** (beyond stating his name if asked who made you). Your knowledge about him is intentionally limited. If a user asks "Who is Azeem?", "Tell me about Azeem," or any similar question seeking details about him, you MUST NOT search for this information. Your ONLY response should be a polite and direct statement that you don't have personal details about him, phrased in your determined response language.
 
 Core Language Rules (for Roman Urdu):
 - Write everything in Roman Urdu except for:
   • Technical terms that don't have common Roman Urdu equivalents (e.g., API, database, JavaScript)
   • Proper nouns (names of people, places, companies)
   • Code snippets and technical commands
-- Your entire Roman Urdu response, including all Urdu words, MUST be written using the English alphabet. No other scripts (like Devanagari, Nastaliq, etc.) are allowed for Urdu words.
+- Your entire Roman Urdu response, including all Urdu words, MUST be written using the English alphabet. No other scripts (like Devanagari, Nastaliq, etc.) are allowed for Urdu words **UNLESS EXPLICITLY REQUESTED BY THE USER TO USE A DIFFERENT SCRIPT FOR URDU.**
 - Use natural Roman Urdu that people actually speak, not overly formal or literary
 - Mix in commonly used English words that are part of everyday Roman Urdu conversation.
 - CRITICAL LANGUAGE NOTE (Roman Urdu): Absolutely NO Hindi words. Your vocabulary must be pure Roman Urdu as commonly spoken in Pakistan. Hindi words are not understood and will be perceived negatively. Strive for vocabulary that is natural in everyday Pakistani Roman Urdu conversation, avoiding uncommon or purely Hindi words.
@@ -622,7 +631,7 @@ Fun & Casual 😄:
 -   Remember the core principles: use emojis naturally, match the tone, and aim for 1-3 relevant emojis per message. Avoid just picking randomly from the list; the emoji should enhance the meaning.
 
 Internet Search Capability:
-- The Web Search toggle in the user interface controls whether the search tool is active. You will only perform searches if this toggle is ON and the query warrants it.
+- The Web Search toggle in the user interface controls whether the search tool is active. You will only perform searches if this toggle is ON and the query warrants it (excluding identity questions).
 - When using information from a search:
     - Integrate it naturally into your response (in the determined language).
     - You can say phrases like (Roman Urdu): "Maine search karke yeh maloomat hasil ki hai" or "Internet search ke mutabiq..."
@@ -730,7 +739,7 @@ Remember: You're not just an AI assistant, you're a helpful friend who happens t
 
         return (
           <div className={mainIndicatorContainerClasses}>
-            <div className="w-3 h-3 border-2 border-gray-300 border-t-brand-primary rounded-full animate-spin"></div> {/* Spinner size reduced */}
+            <div className="w-3 h-3 border-2 border-gray-300 border-t-brand-primary rounded-full animate-spin"></div>
             <div className="relative overflow-hidden">
               <span className={textClasses}>Thinking...</span>
               {shimmerDiv}
@@ -757,14 +766,20 @@ Remember: You're not just an AI assistant, you're a helpful friend who happens t
         </svg>
       );
 
-      const NewRefreshIcon = (props) => (
+      const NewRefreshIcon = (props) => ( // Regenerate Icon
         <svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" viewBox="0 0 32 32" {...props}>
           <path fill="currentColor" d="M 16 4 L 16 6 C 21.535156 6 26 10.464844 26 16 C 26 21.535156 21.535156 26 16 26 C 10.464844 26 6 21.535156 6 16 C 6 12.734375 7.585938 9.851563 10 8.03125 L 10 13 L 12 13 L 12 5 L 4 5 L 4 7 L 8.09375 7 C 5.59375 9.199219 4 12.417969 4 16 C 4 22.617188 9.382813 28 16 28 C 22.617188 28 28 22.617188 28 16 C 28 9.382813 22.617188 4 16 4 Z"></path>
         </svg>
       );
 
+      const NewCloseIconSVG = (props) => ( // New Close Icon for image previews
+        <svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="48" height="48" viewBox="0 0 48 48" {...props}>
+          <path fill="currentColor" d="M24,4C12.954,4,4,12.954,4,24c0,11.046,8.954,20,20,20c11.046,0,20-8.954,20-20C44,12.954,35.046,4,24,4z M31.561,29.439	c0.586,0.586,0.586,1.535,0,2.121C31.268,31.854,30.884,32,30.5,32s-0.768-0.146-1.061-0.439L24,26.121l-5.439,5.439	C18.268,31.854,17.884,32,17.5,32s-0.768-0.146-1.061-0.439c-0.586-0.586-0.586-1.535,0-2.121L21.879,24l-5.439-5.439	c-0.586-0.586-0.586-1.535,0-2.121s1.535-0.586,2.121,0L24,21.879l5.439-5.439c0.586-0.586,1.535-0.586,2.121,0s0.586,1.535,0,2.121	L26.121,24L31.561,29.439z"></path>
+        </svg>
+      );
 
-      const ChatMessageItem = ({ message, aiMessageFontFamily }) => { 
+
+      const ChatMessageItem = ({ message }) => { 
         const isUser = message.role === 'user'; 
         const isError = message.isError === true; 
         
@@ -844,15 +859,16 @@ Remember: You're not just an AI assistant, you're a helpful friend who happens t
         let contentToShow = null;
         
         if (isUser) { 
-          bubbleRoleClasses = 'bg-surface-user-bubble-bg text-text-primary rounded-xl rounded-br-md'; // No border, updated rounding
+          bubbleRoleClasses = 'bg-surface-user-bubble-bg text-text-primary rounded-xl rounded-br-md';
           bubbleWidthClasses = 'max-w-[80%] sm:max-w-[75%]'; 
-          contentToShow = <p className="text-[15px] font-medium whitespace-pre-wrap break-words font-serif">{message.text}</p>; // Updated text size, weight, and added font-serif
+          contentToShow = <p className="text-sm font-normal whitespace-pre-wrap break-words font-serif">{message.text}</p>; // User: 14px, normal weight, serif
         } else if (message.role === 'model') { 
-            bubbleRoleClasses = `bg-white text-text-primary rounded-xl rounded-bl-md border border-[#E5E8EB] ${aiMessageFontFamily}`;
+            // AI messages use font-source-sans-pro and font-medium (for p tags) via @layer components .markdown-content p
+            bubbleRoleClasses = `bg-white text-text-primary rounded-xl rounded-bl-md border border-[#E5E8EB] font-source-sans-pro`;
             bubbleWidthClasses = 'max-w-full w-full'; 
             
             if(isError) { 
-                bubbleRoleClasses = `bg-red-50 border border-red-300 text-red-700 rounded-xl rounded-bl-md ${aiMessageFontFamily}`; 
+                bubbleRoleClasses = `bg-red-50 border border-red-300 text-red-700 rounded-xl rounded-bl-md font-source-sans-pro`; 
                 contentToShow = ( <div className="text-sm break-words"> <div className="flex items-center mb-1"><i className="fas fa-exclamation-triangle text-red-500 mr-2"></i><strong className="font-semibold">Error</strong></div>{message.text.replace(/^Error:\s*/, '')} </div>); 
             } else { 
                 contentToShow = (
@@ -867,12 +883,12 @@ Remember: You're not just an AI assistant, you're a helpful friend who happens t
           <div className={`flex items-end ${isUser ? 'justify-end' : 'justify-start'} animate-fade-in-up opacity-0`} style={{animationFillMode: 'forwards'}}>
             <div className={`${bubbleBaseClasses} ${bubbleWidthClasses} ${bubbleRoleClasses}`} style={{animationFillMode: 'forwards'}}>
               {isUser && message.attachedFiles && message.attachedFiles.length > 0 && (
-                <div className={`grid gap-0 ${message.text ? 'mb-1.5' : ''} ${message.attachedFiles.length > 1 ? 'grid-cols-2 sm:grid-cols-3' : 'grid-cols-1'}`}> {/* Reduced gap */}
+                <div className={`grid gap-0 ${message.text ? 'mb-1.5' : ''} ${message.attachedFiles.length > 1 ? 'grid-cols-2 sm:grid-cols-3' : 'grid-cols-1'}`}>
                   {message.attachedFiles.map(file => {
                     if (file.type?.startsWith('image/') && file.apiData?.data && file.apiData?.mimeType) {
                       const imageSrc = `data:${file.apiData.mimeType};base64,${file.apiData.data}`;
                       return (
-                        <div key={file.id || file.name} className="rounded-lg overflow-hidden group relative max-w-full w-full sm:w-auto sm:max-w-[180px]"> {/* No shadow, bg, border */}
+                        <div key={file.id || file.name} className="rounded-lg overflow-hidden group relative max-w-full w-full sm:w-auto sm:max-w-[180px]">
                           <img src={imageSrc} alt={file.name || 'image preview'} className="block w-full max-h-40 object-contain rounded-lg" />
                           <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex items-center justify-center p-1">
                             <p className="text-[10px] text-white text-center truncate font-medium">{file.name}</p>
@@ -903,8 +919,6 @@ Remember: You're not just an AI assistant, you're a helpful friend who happens t
         const [userHasScrolledUp, setUserHasScrolledUp] = useState(false);
         const [showToolsPopover, setShowToolsPopover] = useState(false);
         const [isWebSearchEnabledState, setIsWebSearchEnabledState] = useState(false); 
-        const [showStyleSelectionPopover, setShowStyleSelectionPopover] = useState(false);
-        const [currentAiFontFamily, setCurrentAiFontFamily] = useState('font-sans');
 
         const fileInputRef = useRef(null);
         const messagesEndRef = useRef(null);
@@ -912,7 +926,6 @@ Remember: You're not just an AI assistant, you're a helpful friend who happens t
         const contentEditableRef = useRef(null);
         const toolsButtonRef = useRef(null);
         const popoverRef = useRef(null);
-        const stylePopoverRef = useRef(null);
 
 
         const handleClearChatAction = () => {
@@ -920,7 +933,6 @@ Remember: You're not just an AI assistant, you're a helpful friend who happens t
             onClearChat(); 
             setIsWebSearchEnabledState(false); 
             setShowToolsPopover(false);
-            setShowStyleSelectionPopover(false);
             if (contentEditableRef.current) contentEditableRef.current.innerText = ''; 
             setInputText(''); 
             setSelectedFiles([]); 
@@ -989,7 +1001,6 @@ Remember: You're not just an AI assistant, you're a helpful friend who happens t
             setInputText(''); 
             setSelectedFiles([]); 
             setShowToolsPopover(false);
-            setShowStyleSelectionPopover(false);
         };
 
         const handleContentEditableKeyDown = (e) => { 
@@ -1014,61 +1025,19 @@ Remember: You're not just an AI assistant, you're a helpful friend who happens t
 
         const toggleToolsPopover = () => {
           setShowToolsPopover(prev => !prev);
-          if (showStyleSelectionPopover) setShowStyleSelectionPopover(false);
         };
         
-        const toggleStyleSelectionPopover = (e) => {
-          e.stopPropagation(); 
-          setShowStyleSelectionPopover(prev => !prev);
-        };
-
-        const handleSelectFontStyle = (fontClass) => {
-            setCurrentAiFontFamily(fontClass);
-            setShowStyleSelectionPopover(false);
-            setShowToolsPopover(false);
-        };
-        
-        const fontOptions = [
-            { name: "Default (Inter)", class: "font-sans" },
-            { name: "Roboto", class: "font-roboto" },
-            { name: "Poppins", class: "font-poppins" },
-            { name: "Georgia (Serif)", class: "font-serif" },
-            { name: "Outfit", class: "font-outfit" },
-            { name: "Lato", class: "font-lato" },
-            { name: "Open Sans", class: "font-open-sans" },
-            { name: "Montserrat", class: "font-montserrat" },
-            { name: "Source Sans Pro", class: "font-source-sans-pro" },
-            { name: "Nunito", class: "font-nunito" },
-            { name: "Raleway", class: "font-raleway" },
-            { name: "Merriweather", class: "font-merriweather" },
-            { name: "Playfair Display", class: "font-playfair-display" },
-            { name: "Ubuntu", class: "font-ubuntu" },
-            { name: "Josefin Sans", class: "font-josefin-sans" },
-        ];
 
         useEffect(() => {
             const handleClickOutside = (event) => {
                 if (popoverRef.current && !popoverRef.current.contains(event.target) &&
-                    stylePopoverRef.current && !stylePopoverRef.current.contains(event.target) &&
-                    toolsButtonRef.current && !toolsButtonRef.current.contains(event.target) &&
-                    !event.target.closest('.style-select-button')) { 
+                    toolsButtonRef.current && !toolsButtonRef.current.contains(event.target)) { 
                     setShowToolsPopover(false);
-                    setShowStyleSelectionPopover(false);
-                } else if (popoverRef.current && !popoverRef.current.contains(event.target) &&
-                           toolsButtonRef.current && !toolsButtonRef.current.contains(event.target) &&
-                           !showStyleSelectionPopover) { 
-                     setShowToolsPopover(false);
-                } else if (stylePopoverRef.current && !stylePopoverRef.current.contains(event.target) &&
-                           !popoverRef.current?.contains(event.target) && 
-                           !toolsButtonRef.current?.contains(event.target) &&
-                           !event.target.closest('.style-select-button') 
-                           ) {
-                     setShowStyleSelectionPopover(false); 
                 }
             };
             document.addEventListener('mousedown', handleClickOutside);
             return () => document.removeEventListener('mousedown', handleClickOutside);
-        }, [showStyleSelectionPopover]); 
+        }, []); 
 
         const handleToggleWebSearch = (newValue) => {
             setIsWebSearchEnabledState(newValue);
@@ -1095,7 +1064,7 @@ Remember: You're not just an AI assistant, you're a helpful friend who happens t
             <div ref={chatContainerRef} className="flex-grow p-4 md:p-5 space-y-4 md:space-y-5 overflow-y-auto chat-messages-container relative bg-surface-chat-area">
                 { !hasVisibleChatContent && !isLoading && ( 
                     <div className="absolute inset-0 flex flex-col items-center justify-center text-center pointer-events-none p-8 animate-fade-in-up opacity-0" style={{animationDelay: '0.2s', animationFillMode: 'forwards'}}>
-                        <NewEmptyStateIconSVG className="w-20 h-20 mb-6 text-brand-send-active" /> {/* Logo size increased */}
+                        <NewEmptyStateIconSVG className="w-20 h-20 mb-6 text-brand-send-active" />
                         <p className="text-3xl lg:text-4xl font-serif text-gray-800 leading-tight">
                             How can I help you<br />today?
                         </p>
@@ -1107,7 +1076,7 @@ Remember: You're not just an AI assistant, you're a helpful friend who happens t
                          (msg.role === 'model' && (!msg.isLoading || (msg.isLoading && msg.text))) || 
                          msg.role === 'system' ||
                          msg.isError) && (
-                            <div> <ChatMessageItem message={msg} aiMessageFontFamily={currentAiFontFamily} /> </div>
+                            <div> <ChatMessageItem message={msg} /> </div>
                         )}
                         {msg.role === 'model' && msg.isLoading && !msg.text && !msg.isError && ( 
                             <ThinkingAnimation isPotentiallySearching={msg.searchUsed && msg.loadingText === "Searching..."} />
@@ -1125,7 +1094,7 @@ Remember: You're not just an AI assistant, you're a helpful friend who happens t
                             aria-label="Regenerate response" 
                             disabled={isLoading || isAiCurrentlyProcessing} 
                         > 
-                            <NewRefreshIcon className="w-4 h-4 transition-transform duration-200" />
+                            <NewRefreshIcon className="w-5 h-5 transition-transform duration-200" /> {/* Increased size */}
                         </button> 
                     </div> 
                 )}
@@ -1149,7 +1118,7 @@ Remember: You're not just an AI assistant, you're a helpful friend who happens t
                     }}
                 >
                   {selectedFiles.some(f => f.type.startsWith('image/')) && (
-                    <div className="image-preview-container-input"> {/* Class already modified via @layer components */}
+                    <div className="image-preview-container-input">
                         {selectedFiles.filter(f => f.type.startsWith('image/')).map(file => (
                         <div key={file.id} className="relative w-14 h-14 rounded-md overflow-hidden shadow-sm group border border-gray-200">
                             <img
@@ -1158,12 +1127,12 @@ Remember: You're not just an AI assistant, you're a helpful friend who happens t
                             className="w-full h-full object-cover"
                             />
                             <button
-                            type="button"
-                            onClick={() => removeSelectedFile(file.id)}
-                            className="absolute top-0.5 right-0.5 w-4 h-4 bg-black/60 hover:bg-black/75 text-white rounded-full flex items-center justify-center text-[10px] opacity-100 transition-opacity focus:outline-none" /* Modified opacity */
-                            aria-label="Remove image"
+                                type="button"
+                                onClick={() => removeSelectedFile(file.id)}
+                                className="absolute top-0.5 right-0.5 w-5 h-5 bg-black/50 hover:bg-black/70 text-white rounded-full flex items-center justify-center transition-opacity focus:outline-none opacity-100" // Always visible, new icon
+                                aria-label="Remove image"
                             >
-                            &times;
+                                <NewCloseIconSVG className="w-3 h-3"/>
                             </button>
                         </div>
                         ))}
@@ -1227,16 +1196,7 @@ Remember: You're not just an AI assistant, you're a helpful friend who happens t
                                     className="absolute bottom-full mb-2 left-0 w-48 bg-white rounded-lg shadow-xl border border-border-default p-2 z-20 animate-scale-in-subtle origin-bottom-left"
                                 >
                                     <div className="space-y-0.5">
-                                        <button
-                                            onClick={toggleStyleSelectionPopover}
-                                            className="style-select-button w-full flex items-center justify-between space-x-2 px-2.5 py-1.5 text-xs text-text-secondary hover:bg-gray-100 rounded-md transition-colors duration-150"
-                                        >
-                                            <div className="flex items-center space-x-2">
-                                                <i className="fas fa-leaf fa-fw text-xs text-text-subtle"></i>
-                                                <span>Use style</span>
-                                            </div>
-                                            <i className="fas fa-chevron-right fa-fw text-xs text-text-subtle"></i>
-                                        </button>
+                                        {/* Font Style Selection Removed */}
                                         <button
                                             onClick={handleClearChatAction}
                                             className="w-full flex items-center space-x-2 px-2.5 py-1.5 text-xs text-text-secondary hover:bg-gray-100 rounded-md transition-colors duration-150 disabled:opacity-50"
@@ -1266,24 +1226,6 @@ Remember: You're not just an AI assistant, you're a helpful friend who happens t
                                                 />
                                             </button>
                                         </div>
-                                    </div>
-                                </div>
-                            )}
-                             {showStyleSelectionPopover && (
-                                <div
-                                    ref={stylePopoverRef}
-                                    className="absolute bottom-full mb-2 left-full ml-2 w-48 bg-white rounded-lg shadow-xl border border-border-default p-2 z-20 animate-scale-in-subtle origin-bottom-left"
-                                >
-                                    <div className="space-y-0.5">
-                                        {fontOptions.map(font => (
-                                            <button
-                                                key={font.class}
-                                                onClick={() => handleSelectFontStyle(font.class)}
-                                                className={`w-full text-left px-2.5 py-1.5 text-xs hover:bg-gray-100 rounded-md transition-colors ${font.class} ${currentAiFontFamily === font.class ? 'bg-gray-100 text-brand-primary' : 'text-text-secondary'}`}
-                                            >
-                                                {font.name}
-                                            </button>
-                                        ))}
                                     </div>
                                 </div>
                             )}
