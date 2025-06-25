@@ -332,18 +332,13 @@
       };
       marked.setOptions({ gfm: true, breaks: true, smartypants: true, renderer });
 
-      const AVAILABLE_MODELS = [
-        { id: 'gemini-2.5-flash-preview-04-17', uiName: 'Alpha 2.5' },
-        { id: 'gemini-2.5-flash-lite-preview-06-17', uiName: 'Alpha 2.5-lite' },
-        { id: 'gemini-2.0-flash', uiName: 'Alpha 2.0' },
-      ];
-      const DEFAULT_MODEL_ID = AVAILABLE_MODELS[0].id; 
 
+      const GEMINI_MAIN_MODEL = 'gemini-2.5-flash-preview-04-17';
       const API_KEY = "AIzaSyDgEdgBX2VWf2PO4X29haQzISTDTemzuW4"; 
 
       const MAX_FILE_SIZE_MB = 5; const MAX_TOTAL_FILES_SIZE_MB = 20;
 
-      if (!API_KEY || API_KEY === "YOUR_GEMINI_API_KEY") { // Replace with your actual placeholder if different
+      if (!API_KEY || API_KEY === "YOUR_GEMINI_API_KEY") {
          console.error(" ERROR: Gemini API Key is not set or is still the placeholder.");
       }
       const genAI = new GoogleGenerativeAI(API_KEY);
@@ -1363,10 +1358,10 @@ Remember: You're not just an AI assistant, you're a helpful friend who happens t
                   )}
                   <button
                       onClick={onOpenPinSettings}
-                      className="w-full text-sm text-text-secondary bg-gray-200 py-2 px-3 rounded-md transition-colors flex items-center space-x-2 justify-start"
+                      className="w-full text-sm text-text-secondary bg-gray-200 py-2 px-3 rounded-md transition-colors flex items-center space-x-2 justify-start" // Always active style for "Change PIN"
                   >
                       <i className="fas fa-key fa-fw"></i>
-                      <span>Change PIN</span>
+                      <span>Change PIN</span> {/* Text updated */}
                   </button>
                   <button
                       onClick={onLogout}
@@ -1423,7 +1418,7 @@ Remember: You're not just an AI assistant, you're a helpful friend who happens t
                     className="ai-message-options-trigger p-1.5 rounded-full text-text-subtle hover:text-brand-primary hover:bg-interactive-hover/70 transition-all duration-150 focus:outline-none focus:ring-1 focus:ring-brand-primary/50"
                     aria-label="AI Message Options"
                 >
-                    <i className="fas fa-ellipsis-v fa-sm"></i>
+                    <i className="fas fa-ellipsis-v fa-sm"></i> {/* Increased icon size */}
                 </button>
                 {showOptions && (
                     <div ref={optionsRef} className="absolute left-0 bottom-full mb-1 w-32 bg-white border border-border-default rounded-md shadow-xl z-20 p-1 animate-scale-in-subtle origin-bottom-left">
@@ -1620,63 +1615,10 @@ Remember: You're not just an AI assistant, you're a helpful friend who happens t
                 </button>
               )}
             </div>
+            {/* AI Message Options (Regen & 3-dots) are rendered in ChatInterface directly after the AI message */}
           </div>);
       };
       
-       const ModelSelector = ({ models, selectedModelId, onSelectModel, currentUser, isLoading, isAiCurrentlyProcessing, currentChatId }) => {
-        const [isOpen, setIsOpen] = useState(false);
-        const dropdownRef = useRef(null);
-        const selectedModel = models.find(m => m.id === selectedModelId) || models[0];
-
-        useEffect(() => {
-            const handleClickOutside = (event) => {
-                if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
-                    setIsOpen(false);
-                }
-            };
-            document.addEventListener("mousedown", handleClickOutside);
-            return () => document.removeEventListener("mousedown", handleClickOutside);
-        }, []);
-
-        const isDisabled = !currentUser || isLoading || isAiCurrentlyProcessing; // Simplified disabled logic
-
-        return (
-            <div className="relative" ref={dropdownRef}>
-                <button
-                    type="button"
-                    onClick={() => setIsOpen(prev => !prev)}
-                    className={`flex items-center justify-center text-xs font-medium text-text-secondary hover:text-brand-primary bg-gray-100 hover:bg-gray-200/70 px-2.5 py-1.5 rounded-md border border-gray-300 transition-colors duration-150 focus:outline-none whitespace-nowrap ${isDisabled ? 'opacity-50 cursor-not-allowed' : ''}`}
-                    disabled={isDisabled}
-                >
-                    <span>{selectedModel.uiName}</span>
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className={`w-3.5 h-3.5 ml-1 transform transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`}>
-                        <path fillRule="evenodd" d="M5.22 8.22a.75.75 0 011.06 0L10 11.94l3.72-3.72a.75.75 0 111.06 1.06l-4.25 4.25a.75.75 0 01-1.06 0L5.22 9.28a.75.75 0 010-1.06z" clipRule="evenodd" />
-                    </svg>
-                </button>
-                {isOpen && (
-                    <div className="absolute bottom-full right-0 mb-1.5 w-40 bg-white border border-border-default rounded-md shadow-xl z-30 p-1 animate-scale-in-subtle origin-bottom-right">
-                        {models.map(model => (
-                            <button
-                                key={model.id}
-                                onClick={() => {
-                                    onSelectModel(model.id);
-                                    setIsOpen(false);
-                                }}
-                                className={`w-full text-left px-2.5 py-1.5 text-xs rounded-md truncate transition-colors ${
-                                    model.id === selectedModelId 
-                                    ? 'bg-brand-primary/20 text-brand-primary font-medium' 
-                                    : 'text-text-secondary hover:bg-interactive-hover/70'
-                                }`}
-                            >
-                                {model.uiName}
-                            </button>
-                        ))}
-                    </div>
-                )}
-            </div>
-        );
-    };
-
       const ChatInterface = ({ 
         messages, 
         onSendMessage, 
@@ -1690,9 +1632,7 @@ Remember: You're not just an AI assistant, you're a helpful friend who happens t
         currentUser,
         onDeleteAiMessagePair, 
         selectedUserMessageId, 
-        setSelectedUserMessageId,
-        selectedModelId, // New prop
-        onSelectModel // New prop
+        setSelectedUserMessageId 
       }) => {
         const [inputText, setInputText] = useState('');
         const [selectedFiles, setSelectedFiles] = useState([]); 
@@ -1778,9 +1718,10 @@ Remember: You're not just an AI assistant, you're a helpful friend who happens t
                 setChatError("Please log in and select or start a new chat first.");
                 return;
             }
-            // If currentChatId is null, onSendMessage will trigger handleNewChat if needed
-            // So we don't need to explicitly check for !currentChatId here for this specific error
-            
+            if (!currentChatId) {
+                setChatError("Please select or start a new chat first.");
+                return;
+            }
             const currentText = contentEditableRef.current?.innerText.trim() || '';
             if (!currentText && selectedFiles.length === 0) return; 
             setUserHasScrolledUp(false); 
@@ -1796,7 +1737,7 @@ Remember: You're not just an AI assistant, you're a helpful friend who happens t
                 const isLikelyDesktop = window.innerWidth > 768; 
                 if (isLikelyDesktop) { 
                     e.preventDefault();
-                    if (!isSendButtonDisabled) { // Removed currentChatId check here, let handleSubmit handle it
+                    if (!isSendButtonDisabled && currentChatId) { 
                         handleSubmit(e); 
                     }
                 }
@@ -1805,13 +1746,12 @@ Remember: You're not just an AI assistant, you're a helpful friend who happens t
 
         const isAiCurrentlyProcessing = messages.some(m => m.role === 'model' && m.isLoading && !m.isError);
         const currentInputTextFromEditable = contentEditableRef.current?.innerText?.trim() || '';
-        // Send button is enabled if user is logged in, and (there's text OR files) and AI is not processing
-        const isSendButtonActuallyDisabled = !currentUser || (!isAiCurrentlyProcessing && (isLoading || (currentInputTextFromEditable === '' && selectedFiles.length === 0)));
+        const isSendButtonDisabled = (!isAiCurrentlyProcessing && (isLoading || (currentInputTextFromEditable === '' && selectedFiles.length === 0)));
         
         const hasVisibleChatContent = messages.some( msg => (msg.parts?.[0]?.text || msg.text || msg.attachedFiles?.length > 0 || msg.uiOnlyAttachedFiles?.length > 0) && !(msg.role === 'system' && !msg.isError && msg.id !== 'loading_chat') );
 
         const handleToggleWebSearch = (newValue) => {
-            if (!(isLoading || isAiCurrentlyProcessing)) { // Removed !currentChatId check here
+            if (!(isLoading || isAiCurrentlyProcessing || !currentChatId)) {
                 setIsWebSearchEnabledState(newValue);
             }
         };
@@ -1821,7 +1761,7 @@ Remember: You're not just an AI assistant, you're a helpful friend who happens t
 
         if (isAiCurrentlyProcessing) { 
             sendOrStopButtonDynamicClasses = "bg-slate-500 hover:bg-slate-600 text-white"; 
-        } else if (isSendButtonActuallyDisabled) { 
+        } else if (isSendButtonDisabled || !currentChatId) { 
             sendOrStopButtonDynamicClasses = "bg-brand-send-active opacity-60 text-white cursor-not-allowed"; 
         } else { 
             sendOrStopButtonDynamicClasses = "bg-brand-send-active hover:bg-brand-send-hover text-white focus:ring-2 focus:ring-offset-1 focus:ring-brand-send-active/50";
@@ -1834,7 +1774,7 @@ Remember: You're not just an AI assistant, you're a helpful friend who happens t
           setInputText('');
           setSelectedFiles([]);
           setIsWebSearchEnabledState(false); 
-        }, [currentChatId]); // This reset is fine when switching chats
+        }, [currentChatId]);
 
         return (
           <div className="w-full h-full flex flex-col bg-white md:rounded-xl shadow-chat-window overflow-hidden">
@@ -1852,20 +1792,23 @@ Remember: You're not just an AI assistant, you're a helpful friend who happens t
             </header>
             
             <div ref={chatContainerRef} className="flex-grow p-4 md:p-5 space-y-3 md:space-y-4 overflow-y-auto chat-messages-container relative bg-surface-chat-area">
-                { !currentUser ? (
+                { !currentUser && (
                      <div className="absolute inset-0 flex flex-col items-center justify-center text-center pointer-events-none p-8 animate-fade-in-up opacity-0" style={{animationDelay: '0.2s', animationFillMode: 'forwards'}}>
                         <NewEmptyStateIconSVG className="w-20 h-20 mb-6 text-brand-send-active" />
                          <p className="text-3xl lg:text-4xl font-serif text-gray-800 leading-tight">Welcome to AlphaGPT</p>
                          <p className="text-sm text-text-subtle mt-4">Please log in or register to start chatting.</p>
                     </div>
-                ) : !currentChatId && !isLoading && messages.length === 0 ? ( 
+                )}
+                { currentUser && !currentChatId && !isLoading && !hasVisibleChatContent && ( 
                     <div className="absolute inset-0 flex flex-col items-center justify-center text-center pointer-events-none p-8 animate-fade-in-up opacity-0" style={{animationDelay: '0.2s', animationFillMode: 'forwards'}}>
                         <NewEmptyStateIconSVG className="w-20 h-20 mb-6 text-brand-send-active" />
                         <p className="text-3xl lg:text-4xl font-serif text-gray-800 leading-tight">
                             How can I help you<br />today?
                         </p>
+                         <p className="text-sm text-text-subtle mt-4">Start a new chat or select one from the history.</p>
                     </div> 
-                ) : currentUser && currentChatId && !isLoading && messages.filter(m => m.role !== 'system' || m.isError).length === 0 ? ( 
+                )}
+                 { currentUser && currentChatId && !isLoading && messages.filter(m => m.role !== 'system' || m.isError).length === 0 && ( 
                     <div className="absolute inset-0 flex flex-col items-center justify-center text-center pointer-events-none p-8 animate-fade-in-up opacity-0" style={{animationDelay: '0.2s', animationFillMode: 'forwards'}}>
                         <NewEmptyStateIconSVG className="w-16 h-16 mb-4 text-brand-send-active/70" />
                         <p className="text-xl font-serif text-gray-700 leading-tight">
@@ -1873,8 +1816,7 @@ Remember: You're not just an AI assistant, you're a helpful friend who happens t
                         </p>
                         <p className="text-sm text-text-subtle mt-2">Send a message to get started!</p>
                     </div> 
-                ) : null }
-
+                )}
                 {messages.map((msg, idx) => { 
                     const isThisMessageAiAndFinalized = msg.role === 'model' && !msg.isLoading && !msg.isError && (msg.parts?.[0]?.text || msg.text);
                     let canThisAiMessageBeRegenerated = false;
@@ -1918,7 +1860,7 @@ Remember: You're not just an AI assistant, you're a helpful friend who happens t
                             )}
 
                             {isThisMessageAiAndFinalized && (
-                                <div className={`flex items-center space-x-2 mt-1 ml-0 justify-start mb-2`}> 
+                                <div className={`flex items-center space-x-2 mt-1 ml-0 justify-start mb-2`}> {/* Added mb-2 for spacing */}
                                     {canThisAiMessageBeRegenerated && (
                                         <button 
                                             onClick={() => { 
@@ -1928,7 +1870,7 @@ Remember: You're not just an AI assistant, you're a helpful friend who happens t
                                             }} 
                                             className="p-1.5 rounded-full text-text-subtle hover:text-brand-primary hover:bg-interactive-hover/70 transition-all duration-150 group focus:outline-none focus:ring-1 focus:ring-brand-primary/50"
                                             aria-label="Regenerate response" 
-                                            disabled={isLoading || isAiCurrentlyProcessing} 
+                                            disabled={isLoading || isAiCurrentlyProcessing || !currentChatId} 
                                         > 
                                             <NewRefreshIcon className="w-5 h-5 transition-transform duration-200" />
                                         </button> 
@@ -1950,7 +1892,7 @@ Remember: You're not just an AI assistant, you're a helpful friend who happens t
                 <div
                     className="flex flex-col bg-white border border-gray-200 rounded-xl p-2.5 shadow-sm focus-within:border-gray-300 focus-within:shadow-input-active-glow transition-all duration-150"
                     onClick={(e) => {
-                        if (currentUser && contentEditableRef.current &&  // Allow focus even if no currentChatId yet
+                        if (currentUser && currentChatId && contentEditableRef.current && 
                             !contentEditableRef.current.contains(e.target) && 
                             e.target.tagName !== 'BUTTON' && 
                             !e.target.closest('button') &&
@@ -1998,12 +1940,12 @@ Remember: You're not just an AI assistant, you're a helpful friend who happens t
 
                   <div
                     ref={contentEditableRef}
-                    contentEditable={currentUser && !(isLoading || isAiCurrentlyProcessing)} // Enabled if logged in, regardless of currentChatId
+                    contentEditable={currentUser && currentChatId && !(isLoading || isAiCurrentlyProcessing)}
                     onInput={handleInputFromContentEditable}
                     onPaste={handlePaste}
                     onKeyDown={handleContentEditableKeyDown}
-                    data-placeholder={!currentUser ? "Please log in to chat" : "Ask AlphaGPT..."}
-                    className={`content-editable-input w-full flex-1 text-sm md:text-[15px] focus:outline-none resize-none overflow-y-auto relative ${!currentUser ? 'cursor-not-allowed' : ''}`}
+                    data-placeholder={!currentUser ? "Please log in to chat" : (currentChatId ? "Ask AlphaGPT..." : "Select or start a new chat")}
+                    className={`content-editable-input w-full flex-1 text-sm md:text-[15px] focus:outline-none resize-none overflow-y-auto relative ${(!currentUser || !currentChatId) ? 'cursor-not-allowed' : ''}`}
                     style={{ maxHeight: '100px', minHeight: '40px' }}
                     suppressContentEditableWarning={true}
                   >
@@ -2011,14 +1953,14 @@ Remember: You're not just an AI assistant, you're a helpful friend who happens t
 
                   <div className="flex justify-between items-end w-full pt-2.5 mt-auto">
                     <div className="flex items-center">
-                        <input type="file" ref={fileInputRef} onChange={handleFileChange} className="hidden" multiple accept="image/*,.txt,text/plain" disabled={!currentUser || isLoading || isAiCurrentlyProcessing} />
+                        <input type="file" ref={fileInputRef} onChange={handleFileChange} className="hidden" multiple accept="image/*,.txt,text/plain" disabled={!currentUser || isLoading || isAiCurrentlyProcessing || !currentChatId} />
                         
                         <button
                           type="button"
                           onClick={() => fileInputRef.current?.click()}
                           className="w-8 h-8 flex items-center justify-center text-gray-500 hover:text-gray-700 rounded-full hover:bg-gray-200/70 border border-gray-300 transition-colors duration-150 disabled:opacity-50 flex-shrink-0 focus:outline-none"
                           aria-label="Attach file"
-                          disabled={!currentUser || isLoading || isAiCurrentlyProcessing}
+                          disabled={!currentUser || isLoading || isAiCurrentlyProcessing || !currentChatId}
                         >
                           <PlusIcon />
                         </button>
@@ -2034,36 +1976,27 @@ Remember: You're not just an AI assistant, you're a helpful friend who happens t
                           `}
                           aria-label="Toggle Web Search"
                           aria-pressed={isWebSearchEnabledState}
-                          disabled={!currentUser || isLoading || isAiCurrentlyProcessing}
+                          disabled={!currentUser || isLoading || isAiCurrentlyProcessing || !currentChatId}
                         >
                           <GlobeIcon className="w-4 h-4" />
                         </button>
 
                     </div>
-                    <div className="flex items-end space-x-1.5"> {/* Container for model selector and send button */}
-                        <ModelSelector
-                            models={AVAILABLE_MODELS}
-                            selectedModelId={selectedModelId}
-                            onSelectModel={onSelectModel}
-                            currentUser={currentUser}
-                            isLoading={isLoading}
-                            isAiCurrentlyProcessing={isAiCurrentlyProcessing}
-                        />
-                        <button
-                            type={isAiCurrentlyProcessing ? "button" : "submit"}
-                            onClick={isAiCurrentlyProcessing ? onStopGeneration : undefined }
-                            disabled={isSendButtonActuallyDisabled}
-                            className={`${sendOrStopButtonBaseClasses} ${sendOrStopButtonDynamicClasses}`}
-                            style={{ overflow: 'hidden' }} 
-                            aria-label={isAiCurrentlyProcessing ? "Stop generation" : "Send message"}
-                        >
-                        {isAiCurrentlyProcessing ? (
-                            <i className="fas fa-stop text-sm"></i>
-                        ) : (
-                            <UpArrowSendIcon />
-                        )}
-                        </button>
-                    </div>
+
+                    <button
+                        type={isAiCurrentlyProcessing ? "button" : "submit"}
+                        onClick={isAiCurrentlyProcessing ? onStopGeneration : undefined }
+                        disabled={!currentUser || isSendButtonDisabled || !currentChatId}
+                        className={`${sendOrStopButtonBaseClasses} ${sendOrStopButtonDynamicClasses}`}
+                        style={{ overflow: 'hidden' }} 
+                        aria-label={isAiCurrentlyProcessing ? "Stop generation" : "Send message"}
+                    >
+                      {isAiCurrentlyProcessing ? (
+                        <i className="fas fa-stop text-sm"></i>
+                      ) : (
+                        <UpArrowSendIcon />
+                      )}
+                    </button>
                   </div>
                 </div>
               </div>
@@ -2188,7 +2121,7 @@ Remember: You're not just an AI assistant, you're a helpful friend who happens t
         const [chatMessages, setChatMessages] = useState([]); 
         const [isChatLoading, setIsChatLoading] = useState(false); 
         const [chatError, setChatError] = useState(null); 
-        const [currentChatId, setCurrentChatId] = useState(null); // Initialize to null
+        const [currentChatId, setCurrentChatId] = useState(null);
         const [chatHistoryList, setChatHistoryList] = useState([]);
         
         const [isSidebarActuallyOpen, setIsSidebarActuallyOpen] = useState(false);
@@ -2204,7 +2137,6 @@ Remember: You're not just an AI assistant, you're a helpful friend who happens t
         const [forgotPasswordStatus, setForgotPasswordStatus] = useState({ message: '', type: '' });
         
         const [selectedUserMessageId, setSelectedUserMessageId] = useState(null);
-        const [selectedModelId, setSelectedModelId] = useState(DEFAULT_MODEL_ID);
 
 
         const initialLoadDoneRef = useRef(false);
@@ -2226,8 +2158,6 @@ Remember: You're not just an AI assistant, you're a helpful friend who happens t
                     setIsPinVerifiedForSession(false); 
                     setPinUnlockError(null);
                     initialLoadDoneRef.current = false; 
-                    setCurrentChatId(null); // Reset current chat on user change/login for "How can I help?"
-                    setChatMessages([]); // Clear messages for the new/no chat view
                 } else {
                     setChatMessages([]);
                     setChatHistoryList([]);
@@ -2302,9 +2232,16 @@ Remember: You're not just an AI assistant, you're a helpful friend who happens t
             const reversedChats = chats.reverse();
             setChatHistoryList(reversedChats);
 
-             // Do NOT automatically select a chat on initial load or user change.
-             // currentChatId remains null until user action.
             if (!initialLoadDoneRef.current) {
+                if (reversedChats.length > 0) {
+                    if (!currentChatId || !reversedChats.find(chat => chat.id === currentChatId)) {
+                        setCurrentChatId(reversedChats[0].id);
+                    }
+                } else {
+                     handleNewChat().then(newId => {
+                         if(newId) setCurrentChatId(newId); 
+                     });
+                }
                 initialLoadDoneRef.current = true;
             }
           }, (error) => {
@@ -2312,7 +2249,7 @@ Remember: You're not just an AI assistant, you're a helpful friend who happens t
             setChatError("Could not load chat history.");
           });
           return () => chatsRef.off('value', listener);
-        }, [currentUser, database]); // Removed handleNewChat, currentChatId from deps
+        }, [currentUser, database, handleNewChat, currentChatId]); 
 
 
         const handleNewChat = useCallback(async () => {
@@ -2348,9 +2285,7 @@ Remember: You're not just an AI assistant, you're a helpful friend who happens t
 
         useEffect(() => {
           if (!currentChatId || !database || !currentUser) { 
-            // Clear messages if currentChatId is nullified (e.g., after deleting the active chat)
-            // or if user logs out while a chat was active.
-            if (!currentChatId && currentUser) { 
+            if (currentChatId !== null || (currentChatId === null && initialLoadDoneRef.current)) { 
                 setChatMessages([]);
             }
             return;
@@ -2469,9 +2404,21 @@ Remember: You're not just an AI assistant, you're a helpful friend who happens t
             try {
                 await database.ref(`userChats/${currentUser.uid}/${chatIdToDelete}`).remove();
                 if (currentChatId === chatIdToDelete) {
-                    setCurrentChatId(null); // Go to "How can I help" view
-                    setChatMessages([]); // Clear messages for the now non-existent chat
-                    // The chatHistoryList will update via its own listener
+                    const remainingChats = chatHistoryList.filter(chat => chat.id !== chatIdToDelete);
+                    if (remainingChats.length > 0) {
+                        let nextChatId = remainingChats[0].id;
+                        if (nextChatId === chatIdToDelete && remainingChats.length > 1) {
+                            nextChatId = remainingChats[1].id;
+                        } else if (nextChatId === chatIdToDelete) { 
+                            setCurrentChatId(null);
+                            await handleNewChat();
+                            return;
+                        }
+                        setCurrentChatId(nextChatId);
+                    } else {
+                        setCurrentChatId(null); 
+                        await handleNewChat(); 
+                    }
                 }
             } catch (error) {
                 console.error("Error deleting chat:", error);
@@ -2510,7 +2457,6 @@ Remember: You're not just an AI assistant, you're a helpful friend who happens t
               ...(role === 'user' && attachedFilesForFirebase.length > 0 && { attachedFiles: attachedFilesForFirebase }), 
               ...(role === 'model' && aiSpecificData.sources && { sources: aiSpecificData.sources }),
               ...(role === 'model' && aiSpecificData.searchUsed !== undefined && { searchUsed: aiSpecificData.searchUsed }),
-              ...(role === 'model' && aiSpecificData.modelUsed && { modelUsed: aiSpecificData.modelUsed }), // Save model used for AI response
             };
             
             try {
@@ -2546,9 +2492,6 @@ Remember: You're not just an AI assistant, you're a helpful friend who happens t
             if (aiSpecificData.searchUsed !== undefined) {
               updates['searchUsed'] = aiSpecificData.searchUsed;
             }
-            if (aiSpecificData.modelUsed !== undefined) { // Save model used on update
-              updates['modelUsed'] = aiSpecificData.modelUsed;
-            }
         
             try {
               await database.ref(`userChats/${currentUser.uid}/${chatId}/messages/${messageKey}`).update(updates);
@@ -2567,8 +2510,7 @@ Remember: You're not just an AI assistant, you're a helpful friend who happens t
             useSearchForThisTurn,
             currentLoadingText,
             chatIdForSaving,
-            isRegeneration = false,
-            modelToUse // Added modelToUse
+            isRegeneration = false 
         ) => {
             if (!currentUser) {
                 setChatError("Please log in to get a response.");
@@ -2593,8 +2535,7 @@ Remember: You're not just an AI assistant, you're a helpful friend who happens t
                 text: "", 
                 parts: [{text: ""}], 
                 sources: null, 
-                timestamp: new Date().getTime(),
-                modelUsed: modelToUse // Track model used for this attempt
+                timestamp: new Date().getTime() 
             } : m));
 
 
@@ -2608,15 +2549,14 @@ Remember: You're not just an AI assistant, you're a helpful friend who happens t
                         isError: false, 
                         sources: streamSourcesBuffer.current.length > 0 ? [...streamSourcesBuffer.current] : null, 
                         searchUsed: useSearchForThisTurn,
-                        loadingText: isLoading ? (firstChunkReceived ? "" : currentLoadingText) : "",
-                        modelUsed: modelToUse // Persist model used on UI
+                        loadingText: isLoading ? (firstChunkReceived ? "" : currentLoadingText) : ""  
                     } : m));
                 }
             };
 
             let firstChunkReceived = false; 
             try {
-                const modelConfig = { model: modelToUse, systemInstruction: getSystemInstruction() }; // Use modelToUse
+                const modelConfig = { model: GEMINI_MAIN_MODEL, systemInstruction: getSystemInstruction() };
                 if (useSearchForThisTurn) { 
                     modelConfig.tools = [{ googleSearch: {} }];
                 }
@@ -2704,14 +2644,12 @@ Remember: You're not just an AI assistant, you're a helpful friend who happens t
                      if (isRegeneration) {
                         await updateMessageInDb(chatIdForSaving, targetAiMessageUiId, 'model', finalText, {
                             sources: streamSourcesBuffer.current.length > 0 ? [...streamSourcesBuffer.current] : null,
-                            searchUsed: useSearchForThisTurn,
-                            modelUsed: modelToUse
+                            searchUsed: useSearchForThisTurn
                         });
                     } else {
                         const savedAiMsgId = await saveMessageToDb(chatIdForSaving, 'model', finalText, [], {
                             sources: streamSourcesBuffer.current.length > 0 ? [...streamSourcesBuffer.current] : null,
-                            searchUsed: useSearchForThisTurn,
-                            modelUsed: modelToUse
+                            searchUsed: useSearchForThisTurn
                         });
                         if (savedAiMsgId) {
                            setChatMessages(prev => prev.filter(m => m.id !== targetAiMessageUiId));
@@ -2721,14 +2659,12 @@ Remember: You're not just an AI assistant, you're a helpful friend who happens t
                      if (isRegeneration) {
                         await updateMessageInDb(chatIdForSaving, targetAiMessageUiId, 'model', finalText, { 
                             sources: streamSourcesBuffer.current.length > 0 ? [...streamSourcesBuffer.current] : null,
-                            searchUsed: useSearchForThisTurn,
-                            modelUsed: modelToUse
+                            searchUsed: useSearchForThisTurn
                          });
                     } else {
                         const savedAiMsgId = await saveMessageToDb(chatIdForSaving, 'model', finalText, [], { 
                             sources: streamSourcesBuffer.current.length > 0 ? [...streamSourcesBuffer.current] : null,
-                            searchUsed: useSearchForThisTurn,
-                            modelUsed: modelToUse
+                            searchUsed: useSearchForThisTurn
                         });
                         if (savedAiMsgId) {
                            setChatMessages(prev => prev.filter(m => m.id !== targetAiMessageUiId));
@@ -2753,13 +2689,12 @@ Remember: You're not just an AI assistant, you're a helpful friend who happens t
                     isLoading: false, 
                     isError: true, 
                     searchUsed: useSearchForThisTurn,
-                    loadingText: "",
-                    modelUsed: modelToUse
+                    loadingText: ""
                 } : m));
                  if (isRegeneration) {
-                    await updateMessageInDb(chatIdForSaving, targetAiMessageUiId, 'model', `Error: ${errorTextForUser}`, { searchUsed: useSearchForThisTurn, sources: null, modelUsed: modelToUse });
+                    await updateMessageInDb(chatIdForSaving, targetAiMessageUiId, 'model', `Error: ${errorTextForUser}`, { searchUsed: useSearchForThisTurn, sources: null });
                 } else {
-                    const savedErrorMsgId = await saveMessageToDb(chatIdForSaving, 'model', `Error: ${errorTextForUser}`, [], { searchUsed: useSearchForThisTurn, modelUsed: modelToUse });
+                    const savedErrorMsgId = await saveMessageToDb(chatIdForSaving, 'model', `Error: ${errorTextForUser}`, [], { searchUsed: useSearchForThisTurn });
                      if (savedErrorMsgId) {
                         setChatMessages(prev => prev.filter(m => m.id !== targetAiMessageUiId));
                      }
@@ -2775,11 +2710,10 @@ Remember: You're not just an AI assistant, you're a helpful friend who happens t
                 return;
             }
             let activeChatId = currentChatId;
-            // If currentChatId is null (e.g. "How can I help you" screen), create a new chat first.
             if (!activeChatId) {
                 const newChatIdAttempt = await handleNewChat();
                 if (!newChatIdAttempt) {
-                     setChatError("Could not start a new chat. Please try again.");
+                     setChatError("Please select or start a new chat first.");
                      return;
                 }
                 activeChatId = newChatIdAttempt;
@@ -2814,8 +2748,7 @@ Remember: You're not just an AI assistant, you're a helpful friend who happens t
                 isLoading: true, 
                 isError: false, 
                 sources: null, 
-                searchUsed: needsSearch,
-                modelUsed: selectedModelId // Store which model will be used for this response
+                searchUsed: needsSearch, 
             };
 
             setChatMessages(prev => {
@@ -2852,8 +2785,7 @@ Remember: You're not just an AI assistant, you're a helpful friend who happens t
                     needsSearch, 
                     finalLoadingText,
                     activeChatId,
-                    false,
-                    selectedModelId // Pass the currently selected model
+                    false 
                 );
             } else { 
                  setChatMessages(prev => {
@@ -2867,7 +2799,7 @@ Remember: You're not just an AI assistant, you're a helpful friend who happens t
                 setIsChatLoading(false);
             }
             
-        }, [chatMessages, currentChatId, handleNewChat, currentUser, selectedModelId]); // Added selectedModelId
+        }, [chatMessages, currentChatId, handleNewChat, currentUser]); 
 
 
         const handleRegenerateLastTextMessage = useCallback(async (aiMessageIdToRegenerate, userWebSearchPreference) => { 
@@ -2896,7 +2828,6 @@ Remember: You're not just an AI assistant, you're a helpful friend who happens t
                 setChatError("Cannot regenerate: Original AI message not found.");
                 return;
             }
-            const modelUsedForOriginalResponse = messagesForCurrentChat[aiMsgIndex].modelUsed || selectedModelId; // Use original model or current if not found
 
             for (let i = aiMsgIndex - 1; i >= 0; i--) {
                 if (messagesForCurrentChat[i].role === 'user') {
@@ -2949,8 +2880,7 @@ Remember: You're not just an AI assistant, you're a helpful friend who happens t
                     needsSearch, 
                     finalLoadingText,
                     currentChatId,
-                    true,
-                    modelUsedForOriginalResponse // Use the model that generated the original response
+                    true 
                 );
             } else { 
                  setChatMessages(prev => prev.map(m => {
@@ -2959,7 +2889,7 @@ Remember: You're not just an AI assistant, you're a helpful friend who happens t
                 }));
                 setIsChatLoading(false);
             }
-        }, [chatMessages, currentChatId, currentUser, selectedModelId]); // Added selectedModelId
+        }, [chatMessages, currentChatId, currentUser]); 
 
         const handleRequestToggleSidebar = () => {
             if (!currentUser) return;
@@ -3031,7 +2961,7 @@ Remember: You're not just an AI assistant, you're a helpful friend who happens t
                 return;
             }
     
-            const currentMessages = [...chatMessages]; 
+            const currentMessages = [...chatMessages]; // Use a copy of the state
             const aiMessageIndex = currentMessages.findIndex(msg => msg.id === aiMessageId);
     
             if (aiMessageIndex === -1) {
@@ -3041,13 +2971,15 @@ Remember: You're not just an AI assistant, you're a helpful friend who happens t
     
             const messagesToDelete = { [aiMessageId]: null }; 
     
+            // Find the immediately preceding user message that is not a system message
             if (aiMessageIndex > 0) {
                 let precedingUserMessage = null;
                 for (let i = aiMessageIndex - 1; i >= 0; i--) {
-                    if (currentMessages[i].role === 'model') { 
+                    if (currentMessages[i].role === 'model') { // If we hit another model message, stop (shouldn't happen if logic is correct)
                         break; 
                     }
                     if (currentMessages[i].role === 'user') {
+                        // Check if there are any other user messages between this one and the AI message
                         let interveningUserMessage = false;
                         for (let k = i + 1; k < aiMessageIndex; k++) {
                             if (currentMessages[k].role === 'user') {
@@ -3058,7 +2990,7 @@ Remember: You're not just an AI assistant, you're a helpful friend who happens t
                         if (!interveningUserMessage) {
                            precedingUserMessage = currentMessages[i];
                         }
-                        break; 
+                        break; // Found the closest user message (or determined there isn't one relevant)
                     }
                 }
                 if (precedingUserMessage) {
@@ -3068,6 +3000,7 @@ Remember: You're not just an AI assistant, you're a helpful friend who happens t
     
             try {
                 await database.ref(`userChats/${currentUser.uid}/${currentChatId}/messages`).update(messagesToDelete);
+                // UI will update via Firebase listener, which now gets the filtered chatMessages
             } catch (error) {
                 console.error("Error deleting message pair:", error);
                 setChatError("Failed to delete messages.");
@@ -3165,8 +3098,6 @@ Remember: You're not just an AI assistant, you're a helpful friend who happens t
                         onDeleteAiMessagePair={handleDeleteAiMessagePair}
                         selectedUserMessageId={selectedUserMessageId}
                         setSelectedUserMessageId={setSelectedUserMessageId}
-                        selectedModelId={selectedModelId} // Pass down
-                        onSelectModel={setSelectedModelId} // Pass down
                     />
                 </div>
             </div>
