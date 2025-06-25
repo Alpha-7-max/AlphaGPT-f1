@@ -21,7 +21,7 @@
               'surface-chat-area': 'rgb(var(--surface-chat-area) / <alpha-value>)', 
               'surface-user-bubble-bg': 'rgb(var(--surface-user-bubble-bg-val) / <alpha-value>)', 
               'border-user-bubble-color': 'rgb(var(--border-user-bubble-color-val) / <alpha-value>)',
-              'surface-sidebar': 'rgb(var(--surface-sidebar) / <alpha-value>)',
+              // 'surface-sidebar': 'rgb(var(--surface-sidebar) / <alpha-value>)', // Sidebar removed
 
               'text-primary': 'rgb(var(--text-primary) / <alpha-value>)',         
               'text-secondary': 'rgb(var(--text-secondary) / <alpha-value>)',           
@@ -81,8 +81,8 @@
               'modal-fade-out': 'modal-fade-out 0.3s ease-in forwards',
               'shimmer': 'shimmer 1.5s ease-in-out infinite', 
               'spin-continuous': 'spinContinuous 2s linear infinite',
-              'slide-in-left': 'slideInLeft 0.3s ease-out forwards',
-              'slide-out-left': 'slideOutLeft 0.3s ease-in forwards',
+              // 'slide-in-left': 'slideInLeft 0.3s ease-out forwards', // Sidebar removed
+              // 'slide-out-left': 'slideOutLeft 0.3s ease-in forwards', // Sidebar removed
             },
             keyframes: {
               fadeInUp: { '0%': { opacity: '0', transform: 'translateY(10px)' }, '100%': { opacity: '1', transform: 'translateY(0)' }, },
@@ -112,14 +112,14 @@
                 '0%': { transform: 'rotate(0deg)' },
                 '100%': { transform: 'rotate(360deg)' }
               },
-              slideInLeft: {
-                '0%': { transform: 'translateX(-100%)', opacity: '0.5' },
-                '100%': { transform: 'translateX(0)', opacity: '1' },
-              },
-              slideOutLeft: {
-                '0%': { transform: 'translateX(0)', opacity: '1' },
-                '100%': { transform: 'translateX(-100%)', opacity: '0' },
-              },
+              // slideInLeft: { // Sidebar removed
+              //   '0%': { transform: 'translateX(-100%)', opacity: '0.5' },
+              //   '100%': { transform: 'translateX(0)', opacity: '1' },
+              // },
+              // slideOutLeft: { // Sidebar removed
+              //   '0%': { transform: 'translateX(0)', opacity: '1' },
+              //   '100%': { transform: 'translateX(-100%)', opacity: '0' },
+              // },
             },
             spacing: { 
               '1.5': '0.375rem', 
@@ -155,7 +155,7 @@
           --surface-input: 255 255 255;
           --surface-accent: 241 245 249; 
           --surface-bubble-ai: 255 255 255;
-          --surface-sidebar: 255 255 255; 
+          /* --surface-sidebar: 255 255 255;  */ /* Sidebar removed */
           
           --surface-user-bubble-bg-val: 232 232 232; 
           
@@ -260,10 +260,10 @@
         .image-preview-container-input::-webkit-scrollbar-track { @apply bg-slate-100 rounded-full; }
         .image-preview-container-input::-webkit-scrollbar-thumb { @apply bg-slate-300 rounded-full hover:bg-slate-400; }
 
-        .sidebar-chat-list::-webkit-scrollbar { @apply w-1; }
-        .sidebar-chat-list::-webkit-scrollbar-track { @apply bg-gray-100; }
-        .sidebar-chat-list::-webkit-scrollbar-thumb { @apply bg-gray-300 hover:bg-gray-400 rounded-full; }
-        .sidebar-chat-list { scrollbar-width: thin; scrollbar-color: theme('colors.gray.300') theme('colors.gray.100'); }
+        /* .sidebar-chat-list::-webkit-scrollbar { @apply w-1; } Sidebar removed */
+        /* .sidebar-chat-list::-webkit-scrollbar-track { @apply bg-gray-100; } */
+        /* .sidebar-chat-list::-webkit-scrollbar-thumb { @apply bg-gray-300 hover:bg-gray-400 rounded-full; } */
+        /* .sidebar-chat-list { scrollbar-width: thin; scrollbar-color: theme('colors.gray.300') theme('colors.gray.100'); } */
       }
     </style>
     <link rel="preconnect" href="https://fonts.googleapis.com"> <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin> 
@@ -271,10 +271,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-light.min.css">
 
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
-
+    <!-- Firebase SDKs removed -->
 
     <script type="importmap">
       {
@@ -298,30 +295,7 @@
       import { marked } from 'marked';
       import hljs from 'highlight.js';
 
-      const firebaseConfig = {
-        apiKey: "AIzaSyBVprrC-St6CQbTGnBpEsLzqPiFB5PuyHQ",
-        authDomain: "fx-todo-69aa3.firebaseapp.com",
-        projectId: "fx-todo-69aa3",
-        storageBucket: "fx-todo-69aa3.firebasestorage.app",
-        messagingSenderId: "924128604086",
-        appId: "1:924128604086:web:9606a2a0faa198688fdb17"
-      };
-
-      let firebaseApp;
-      let auth;
-      let database;
-      try {
-        if (!firebase.apps.length) {
-          firebaseApp = firebase.initializeApp(firebaseConfig);
-        } else {
-          firebaseApp = firebase.app(); 
-        }
-        auth = firebase.auth();
-        database = firebase.database();
-      } catch (e) {
-        console.error("Firebase initialization error:", e);
-      }
-
+      // Firebase Config and Initialization Removed
 
       const renderer = new marked.Renderer();
       renderer.link = (href, title, text) => {
@@ -332,13 +306,18 @@
       };
       marked.setOptions({ gfm: true, breaks: true, smartypants: true, renderer });
 
+      const AVAILABLE_MODELS = [
+        { id: 'gemini-2.5-flash-preview-04-17', uiName: 'Alpha 2.5' },
+        { id: 'gemini-2.5-flash-lite-preview-06-17', uiName: 'Alpha 2.5-lite' },
+        { id: 'gemini-2.0-flash', uiName: 'Alpha 2.0' },
+      ];
+      const DEFAULT_MODEL_ID = AVAILABLE_MODELS[0].id; 
 
-      const GEMINI_MAIN_MODEL = 'gemini-2.5-flash-preview-04-17';
       const API_KEY = "AIzaSyDgEdgBX2VWf2PO4X29haQzISTDTemzuW4"; 
 
       const MAX_FILE_SIZE_MB = 5; const MAX_TOTAL_FILES_SIZE_MB = 20;
 
-      if (!API_KEY || API_KEY === "YOUR_GEMINI_API_KEY") {
+      if (!API_KEY || API_KEY === "YOUR_GEMINI_API_KEY") { 
          console.error(" ERROR: Gemini API Key is not set or is still the placeholder.");
       }
       const genAI = new GoogleGenerativeAI(API_KEY);
@@ -1005,7 +984,7 @@ Remember: You're not just an AI assistant, you're a helpful friend who happens t
 
       const UpArrowSendIcon = () => (
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4 text-white">
-            <path fillRule="evenodd" d="M12 20.25a.75.75 0 01-.75-.75V6.31l-5.47 5.47a.75.75 0 01-1.06-1.06l6.75-6.75a.75.75 0 011.06 0l6.75 6.75a.75.75 0 11-1.06 1.06l-5.47-5.47V19.5a.75.75 0 01-.75-.75z" clipRule="evenodd" />
+            <path fillRule="evenodd" d="M12 20.25a.75.75 0 01-.75-.75V6.31l-5.47 5.47a.75.75 0 01-1.06-1.06l6.75-6.75a.75.75 0 011.06 0l6.75 6.75a.75.75 0 11-1.06 1.06l-5.47-5.47V19.5a.75.75 0 01-.75.75z" clipRule="evenodd" />
         </svg>
       );
 
@@ -1027,354 +1006,12 @@ Remember: You're not just an AI assistant, you're a helpful friend who happens t
         </svg>
       );
 
+      // HamburgerIcon removed as sidebar is removed
 
-      const HamburgerIcon = (props) => (
-        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" {...props}>
-          <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
-        </svg>
-      );
-
-      const PinUnlockModal = ({ isOpen, onClose, onSubmitPin, pinError }) => {
-        const [currentPin, setCurrentPin] = useState('');
-        const pinInputRef = useRef(null);
-    
-        useEffect(() => {
-          if (isOpen) {
-            setCurrentPin('');
-            setTimeout(() => { 
-              pinInputRef.current?.focus();
-            }, 100);
-          }
-        }, [isOpen]);
-    
-        const handleSubmit = (e) => {
-          e.preventDefault();
-          onSubmitPin(currentPin);
-        };
-    
-        if (!isOpen) return null;
-    
-        return (
-          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4 animate-modal-fade-in">
-            <div className="bg-white p-4 sm:p-5 rounded-lg shadow-xl w-full max-w-[18rem] sm:max-w-xs relative"> 
-              <button 
-                onClick={onClose}
-                className="absolute top-2 right-2 text-gray-500 hover:text-gray-700 p-1 rounded-full"
-                aria-label="Close PIN modal"
-              >
-                <NewCloseIconSVG className="w-5 h-5" />
-              </button>
-              <h2 className="text-md sm:text-lg font-semibold text-text-primary mb-3 sm:mb-4 text-center">Enter PIN to Unlock</h2>
-              <form onSubmit={handleSubmit}>
-                <input
-                  ref={pinInputRef}
-                  type="password"
-                  value={currentPin}
-                  onChange={(e) => setCurrentPin(e.target.value)}
-                  className="w-full px-3 py-2 border border-border-default rounded-md focus:ring-2 focus:ring-brand-primary/50 focus:border-brand-primary/80 outline-none mb-3 text-center"
-                  placeholder="Your PIN"
-                />
-                {pinError && <p className="text-red-500 text-xs text-center mb-3">{pinError}</p>}
-                <button
-                  type="submit"
-                  className="w-full bg-brand-send-active text-white py-2 px-4 rounded-md hover:bg-brand-send-hover transition-colors font-medium text-sm sm:text-base"
-                >
-                  Unlock Sidebar
-                </button>
-              </form>
-            </div>
-          </div>
-        );
-      };
-      
-      const PinSettingsModal = ({ isOpen, onClose, onSetPin, currentPin, statusMessage, statusType }) => {
-        const [newPin, setNewPin] = useState('');
-        const [confirmPin, setConfirmPin] = useState('');
-        const [error, setError] = useState('');
-        const newPinInputRef = useRef(null);
-
-        useEffect(() => {
-            if (isOpen) {
-                setNewPin('');
-                setConfirmPin('');
-                setError('');
-                setTimeout(() => newPinInputRef.current?.focus(), 100);
-            }
-        }, [isOpen]);
-
-        const handleSubmit = (e) => {
-            e.preventDefault();
-            if (!newPin) {
-                setError('PIN cannot be empty.');
-                return;
-            }
-            if (newPin.length < 4) {
-                setError('PIN must be at least 4 characters long.');
-                return;
-            }
-            if (newPin !== confirmPin) {
-                setError('PINs do not match.');
-                return;
-            }
-            setError('');
-            onSetPin(newPin);
-        };
-
-        if (!isOpen) return null;
-
-        return (
-            <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4 animate-modal-fade-in">
-                <div className="bg-white p-4 sm:p-6 rounded-lg shadow-xl w-full max-w-[18rem] sm:max-w-sm relative"> 
-                    <button
-                        onClick={onClose}
-                        className="absolute top-2 right-2 text-gray-500 hover:text-gray-700 p-1 rounded-full"
-                        aria-label="Close PIN settings"
-                    >
-                         <NewCloseIconSVG className="w-5 h-5" />
-                    </button>
-                    <h2 className="text-md sm:text-lg font-semibold text-text-primary mb-1 text-center">
-                        {currentPin ? 'Change PIN' : 'Set PIN'}
-                    </h2>
-                    {currentPin && <p className="text-xs text-text-subtle text-center mb-3 sm:mb-4">Current PIN is set. Enter new PIN to change.</p>}
-                    
-                    <form onSubmit={handleSubmit} className="space-y-3">
-                        <div>
-                            <label htmlFor="newPinModal" className="block text-sm font-medium text-text-secondary">New PIN</label>
-                            <input
-                                id="newPinModal"
-                                ref={newPinInputRef}
-                                type="password"
-                                value={newPin}
-                                onChange={(e) => setNewPin(e.target.value)}
-                                className="mt-1 w-full px-3 py-2 border border-border-default rounded-md focus:ring-2 focus:ring-brand-primary/50 focus:border-brand-primary/80 outline-none"
-                                placeholder="Enter new PIN"
-                            />
-                        </div>
-                        <div>
-                            <label htmlFor="confirmPinModal" className="block text-sm font-medium text-text-secondary">Confirm New PIN</label>
-                            <input
-                                id="confirmPinModal"
-                                type="password"
-                                value={confirmPin}
-                                onChange={(e) => setConfirmPin(e.target.value)}
-                                className="mt-1 w-full px-3 py-2 border border-border-default rounded-md focus:ring-2 focus:ring-brand-primary/50 focus:border-brand-primary/80 outline-none"
-                                placeholder="Confirm new PIN"
-                            />
-                        </div>
-                        {error && <p className="text-red-500 text-xs text-center">{error}</p>}
-                        {statusMessage && (
-                             <p className={`text-xs text-center ${statusType === 'success' ? 'text-green-600' : 'text-red-600'}`}>{statusMessage}</p>
-                        )}
-                        <button
-                            type="submit"
-                            className="w-full bg-brand-send-active text-white py-2 px-4 rounded-md hover:bg-brand-send-hover transition-colors font-medium text-sm sm:text-base"
-                        >
-                            {currentPin ? 'Change PIN' : 'Set PIN'}
-                        </button>
-                    </form>
-                </div>
-            </div>
-        );
-    };
-
-    const ForgotPasswordModal = ({ isOpen, onClose, onSendResetEmail, statusMessage, statusType }) => {
-        const [email, setEmail] = useState('');
-        const [loading, setLoading] = useState(false);
-        const emailInputRef = useRef(null);
-
-        useEffect(() => {
-            if (isOpen) {
-                setEmail('');
-                setLoading(false);
-                setTimeout(() => emailInputRef.current?.focus(), 100);
-            }
-        }, [isOpen]);
-
-        const handleSubmit = async (e) => {
-            e.preventDefault();
-            if (!email) {
-                onSendResetEmail(email, true, "Email address is required.");
-                return;
-            }
-            setLoading(true);
-            await onSendResetEmail(email);
-            setLoading(false);
-        };
-
-        if (!isOpen) return null;
-
-        return (
-            <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4 animate-modal-fade-in">
-                <div className="bg-white p-4 sm:p-6 rounded-lg shadow-xl w-full max-w-[18rem] sm:max-w-sm relative">
-                    <button
-                        onClick={onClose}
-                        className="absolute top-2 right-2 text-gray-500 hover:text-gray-700 p-1 rounded-full"
-                        aria-label="Close Forgot Password modal"
-                    >
-                        <NewCloseIconSVG className="w-5 h-5" />
-                    </button>
-                    <h2 className="text-md sm:text-lg font-semibold text-text-primary mb-3 sm:mb-4 text-center">Forgot Password?</h2>
-                    <p className="text-xs text-text-subtle text-center mb-3">Enter your email to receive a password reset link.</p>
-                    <form onSubmit={handleSubmit} className="space-y-3">
-                        <div>
-                            <label htmlFor="resetEmail" className="block text-sm font-medium text-text-secondary">Email Address</label>
-                            <input
-                                id="resetEmail"
-                                ref={emailInputRef}
-                                type="email"
-                                value={email}
-                                onChange={(e) => setEmail(e.target.value)}
-                                className="mt-1 w-full px-3 py-2 border border-border-default rounded-md focus:ring-2 focus:ring-brand-primary/50 focus:border-brand-primary/80 outline-none"
-                                placeholder="your.email@example.com"
-                                required
-                            />
-                        </div>
-                        {statusMessage && (
-                            <p className={`text-xs text-center ${statusType === 'success' ? 'text-green-600' : 'text-red-600'}`}>{statusMessage}</p>
-                        )}
-                        <button
-                            type="submit"
-                            disabled={loading}
-                            className="w-full bg-brand-send-active text-white py-2 px-4 rounded-md hover:bg-brand-send-hover transition-colors font-medium text-sm sm:text-base disabled:opacity-70"
-                        >
-                            {loading ? (
-                                <div className="flex justify-center items-center">
-                                    <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin-continuous"></div>
-                                </div>
-                            ) : "Send Reset Link"}
-                        </button>
-                    </form>
-                </div>
-            </div>
-        );
-    };
-
-
-      const Sidebar = ({ 
-        chatHistory, onSelectChat, currentChatId, onNewChat, 
-        isOpen, setIsOpen, onDeleteChat, 
-        onLogout, onOpenPinSettings, userEmail 
-      }) => {
-        const [confirmDeleteId, setConfirmDeleteId] = useState(null);
-        const deletePopoverRef = useRef(null);
-        const longPressTimerRef = useRef(null);
-        const longPressTimeout = 700; 
-
-        const handleChatPressStart = (event, chatId) => {
-            clearTimeout(longPressTimerRef.current);
-            longPressTimerRef.current = setTimeout(() => {
-                if (event.type === 'touchstart' || window.innerWidth < 768) {
-                    setConfirmDeleteId(chatId);
-                }
-            }, longPressTimeout);
-        };
-
-        const handleChatPressEnd = () => {
-            clearTimeout(longPressTimerRef.current);
-        };
-
-        useEffect(() => {
-            const handleClickOutside = (event) => {
-                const clickedButton = event.target.closest(`button[data-chat-id="${confirmDeleteId}"]`);
-                if (clickedButton) return; 
-
-                if (deletePopoverRef.current && !deletePopoverRef.current.contains(event.target)) {
-                    setConfirmDeleteId(null);
-                }
-            };
-            document.addEventListener('mousedown', handleClickOutside);
-            return () => document.removeEventListener('mousedown', handleClickOutside);
-        }, [confirmDeleteId]);
-
-
-        return (
-          <>
-            {isOpen && (
-              <div 
-                className="fixed inset-0 bg-black/30 z-30 md:hidden"
-                onClick={() => setIsOpen(false)} 
-              ></div>
-            )}
-            <div className={`fixed md:static top-0 left-0 h-full w-64 bg-surface-sidebar text-text-primary p-4 flex flex-col z-40 transform ${isOpen ? 'animate-slide-in-left' : '-translate-x-full md:translate-x-0'} md:!translate-x-0 transition-transform duration-300 ease-in-out border-r border-border-light`}>
-              <div className="flex-grow flex flex-col overflow-hidden">
-                <h2 className="text-lg font-semibold mb-3 pb-2 border-b border-border-light">Chat History</h2>
-                <button
-                  onClick={() => { onNewChat(); setIsOpen(false); setConfirmDeleteId(null); }}
-                  className="w-full bg-brand-send-active text-white py-2 px-3 rounded-md hover:bg-brand-send-hover transition-colors mb-4 text-sm font-medium flex items-center justify-center space-x-2"
-                >
-                  <i className="fas fa-plus-circle"></i>
-                  <span>New Chat</span>
-                </button>
-                <ul className="flex-grow overflow-y-auto space-y-1 sidebar-chat-list mb-4">
-                  {chatHistory.map(chat => (
-                    <li key={chat.id} className="relative group">
-                      <button
-                        data-chat-id={chat.id} 
-                        onClick={() => {
-                          if (confirmDeleteId === chat.id) {
-                              setConfirmDeleteId(null); 
-                          } else {
-                              onSelectChat(chat.id);
-                              setIsOpen(false); 
-                              setConfirmDeleteId(null); 
-                          }
-                        }}
-                        onMouseDown={(e) => handleChatPressStart(e, chat.id)}
-                        onMouseUp={handleChatPressEnd}
-                        onMouseLeave={handleChatPressEnd}
-                        onTouchStart={(e) => handleChatPressStart(e, chat.id)}
-                        onTouchEnd={handleChatPressEnd}
-                        onTouchMove={handleChatPressEnd} 
-                        title={chat.title}
-                        className={`w-full text-left text-sm pl-2.5 pr-2.5 py-2 rounded-md truncate transition-colors ${chat.id === currentChatId ? 'bg-brand-primary/20 text-brand-primary font-medium' : 'hover:bg-interactive-hover/70 text-text-secondary'}`}
-                      >
-                        {chat.title || `Chat ${chat.id.substring(0,5)}...`}
-                      </button>
-                      {confirmDeleteId === chat.id && (
-                        <div ref={deletePopoverRef} className="absolute right-0 mt-1 mr-1 w-36 bg-white border border-border-default rounded-md shadow-xl z-20 p-1 animate-scale-in-subtle origin-top-right">
-                          <button
-                            onClick={(e) => { 
-                              e.stopPropagation();
-                              onDeleteChat(chat.id);
-                              setConfirmDeleteId(null);
-                            }}
-                            className="w-full text-left px-2.5 py-1.5 text-xs text-red-600 hover:bg-red-500/10 rounded-md flex items-center space-x-1.5 transition-colors"
-                          >
-                            <i className="fas fa-trash-alt fa-fw"></i>
-                            <span>Delete Chat</span>
-                          </button>
-                        </div>
-                      )}
-                    </li>
-                  ))}
-                  {chatHistory.length === 0 && <li className="text-xs text-text-subtle text-center py-4">No chats yet.</li>}
-                </ul>
-              </div>
-              <div className="mt-auto border-t border-border-light pt-3 space-y-2">
-                  {userEmail && (
-                    <div className="text-xs text-text-subtle px-3 py-1.5 truncate" title={userEmail}>
-                        {userEmail}
-                    </div>
-                  )}
-                  <button
-                      onClick={onOpenPinSettings}
-                      className="w-full text-sm text-text-secondary bg-gray-200 py-2 px-3 rounded-md transition-colors flex items-center space-x-2 justify-start" // Always active style for "Change PIN"
-                  >
-                      <i className="fas fa-key fa-fw"></i>
-                      <span>Change PIN</span> {/* Text updated */}
-                  </button>
-                  <button
-                      onClick={onLogout}
-                      className="w-full text-sm text-red-600 hover:bg-red-500/10 py-2 px-3 rounded-md transition-colors flex items-center space-x-2 justify-start"
-                  >
-                      <i className="fas fa-sign-out-alt fa-fw"></i>
-                      <span>Logout</span>
-                  </button>
-              </div>
-            </div>
-          </>
-        );
-      };
+      // PinUnlockModal Removed
+      // PinSettingsModal Removed
+      // ForgotPasswordModal Removed
+      // Sidebar Component Removed
 
       const ChatMessageItemOptions = ({ message, onDeleteAiMessagePair }) => {
         const [showOptions, setShowOptions] = useState(false);
@@ -1418,7 +1055,7 @@ Remember: You're not just an AI assistant, you're a helpful friend who happens t
                     className="ai-message-options-trigger p-1.5 rounded-full text-text-subtle hover:text-brand-primary hover:bg-interactive-hover/70 transition-all duration-150 focus:outline-none focus:ring-1 focus:ring-brand-primary/50"
                     aria-label="AI Message Options"
                 >
-                    <i className="fas fa-ellipsis-v fa-sm"></i> {/* Increased icon size */}
+                    <i className="fas fa-ellipsis-v fa-sm"></i>
                 </button>
                 {showOptions && (
                     <div ref={optionsRef} className="absolute left-0 bottom-full mb-1 w-32 bg-white border border-border-default rounded-md shadow-xl z-20 p-1 animate-scale-in-subtle origin-bottom-left">
@@ -1615,24 +1252,79 @@ Remember: You're not just an AI assistant, you're a helpful friend who happens t
                 </button>
               )}
             </div>
-            {/* AI Message Options (Regen & 3-dots) are rendered in ChatInterface directly after the AI message */}
           </div>);
       };
       
+       const ModelSelector = ({ models, selectedModelId, onSelectModel, isLoading, isAiCurrentlyProcessing }) => {
+        const [isOpen, setIsOpen] = useState(false);
+        const dropdownRef = useRef(null);
+        const selectedModel = models.find(m => m.id === selectedModelId) || models[0];
+
+        useEffect(() => {
+            const handleClickOutside = (event) => {
+                if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+                    setIsOpen(false);
+                }
+            };
+            document.addEventListener("mousedown", handleClickOutside);
+            return () => document.removeEventListener("mousedown", handleClickOutside);
+        }, []);
+
+        const isDisabled = isLoading || isAiCurrentlyProcessing; // currentUser check removed
+
+        return (
+            <div className="relative" ref={dropdownRef}>
+                <button
+                    type="button"
+                    onClick={() => setIsOpen(prev => !prev)}
+                    className={`flex items-center justify-center text-[11px] font-medium text-text-secondary hover:text-brand-primary bg-surface-input hover:bg-interactive-hover/70 px-2 py-1 rounded-md border border-gray-300 transition-colors duration-150 focus:outline-none whitespace-nowrap ${isDisabled ? 'opacity-50 cursor-not-allowed' : ''}`}
+                    disabled={isDisabled}
+                >
+                    <span>{selectedModel.uiName}</span>
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className={`w-3 h-3 ml-1 transform transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`}>
+                        <path fillRule="evenodd" d="M5.22 8.22a.75.75 0 011.06 0L10 11.94l3.72-3.72a.75.75 0 111.06 1.06l-4.25 4.25a.75.75 0 01-1.06 0L5.22 9.28a.75.75 0 010-1.06z" clipRule="evenodd" />
+                    </svg>
+                </button>
+                {isOpen && (
+                    <div className="absolute bottom-full right-0 mb-1.5 w-32 bg-white border border-border-default rounded-md shadow-xl z-30 p-1 animate-scale-in-subtle origin-bottom-right">
+                        {models.map(model => (
+                            <button
+                                key={model.id}
+                                onClick={() => {
+                                    onSelectModel(model.id);
+                                    setIsOpen(false);
+                                }}
+                                className={`w-full text-left px-2.5 py-1.5 text-xs rounded-md truncate transition-colors ${
+                                    model.id === selectedModelId 
+                                    ? 'bg-brand-primary/20 text-brand-primary font-medium' 
+                                    : 'text-text-secondary hover:bg-interactive-hover/70'
+                                }`}
+                            >
+                                {model.uiName}
+                            </button>
+                        ))}
+                    </div>
+                )}
+            </div>
+        );
+    };
+
       const ChatInterface = ({ 
         messages, 
         onSendMessage, 
-        isLoading, 
+        isLoading, // This is isChatLoading from App
         onStopGeneration, 
         onRegenerateLastTextMessage, 
         onNewChat, 
         setChatError,
         currentChatId, 
-        onToggleSidebarRequest,
-        currentUser,
+        // onToggleSidebarRequest, // Sidebar removed
+        // currentUser, // currentUser is always guest-like now
         onDeleteAiMessagePair, 
         selectedUserMessageId, 
-        setSelectedUserMessageId 
+        setSelectedUserMessageId,
+        selectedModelId, 
+        onSelectModel 
       }) => {
         const [inputText, setInputText] = useState('');
         const [selectedFiles, setSelectedFiles] = useState([]); 
@@ -1714,14 +1406,8 @@ Remember: You're not just an AI assistant, you're a helpful friend who happens t
         
         const handleSubmit = (e) => { 
             if(e) e.preventDefault(); 
-            if (!currentChatId && !currentUser) { 
-                setChatError("Please log in and select or start a new chat first.");
-                return;
-            }
-            if (!currentChatId) {
-                setChatError("Please select or start a new chat first.");
-                return;
-            }
+            // currentUser check removed (always guest)
+            
             const currentText = contentEditableRef.current?.innerText.trim() || '';
             if (!currentText && selectedFiles.length === 0) return; 
             setUserHasScrolledUp(false); 
@@ -1737,7 +1423,7 @@ Remember: You're not just an AI assistant, you're a helpful friend who happens t
                 const isLikelyDesktop = window.innerWidth > 768; 
                 if (isLikelyDesktop) { 
                     e.preventDefault();
-                    if (!isSendButtonDisabled && currentChatId) { 
+                    if (!isSendButtonActuallyDisabled) { 
                         handleSubmit(e); 
                     }
                 }
@@ -1746,12 +1432,10 @@ Remember: You're not just an AI assistant, you're a helpful friend who happens t
 
         const isAiCurrentlyProcessing = messages.some(m => m.role === 'model' && m.isLoading && !m.isError);
         const currentInputTextFromEditable = contentEditableRef.current?.innerText?.trim() || '';
-        const isSendButtonDisabled = (!isAiCurrentlyProcessing && (isLoading || (currentInputTextFromEditable === '' && selectedFiles.length === 0)));
+        const isSendButtonActuallyDisabled = (!isAiCurrentlyProcessing && (isLoading || (currentInputTextFromEditable === '' && selectedFiles.length === 0))); // currentUser check removed
         
-        const hasVisibleChatContent = messages.some( msg => (msg.parts?.[0]?.text || msg.text || msg.attachedFiles?.length > 0 || msg.uiOnlyAttachedFiles?.length > 0) && !(msg.role === 'system' && !msg.isError && msg.id !== 'loading_chat') );
-
         const handleToggleWebSearch = (newValue) => {
-            if (!(isLoading || isAiCurrentlyProcessing || !currentChatId)) {
+            if (!(isLoading || isAiCurrentlyProcessing)) {
                 setIsWebSearchEnabledState(newValue);
             }
         };
@@ -1761,62 +1445,56 @@ Remember: You're not just an AI assistant, you're a helpful friend who happens t
 
         if (isAiCurrentlyProcessing) { 
             sendOrStopButtonDynamicClasses = "bg-slate-500 hover:bg-slate-600 text-white"; 
-        } else if (isSendButtonDisabled || !currentChatId) { 
+        } else if (isSendButtonActuallyDisabled) { 
             sendOrStopButtonDynamicClasses = "bg-brand-send-active opacity-60 text-white cursor-not-allowed"; 
         } else { 
             sendOrStopButtonDynamicClasses = "bg-brand-send-active hover:bg-brand-send-hover text-white focus:ring-2 focus:ring-offset-1 focus:ring-brand-send-active/50";
         }
         
-        useEffect(() => {
+        useEffect(() => { 
           if (contentEditableRef.current) {
             contentEditableRef.current.innerText = ''; 
           }
           setInputText('');
           setSelectedFiles([]);
           setIsWebSearchEnabledState(false); 
-        }, [currentChatId]);
+        }, [currentChatId]); // currentUser dependency removed
+
+        const activeMessages = messages.filter(m => (m.role !== 'system' || m.isError) && m.id !== 'loading_chat_indicator');
+
 
         return (
           <div className="w-full h-full flex flex-col bg-white md:rounded-xl shadow-chat-window overflow-hidden">
             <header className="p-3 flex items-center justify-between flex-shrink-0 bg-white border-b border-border-light shadow-header">
-                <button 
-                  onClick={onToggleSidebarRequest} 
-                  className="md:hidden p-2 text-text-secondary hover:text-brand-primary rounded-full hover:bg-interactive-hover/70 transition-colors"
-                  aria-label="Toggle sidebar"
-                  disabled={!currentUser}
+                {/* Hamburger icon removed */}
+                <h1 className="text-xl font-sans font-semibold text-gray-800 text-left flex-grow">AlphaGPT</h1>
+                <button
+                    onClick={() => {
+                        onNewChat();
+                        setSelectedUserMessageId(null);
+                    }}
+                    className="p-1.5 text-text-secondary hover:text-brand-primary rounded-full hover:bg-interactive-hover/70 transition-colors focus:outline-none"
+                    aria-label="New Chat"
+                    disabled={isLoading || isAiCurrentlyProcessing}
                 >
-                  <HamburgerIcon className="w-6 h-6" />
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-6 h-6">
+                        <path fillRule="evenodd" d="M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25zM12.75 9a.75.75 0 00-1.5 0v2.25H9a.75.75 0 000 1.5h2.25V15a.75.75 0 001.5 0v-2.25H15a.75.75 0 000-1.5h-2.25V9z" clipRule="evenodd" />
+                    </svg>
                 </button>
-                <h1 className="text-xl font-sans font-semibold text-gray-800 text-center flex-grow md:flex-grow-0">AlphaGPT</h1>
-                <div className="w-8 md:hidden"></div>
             </header>
             
             <div ref={chatContainerRef} className="flex-grow p-4 md:p-5 space-y-3 md:space-y-4 overflow-y-auto chat-messages-container relative bg-surface-chat-area">
-                { !currentUser && (
-                     <div className="absolute inset-0 flex flex-col items-center justify-center text-center pointer-events-none p-8 animate-fade-in-up opacity-0" style={{animationDelay: '0.2s', animationFillMode: 'forwards'}}>
-                        <NewEmptyStateIconSVG className="w-20 h-20 mb-6 text-brand-send-active" />
-                         <p className="text-3xl lg:text-4xl font-serif text-gray-800 leading-tight">Welcome to AlphaGPT</p>
-                         <p className="text-sm text-text-subtle mt-4">Please log in or register to start chatting.</p>
-                    </div>
-                )}
-                { currentUser && !currentChatId && !isLoading && !hasVisibleChatContent && ( 
+                { /* Login prompt removed */ }
+                { activeMessages.length === 0 && !isLoading ? ( 
                     <div className="absolute inset-0 flex flex-col items-center justify-center text-center pointer-events-none p-8 animate-fade-in-up opacity-0" style={{animationDelay: '0.2s', animationFillMode: 'forwards'}}>
-                        <NewEmptyStateIconSVG className="w-20 h-20 mb-6 text-brand-send-active" />
-                        <p className="text-3xl lg:text-4xl font-serif text-gray-800 leading-tight">
+                        <NewEmptyStateIconSVG className="w-16 h-16 mb-5 text-brand-send-active" />
+                        <p className="text-2xl lg:text-3xl font-serif text-gray-800 leading-tight">
                             How can I help you<br />today?
                         </p>
-                         <p className="text-sm text-text-subtle mt-4">Start a new chat or select one from the history.</p>
+                         {currentChatId && <p className="text-xs text-text-subtle mt-3">Send a message to get started in this chat.</p>}
                     </div> 
-                )}
-                 { currentUser && currentChatId && !isLoading && messages.filter(m => m.role !== 'system' || m.isError).length === 0 && ( 
-                    <div className="absolute inset-0 flex flex-col items-center justify-center text-center pointer-events-none p-8 animate-fade-in-up opacity-0" style={{animationDelay: '0.2s', animationFillMode: 'forwards'}}>
-                        <NewEmptyStateIconSVG className="w-16 h-16 mb-4 text-brand-send-active/70" />
-                        <p className="text-xl font-serif text-gray-700 leading-tight">
-                            This chat is empty.
-                        </p>
-                        <p className="text-sm text-text-subtle mt-2">Send a message to get started!</p>
-                    </div> 
-                )}
+                ) : null }
+
                 {messages.map((msg, idx) => { 
                     const isThisMessageAiAndFinalized = msg.role === 'model' && !msg.isLoading && !msg.isError && (msg.parts?.[0]?.text || msg.text);
                     let canThisAiMessageBeRegenerated = false;
@@ -1860,7 +1538,7 @@ Remember: You're not just an AI assistant, you're a helpful friend who happens t
                             )}
 
                             {isThisMessageAiAndFinalized && (
-                                <div className={`flex items-center space-x-2 mt-1 ml-0 justify-start mb-2`}> {/* Added mb-2 for spacing */}
+                                <div className={`flex items-center space-x-2 mt-1 ml-0 justify-start mb-2`}> 
                                     {canThisAiMessageBeRegenerated && (
                                         <button 
                                             onClick={() => { 
@@ -1870,7 +1548,7 @@ Remember: You're not just an AI assistant, you're a helpful friend who happens t
                                             }} 
                                             className="p-1.5 rounded-full text-text-subtle hover:text-brand-primary hover:bg-interactive-hover/70 transition-all duration-150 group focus:outline-none focus:ring-1 focus:ring-brand-primary/50"
                                             aria-label="Regenerate response" 
-                                            disabled={isLoading || isAiCurrentlyProcessing || !currentChatId} 
+                                            disabled={isLoading || isAiCurrentlyProcessing} 
                                         > 
                                             <NewRefreshIcon className="w-5 h-5 transition-transform duration-200" />
                                         </button> 
@@ -1892,12 +1570,13 @@ Remember: You're not just an AI assistant, you're a helpful friend who happens t
                 <div
                     className="flex flex-col bg-white border border-gray-200 rounded-xl p-2.5 shadow-sm focus-within:border-gray-300 focus-within:shadow-input-active-glow transition-all duration-150"
                     onClick={(e) => {
-                        if (currentUser && currentChatId && contentEditableRef.current && 
+                        if (contentEditableRef.current && // currentUser check removed
                             !contentEditableRef.current.contains(e.target) && 
                             e.target.tagName !== 'BUTTON' && 
                             !e.target.closest('button') &&
                            !e.target.closest('[aria-label="Attach file"]') && 
-                           !e.target.closest('[aria-label="Toggle Web Search"]') 
+                           !e.target.closest('[aria-label="Toggle Web Search"]') &&
+                           !e.target.closest('.relative') 
                            ) {
                            contentEditableRef.current.focus();
                         }
@@ -1940,12 +1619,12 @@ Remember: You're not just an AI assistant, you're a helpful friend who happens t
 
                   <div
                     ref={contentEditableRef}
-                    contentEditable={currentUser && currentChatId && !(isLoading || isAiCurrentlyProcessing)}
+                    contentEditable={!(isLoading || isAiCurrentlyProcessing)}  // currentUser check removed
                     onInput={handleInputFromContentEditable}
                     onPaste={handlePaste}
                     onKeyDown={handleContentEditableKeyDown}
-                    data-placeholder={!currentUser ? "Please log in to chat" : (currentChatId ? "Ask AlphaGPT..." : "Select or start a new chat")}
-                    className={`content-editable-input w-full flex-1 text-sm md:text-[15px] focus:outline-none resize-none overflow-y-auto relative ${(!currentUser || !currentChatId) ? 'cursor-not-allowed' : ''}`}
+                    data-placeholder={"Ask AlphaGPT..."} // currentUser check removed for placeholder
+                    className={`content-editable-input w-full flex-1 text-sm md:text-[15px] focus:outline-none resize-none overflow-y-auto relative`} // cursor-not-allowed removed
                     style={{ maxHeight: '100px', minHeight: '40px' }}
                     suppressContentEditableWarning={true}
                   >
@@ -1953,14 +1632,14 @@ Remember: You're not just an AI assistant, you're a helpful friend who happens t
 
                   <div className="flex justify-between items-end w-full pt-2.5 mt-auto">
                     <div className="flex items-center">
-                        <input type="file" ref={fileInputRef} onChange={handleFileChange} className="hidden" multiple accept="image/*,.txt,text/plain" disabled={!currentUser || isLoading || isAiCurrentlyProcessing || !currentChatId} />
+                        <input type="file" ref={fileInputRef} onChange={handleFileChange} className="hidden" multiple accept="image/*,.txt,text/plain" disabled={isLoading || isAiCurrentlyProcessing} /> {/* currentUser check removed */}
                         
                         <button
                           type="button"
                           onClick={() => fileInputRef.current?.click()}
                           className="w-8 h-8 flex items-center justify-center text-gray-500 hover:text-gray-700 rounded-full hover:bg-gray-200/70 border border-gray-300 transition-colors duration-150 disabled:opacity-50 flex-shrink-0 focus:outline-none"
                           aria-label="Attach file"
-                          disabled={!currentUser || isLoading || isAiCurrentlyProcessing || !currentChatId}
+                          disabled={isLoading || isAiCurrentlyProcessing} // currentUser check removed
                         >
                           <PlusIcon />
                         </button>
@@ -1976,27 +1655,36 @@ Remember: You're not just an AI assistant, you're a helpful friend who happens t
                           `}
                           aria-label="Toggle Web Search"
                           aria-pressed={isWebSearchEnabledState}
-                          disabled={!currentUser || isLoading || isAiCurrentlyProcessing || !currentChatId}
+                          disabled={isLoading || isAiCurrentlyProcessing} // currentUser check removed
                         >
                           <GlobeIcon className="w-4 h-4" />
                         </button>
 
                     </div>
-
-                    <button
-                        type={isAiCurrentlyProcessing ? "button" : "submit"}
-                        onClick={isAiCurrentlyProcessing ? onStopGeneration : undefined }
-                        disabled={!currentUser || isSendButtonDisabled || !currentChatId}
-                        className={`${sendOrStopButtonBaseClasses} ${sendOrStopButtonDynamicClasses}`}
-                        style={{ overflow: 'hidden' }} 
-                        aria-label={isAiCurrentlyProcessing ? "Stop generation" : "Send message"}
-                    >
-                      {isAiCurrentlyProcessing ? (
-                        <i className="fas fa-stop text-sm"></i>
-                      ) : (
-                        <UpArrowSendIcon />
-                      )}
-                    </button>
+                    <div className="flex items-end space-x-2"> 
+                        <ModelSelector
+                            models={AVAILABLE_MODELS}
+                            selectedModelId={selectedModelId}
+                            onSelectModel={onSelectModel}
+                            // currentUser removed
+                            isLoading={isLoading}
+                            isAiCurrentlyProcessing={isAiCurrentlyProcessing}
+                        />
+                        <button
+                            type={isAiCurrentlyProcessing ? "button" : "submit"}
+                            onClick={isAiCurrentlyProcessing ? onStopGeneration : undefined }
+                            disabled={isSendButtonActuallyDisabled}
+                            className={`${sendOrStopButtonBaseClasses} ${sendOrStopButtonDynamicClasses}`}
+                            style={{ overflow: 'hidden' }} 
+                            aria-label={isAiCurrentlyProcessing ? "Stop generation" : "Send message"}
+                        >
+                        {isAiCurrentlyProcessing ? (
+                            <i className="fas fa-stop text-sm"></i>
+                        ) : (
+                            <UpArrowSendIcon />
+                        )}
+                        </button>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -2004,203 +1692,38 @@ Remember: You're not just an AI assistant, you're a helpful friend who happens t
           </div>);
       };
 
-      const AuthPage = ({ onAuthSuccess, onShowForgotPassword }) => { 
-        const [isLogin, setIsLogin] = useState(true);
-        const [email, setEmail] = useState('');
-        const [password, setPassword] = useState('');
-        const [confirmPassword, setConfirmPassword] = useState('');
-        const [error, setError] = useState('');
-        const [loading, setLoading] = useState(false);
-
-        const handleSubmit = async (e) => {
-            e.preventDefault();
-            setError('');
-            setLoading(true);
-
-            if (!email || !password) {
-                setError("Email and password are required.");
-                setLoading(false);
-                return;
-            }
-            if (!isLogin && password !== confirmPassword) {
-                setError("Passwords do not match.");
-                setLoading(false);
-                return;
-            }
-             if (!isLogin && password.length < 6) {
-                setError("Password must be at least 6 characters long.");
-                setLoading(false);
-                return;
-            }
-
-
-            try {
-                if (isLogin) {
-                    await auth.signInWithEmailAndPassword(email, password);
-                } else {
-                    await auth.createUserWithEmailAndPassword(email, password);
-                }
-            } catch (err) {
-                setError(err.message);
-            } finally {
-                setLoading(false);
-            }
-        };
-        
-        return (
-            <div className="min-h-screen flex flex-col items-center justify-center bg-surface-main p-4">
-                <div className="w-full max-w-xs sm:max-w-sm bg-white p-6 sm:p-8 rounded-xl shadow-chat-window"> 
-                    <h1 className="text-2xl sm:text-3xl font-bold text-center text-brand-primary mb-1 sm:mb-2">AlphaGPT</h1>
-                    <p className="text-center text-text-subtle mb-6 sm:mb-8">{isLogin ? "Login to continue" : "Create an account"}</p>
-                    
-                    <form onSubmit={handleSubmit} className="space-y-4">
-                        <div>
-                            <label htmlFor="email" className="block text-sm font-medium text-text-secondary">Email</label>
-                            <input 
-                                type="email" id="email" value={email} onChange={(e) => setEmail(e.target.value)} 
-                                className="mt-1 w-full px-3 py-2 sm:py-2.5 border border-border-default rounded-lg focus:ring-2 focus:ring-brand-primary/50 focus:border-brand-primary/80 outline-none transition-shadow"
-                                required 
-                            />
-                        </div>
-                        <div>
-                            <div className="flex justify-between items-center">
-                                <label htmlFor="password" className="block text-sm font-medium text-text-secondary">Password</label>
-                                {isLogin && (
-                                    <button 
-                                        type="button" 
-                                        onClick={onShowForgotPassword} 
-                                        className="text-xs text-brand-primary hover:text-brand-send-hover font-medium"
-                                    >
-                                        Forgot?
-                                    </button>
-                                )}
-                            </div>
-                            <input 
-                                type="password" id="password" value={password} onChange={(e) => setPassword(e.target.value)} 
-                                className="mt-1 w-full px-3 py-2 sm:py-2.5 border border-border-default rounded-lg focus:ring-2 focus:ring-brand-primary/50 focus:border-brand-primary/80 outline-none transition-shadow"
-                                required 
-                            />
-                        </div>
-                        {!isLogin && (
-                            <div>
-                                <label htmlFor="confirmPassword" className="block text-sm font-medium text-text-secondary">Confirm Password</label>
-                                <input 
-                                    type="password" id="confirmPassword" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} 
-                                    className="mt-1 w-full px-3 py-2 sm:py-2.5 border border-border-default rounded-lg focus:ring-2 focus:ring-brand-primary/50 focus:border-brand-primary/80 outline-none transition-shadow"
-                                    required 
-                                />
-                            </div>
-                        )}
-                        {error && <p className="text-red-500 text-xs text-center">{error}</p>}
-                        <button 
-                            type="submit" 
-                            disabled={loading}
-                            className="w-full bg-brand-send-active text-white py-2 sm:py-2.5 px-4 rounded-lg hover:bg-brand-send-hover transition-colors font-semibold text-base disabled:opacity-70"
-                        >
-                            {loading ? (
-                                <div className="flex justify-center items-center">
-                                    <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin-continuous"></div>
-                                </div>
-                            ) : (isLogin ? "Login" : "Register")}
-                        </button>
-                    </form>
-                    <p className="text-center text-sm text-text-subtle mt-6">
-                        {isLogin ? "Don't have an account? " : "Already have an account? "}
-                        <button onClick={() => { setIsLogin(!isLogin); setError(''); }} className="font-medium text-brand-primary hover:text-brand-send-hover">
-                            {isLogin ? "Register" : "Login"}
-                        </button>
-                    </p>
-                </div>
-            </div>
-        );
-    };
+      // AuthPage Component Removed
       
       const App = () => { 
-        const [currentUser, setCurrentUser] = useState(null);
-        const [authLoading, setAuthLoading] = useState(true);
+        // currentUser is now effectively a guest, always present
+        const [currentUser, setCurrentUser] = useState({ uid: 'guest_user', email: 'Guest User' }); // Mock user
+        // authLoading is false as there's no Firebase auth
+        const [authLoading, setAuthLoading] = useState(false);
+        
         const [chatMessages, setChatMessages] = useState([]); 
         const [isChatLoading, setIsChatLoading] = useState(false); 
         const [chatError, setChatError] = useState(null); 
-        const [currentChatId, setCurrentChatId] = useState(null);
-        const [chatHistoryList, setChatHistoryList] = useState([]);
+        const [currentChatId, setCurrentChatId] = useState('session_chat_init'); // Initial chat ID for the session
         
-        const [isSidebarActuallyOpen, setIsSidebarActuallyOpen] = useState(false);
-        const [isPinUnlockModalOpen, setIsPinUnlockModalOpen] = useState(false);
-        const [pinUnlockError, setPinUnlockError] = useState(null);
-        const [isPinVerifiedForSession, setIsPinVerifiedForSession] = useState(false); 
-        const [userPinFromDb, setUserPinFromDb] = useState(null);
-
-        const [isPinSettingsModalOpen, setIsPinSettingsModalOpen] = useState(false);
-        const [pinSettingsStatus, setPinSettingsStatus] = useState({ message: '', type: '' });
+        // chatHistoryList is not used as sidebar is removed, but kept for structure if local history is added later
+        const [chatHistoryList, setChatHistoryList] = useState([]); 
         
-        const [isForgotPasswordModalOpen, setIsForgotPasswordModalOpen] = useState(false);
-        const [forgotPasswordStatus, setForgotPasswordStatus] = useState({ message: '', type: '' });
+        // Sidebar and PIN related states removed
         
         const [selectedUserMessageId, setSelectedUserMessageId] = useState(null);
+        const [selectedModelId, setSelectedModelId] = useState(DEFAULT_MODEL_ID);
 
 
-        const initialLoadDoneRef = useRef(false);
+        // initialLoadDoneRef removed as it was for Firebase chat history loading
         const isStoppingGenerationRef = useRef(false);
         const streamTextBuffer = useRef("");
         const streamSourcesBuffer = useRef([]); 
         
-        useEffect(() => {
-            if (!auth) {
-                 setAuthLoading(false); 
-                 console.error("Firebase Auth is not initialized. Authentication will not work.");
-                 return;
-            }
-            const unsubscribe = auth.onAuthStateChanged(user => {
-                setCurrentUser(user);
-                setAuthLoading(false);
-                if (user) {
-                    loadUserPin(user.uid);
-                    setIsPinVerifiedForSession(false); 
-                    setPinUnlockError(null);
-                    initialLoadDoneRef.current = false; 
-                } else {
-                    setChatMessages([]);
-                    setChatHistoryList([]);
-                    setCurrentChatId(null);
-                    setUserPinFromDb(null);
-                    setIsPinVerifiedForSession(false);
-                    initialLoadDoneRef.current = false;
-                }
-            });
-            return () => unsubscribe();
-        }, []);
+        // Firebase Auth useEffect removed
 
-        const loadUserPin = async (uid) => {
-            if (!database || !uid) return;
-            try {
-                const snapshot = await database.ref(`userPins/${uid}/pin`).once('value');
-                setUserPinFromDb(snapshot.val());
-            } catch (err) {
-                console.error("Error loading user PIN:", err);
-                setChatError("Could not load PIN settings.");
-            }
-        };
+        // Firebase PIN loading useEffect removed
 
-        const saveUserPin = async (uid, newPin) => {
-            if (!database || !uid) {
-                setPinSettingsStatus({ message: 'Error: Not logged in or database unavailable.', type: 'error' });
-                return;
-            }
-            try {
-                await database.ref(`userPins/${uid}`).set({ pin: newPin });
-                setUserPinFromDb(newPin); 
-                setIsPinVerifiedForSession(true); 
-                setPinSettingsStatus({ message: 'PIN updated successfully!', type: 'success' });
-                setTimeout(() => {
-                    setIsPinSettingsModalOpen(false);
-                    setPinSettingsStatus({ message: '', type: '' }); 
-                }, 1500);
-            } catch (err) {
-                console.error("Error saving user PIN:", err);
-                setPinSettingsStatus({ message: 'Failed to save PIN. Please try again.', type: 'error' });
-            }
-        };
-
+        // saveUserPin function removed
 
         useEffect(() => { 
             if (chatError) { 
@@ -2214,104 +1737,24 @@ Remember: You're not just an AI assistant, you're a helpful friend who happens t
             }
         }, [chatError]); 
 
-        useEffect(() => {
-          if (!database || !currentUser) {
-            setChatHistoryList([]); 
-            if (!currentUser && !authLoading) initialLoadDoneRef.current = false; 
-            return;
-          }
-          const chatsRef = database.ref(`userChats/${currentUser.uid}`).orderByChild('createdAt');
-          const listener = chatsRef.on('value', (snapshot) => {
-            const chats = [];
-            snapshot.forEach((childSnapshot) => {
-              chats.push({
-                id: childSnapshot.key,
-                ...childSnapshot.val()
-              });
-            });
-            const reversedChats = chats.reverse();
-            setChatHistoryList(reversedChats);
+        // Firebase Chat History loading useEffect removed
 
-            if (!initialLoadDoneRef.current) {
-                if (reversedChats.length > 0) {
-                    if (!currentChatId || !reversedChats.find(chat => chat.id === currentChatId)) {
-                        setCurrentChatId(reversedChats[0].id);
-                    }
-                } else {
-                     handleNewChat().then(newId => {
-                         if(newId) setCurrentChatId(newId); 
-                     });
-                }
-                initialLoadDoneRef.current = true;
-            }
-          }, (error) => {
-            console.error("Error loading chat history:", error);
-            setChatError("Could not load chat history.");
-          });
-          return () => chatsRef.off('value', listener);
-        }, [currentUser, database, handleNewChat, currentChatId]); 
+        // Firebase Message loading useEffect removed for currentChatId (messages are now local)
 
 
-        const handleNewChat = useCallback(async () => {
-            if (!database || !currentUser) { 
-              setChatError("Please log in to create a new chat.");
-              return null;
-            }
-            setIsChatLoading(true);
-            try {
-              const newChatRef = database.ref(`userChats/${currentUser.uid}`).push();
-              const newChatId = newChatRef.key;
-        
-              await newChatRef.set({
-                title: "New Chat", 
-                createdAt: firebase.database.ServerValue.TIMESTAMP,
-                messages: {} 
-              });
-              
-              setCurrentChatId(newChatId); 
-              setChatMessages([]);      
-              setChatError(null);
-              setIsSidebarActuallyOpen(false); 
-              return newChatId;
-            } catch(error) {
-              console.error("Error creating new chat:", error);
-              setChatError("Failed to create new chat.");
-              return null;
-            } finally {
-              setIsChatLoading(false);
-            }
-          }, [currentUser]); 
+        const handleNewChat = useCallback(() => {
+            // No Firebase interaction for new chat
+            const newSessionId = 'session_chat_' + Date.now().toString(36) + Math.random().toString(36).substring(2);
+            setCurrentChatId(newSessionId); 
+            setChatMessages([]);      
+            setChatError(null);
+            // setIsSidebarActuallyOpen(false); // Sidebar removed
+            return newSessionId; // Return new ID for consistency if needed by caller
+          }, []); 
         
 
-        useEffect(() => {
-          if (!currentChatId || !database || !currentUser) { 
-            if (currentChatId !== null || (currentChatId === null && initialLoadDoneRef.current)) { 
-                setChatMessages([]);
-            }
-            return;
-          }
-          setChatMessages([{id: 'loading_chat_indicator', role: 'system', text: 'Loading chat...', timestamp: Date.now()}]); 
-
-          const messagesRef = database.ref(`userChats/${currentUser.uid}/${currentChatId}/messages`).orderByChild('timestamp');
-          const listener = messagesRef.on('value', (snapshot) => {
-            const messagesFromDb = [];
-            snapshot.forEach((msgSnapshot) => {
-              messagesFromDb.push({
-                id: msgSnapshot.key,
-                ...msgSnapshot.val()
-              });
-            });
-            setChatMessages(messagesFromDb);
-          }, (error) => {
-            console.error(`Error loading messages for chat ${currentChatId}:`, error);
-            setChatMessages([{id: 'error_loading_messages', role: 'system', text: 'Error loading messages.', isError: true, timestamp: Date.now()}]);
-          });
-          return () => messagesRef.off('value', listener);
-        }, [currentChatId, currentUser]); 
-
-
-        const getGeminiHistory = (currentMessagesFromDb) => { 
-            const geminiMessages = currentMessagesFromDb
+        const getGeminiHistory = (currentMessagesFromState) => { 
+            const geminiMessages = currentMessagesFromState
                 .filter(msg => !(msg.role === 'system' || (msg.role === 'model' && msg.isLoading && !(msg.parts?.[0]?.text || msg.text) ) || msg.isError))
                 .map(msg => {
                     let partsForGemini = [];
@@ -2321,26 +1764,19 @@ Remember: You're not just an AI assistant, you're a helpful friend who happens t
                         partsForGemini = [{text: msg.text}];
                     }
                     
-                    if(msg.uiOnlyAttachedFiles && msg.uiOnlyAttachedFiles.length > 0){
-                        msg.uiOnlyAttachedFiles.forEach(file => {
-                            if (file.type.startsWith('image/') && file.apiData?.mimeType && file.apiData?.data) {
-                                partsForGemini.push({ inlineData: file.apiData });
-                            } else if ((file.name.toLowerCase().endsWith('.txt') || file.type === 'text/plain') && file.apiData?.textContent) {
-                                const fileContentMarker = `\n[Content of attached file: ${file.name}]\n`;
-                                if (!partsForGemini.some(p => p.text && p.text.includes(fileContentMarker))) {
-                                   partsForGemini.push({ text: `${fileContentMarker}${file.apiData.textContent}\n[End of file: ${file.name}]\n` });
-                                }
+                    // Handling uiOnlyAttachedFiles (from input) or attachedFiles (from "DB", now local state)
+                    const filesToConsider = msg.uiOnlyAttachedFiles || msg.attachedFiles || [];
+
+                    filesToConsider.forEach(file => {
+                        if (file.type.startsWith('image/') && file.apiData?.mimeType && file.apiData?.data) {
+                            partsForGemini.push({ inlineData: file.apiData });
+                        } else if ((file.name?.toLowerCase().endsWith('.txt') || file.type === 'text/plain') && file.apiData?.textContent) {
+                            const fileContentMarker = `\n[Content of attached file: ${file.name}]\n`;
+                            if (!partsForGemini.some(p => p.text && p.text.includes(fileContentMarker))) {
+                               partsForGemini.push({ text: `${fileContentMarker}${file.apiData.textContent}\n[End of file: ${file.name}]\n` });
                             }
-                        });
-                    } else if (msg.attachedFiles && msg.attachedFiles.length > 0 && msg.role === 'user') { 
-                        msg.attachedFiles.forEach(fileMeta => {
-                            if(fileMeta.type?.startsWith('image/') && fileMeta.apiData) { 
-                                if (!partsForGemini.some(p => p.inlineData && p.inlineData.data === fileMeta.apiData.data)) {
-                                   partsForGemini.push({ inlineData: fileMeta.apiData });
-                                }
-                            }
-                        });
-                    }
+                        }
+                    });
                     return { role: msg.role, parts: partsForGemini }; 
                 }).filter(entry => entry.parts && entry.parts.length > 0 && entry.parts.some(p => (p.text && p.text.trim()) || p.inlineData ));
 
@@ -2394,38 +1830,8 @@ Remember: You're not just an AI assistant, you're a helpful friend who happens t
             });
         }, []); 
         
-        const handleDeleteChat = async (chatIdToDelete) => {
-            if (!database || !currentUser) { 
-                setChatError("Please log in to delete chats.");
-                return;
-            }
-            if (!chatIdToDelete) return;
-        
-            try {
-                await database.ref(`userChats/${currentUser.uid}/${chatIdToDelete}`).remove();
-                if (currentChatId === chatIdToDelete) {
-                    const remainingChats = chatHistoryList.filter(chat => chat.id !== chatIdToDelete);
-                    if (remainingChats.length > 0) {
-                        let nextChatId = remainingChats[0].id;
-                        if (nextChatId === chatIdToDelete && remainingChats.length > 1) {
-                            nextChatId = remainingChats[1].id;
-                        } else if (nextChatId === chatIdToDelete) { 
-                            setCurrentChatId(null);
-                            await handleNewChat();
-                            return;
-                        }
-                        setCurrentChatId(nextChatId);
-                    } else {
-                        setCurrentChatId(null); 
-                        await handleNewChat(); 
-                    }
-                }
-            } catch (error) {
-                console.error("Error deleting chat:", error);
-                setChatError("Failed to delete chat.");
-            }
-        };
-        
+        // handleDeleteChat removed as no persistent chat history
+
         const mergeCitations = (existingSources, newSources) => {
             if (!newSources || newSources.length === 0) return existingSources;
             const existingUris = new Set((existingSources || []).map(s => s.uri));
@@ -2433,90 +1839,66 @@ Remember: You're not just an AI assistant, you're a helpful friend who happens t
             return [...(existingSources || []), ...uniqueNewSources];
         };
 
-        const saveMessageToDb = async (chatIdToSaveTo, role, text, filesForDb, aiSpecificData = {}) => {
-            if (!chatIdToSaveTo || !database || !currentUser) { 
-              console.error("Cannot save message: No active chat ID, Firebase not ready, or not logged in.");
-              return null;
-            }
-            const messagePartsForDb = [];
-            if (text) messagePartsForDb.push({ text: text });
-            
-            const attachedFilesForFirebase = filesForDb.map(f => {
-                if (f.type.startsWith('image/') && f.apiData) { 
-                    return { name: f.name, type: f.type, apiData: { mimeType: f.apiData.mimeType, data: f.apiData.data } }; 
-                } else if (f.type.startsWith('text/plain') && f.apiData?.textContent) {
-                    return { name: f.name, type: f.type, textPreview: f.apiData.textContent.substring(0,100)+"..."};
-                }
-                return { name: f.name, type: f.type }; 
-            });
+        const addMessageToLocalChat = async (role, text, filesForDisplay, aiSpecificData = {}) => {
+            const messageId = Date.now().toString(36) + Math.random().toString(36).substring(2);
+            const messagePartsForDisplay = [];
+            if (text) messagePartsForDisplay.push({ text: text });
 
+            // uiOnlyAttachedFiles for user messages, filesForDisplay from input are already structured for this
+            const attachedFilesForLocalState = filesForDisplay.map(f => ({
+                id: f.id,
+                name: f.name,
+                type: f.type,
+                apiData: f.apiData // This holds base64 for images, textContent for text files
+            }));
+            
             const messageData = {
+              id: messageId,
               role: role,
-              parts: messagePartsForDb.length > 0 ? messagePartsForDb : [{text: ""}], 
-              timestamp: firebase.database.ServerValue.TIMESTAMP,
-              ...(role === 'user' && attachedFilesForFirebase.length > 0 && { attachedFiles: attachedFilesForFirebase }), 
+              parts: messagePartsForDisplay.length > 0 ? messagePartsForDisplay : [{text: ""}], 
+              text: text || "", // For easier access sometimes, though parts is canonical
+              timestamp: new Date().getTime(),
+              ...(role === 'user' && attachedFilesForLocalState.length > 0 && { uiOnlyAttachedFiles: attachedFilesForLocalState }), 
               ...(role === 'model' && aiSpecificData.sources && { sources: aiSpecificData.sources }),
               ...(role === 'model' && aiSpecificData.searchUsed !== undefined && { searchUsed: aiSpecificData.searchUsed }),
+              ...(role === 'model' && aiSpecificData.modelUsed && { modelUsed: aiSpecificData.modelUsed }), 
             };
             
-            try {
-              const newMessageRef = await database.ref(`userChats/${currentUser.uid}/${chatIdToSaveTo}/messages`).push(messageData);
-              const chatSnapshot = await database.ref(`userChats/${currentUser.uid}/${chatIdToSaveTo}/title`).once('value');
-              const currentTitle = chatSnapshot.val();
-              if (role === 'user' && text && (currentTitle === "New Chat" || currentTitle.startsWith("New Chat -"))) {
-                const shortTitle = text.substring(0, 35) + (text.length > 35 ? "..." : "");
-                await database.ref(`userChats/${currentUser.uid}/${chatIdToSaveTo}/title`).set(shortTitle);
-              }
-              return newMessageRef.key; 
-            } catch (error) {
-              console.error("Error saving message to Firebase:", error);
-              setChatError("Error saving message.");
-              return null;
-            }
+            setChatMessages(prev => [...prev, messageData]);
+            return messageId; 
         };
 
-        const updateMessageInDb = async (chatId, messageKey, role, text, aiSpecificData = {}) => {
-            if (!chatId || !messageKey || !database || !currentUser) { 
-              console.error("Cannot update message: Missing info, Firebase not ready, or not logged in.");
-              setChatError("Failed to update message: Connection issue.");
-              return null;
-            }
-            const updates = {
-              parts: text ? [{ text: text }] : [{text: ""}],
-              timestamp: firebase.database.ServerValue.TIMESTAMP, 
-            };
-        
-            if (aiSpecificData.sources !== undefined) {
-              updates['sources'] = aiSpecificData.sources; 
-            }
-            if (aiSpecificData.searchUsed !== undefined) {
-              updates['searchUsed'] = aiSpecificData.searchUsed;
-            }
-        
-            try {
-              await database.ref(`userChats/${currentUser.uid}/${chatId}/messages/${messageKey}`).update(updates);
-              return messageKey;
-            } catch (error) {
-              console.error("Error updating message in Firebase:", error);
-              setChatError("Error updating message in storage.");
-              return null;
-            }
+        const updateMessageInLocalChat = async (messageKey, text, aiSpecificData = {}) => {
+             setChatMessages(prev => prev.map(msg => {
+                if (msg.id === messageKey) {
+                    return {
+                        ...msg,
+                        parts: text ? [{ text: text }] : [{text: ""}],
+                        text: text || "",
+                        timestamp: new Date().getTime(), 
+                        isLoading: aiSpecificData.isLoading !== undefined ? aiSpecificData.isLoading : msg.isLoading,
+                        isError: aiSpecificData.isError !== undefined ? aiSpecificData.isError : msg.isError,
+                        ...(aiSpecificData.sources !== undefined && { sources: aiSpecificData.sources }),
+                        ...(aiSpecificData.searchUsed !== undefined && { searchUsed: aiSpecificData.searchUsed }),
+                        ...(aiSpecificData.modelUsed !== undefined && { modelUsed: aiSpecificData.modelUsed }),
+                    };
+                }
+                return msg;
+            }));
+            return messageKey;
         };
         
         const _streamAiResponse = async (
             originalPromptPartsForGemini, 
-            targetAiMessageUiId, 
+            targetAiMessageUiId, // This will be the ID of the placeholder AI message
             historyForGeminiInit, 
             useSearchForThisTurn,
             currentLoadingText,
-            chatIdForSaving,
-            isRegeneration = false 
+            // chatIdForSaving, // Not needed for local state version
+            isRegeneration = false,
+            modelToUse 
         ) => {
-            if (!currentUser) {
-                setChatError("Please log in to get a response.");
-                setIsChatLoading(false);
-                return;
-            }
+            // currentUser check removed (always guest)
             setIsChatLoading(true);
             streamTextBuffer.current = "";
             streamSourcesBuffer.current = []; 
@@ -2526,37 +1908,44 @@ Remember: You're not just an AI assistant, you're a helpful friend who happens t
                 return;
             }
 
-            setChatMessages(prev => prev.map(m => m.id === targetAiMessageUiId ? { 
-                ...m, 
-                isLoading: true, 
-                isError: false, 
-                searchUsed: useSearchForThisTurn,
-                loadingText: currentLoadingText, 
-                text: "", 
-                parts: [{text: ""}], 
-                sources: null, 
-                timestamp: new Date().getTime() 
-            } : m));
+            // Update placeholder in local state
+             if (!isRegeneration) { // For new message, placeholder is already added
+                setChatMessages(prev => prev.map(m => m.id === targetAiMessageUiId ? { 
+                    ...m, 
+                    isLoading: true, 
+                    isError: false, 
+                    searchUsed: useSearchForThisTurn,
+                    loadingText: currentLoadingText, 
+                    text: "", 
+                    parts: [{text: ""}], 
+                    sources: null, 
+                    timestamp: new Date().getTime(),
+                    modelUsed: modelToUse 
+                } : m));
+            } else { // For regeneration, update existing message to loading state
+                 updateMessageInLocalChat(targetAiMessageUiId, "", {
+                    isLoading: true, isError: false, searchUsed: useSearchForThisTurn, 
+                    loadingText: currentLoadingText, sources: null, modelUsed: modelToUse
+                });
+            }
 
 
             const performUiUpdateWithText = (isLoading = true) => { 
                 if (!isStoppingGenerationRef.current || !isLoading) { 
-                    setChatMessages(prev => prev.map(m => m.id === targetAiMessageUiId ? { 
-                        ...m, 
-                        text: streamTextBuffer.current, 
-                        parts: [{text: streamTextBuffer.current}],
-                        isLoading: isLoading, 
-                        isError: false, 
-                        sources: streamSourcesBuffer.current.length > 0 ? [...streamSourcesBuffer.current] : null, 
+                    updateMessageInLocalChat(targetAiMessageUiId, streamTextBuffer.current, {
+                        isLoading: isLoading,
+                        isError: false,
+                        sources: streamSourcesBuffer.current.length > 0 ? [...streamSourcesBuffer.current] : null,
                         searchUsed: useSearchForThisTurn,
-                        loadingText: isLoading ? (firstChunkReceived ? "" : currentLoadingText) : ""  
-                    } : m));
+                        loadingText: isLoading ? (firstChunkReceived ? "" : currentLoadingText) : "",
+                        modelUsed: modelToUse
+                    });
                 }
             };
 
             let firstChunkReceived = false; 
             try {
-                const modelConfig = { model: GEMINI_MAIN_MODEL, systemInstruction: getSystemInstruction() };
+                const modelConfig = { model: modelToUse, systemInstruction: getSystemInstruction() }; 
                 if (useSearchForThisTurn) { 
                     modelConfig.tools = [{ googleSearch: {} }];
                 }
@@ -2638,40 +2027,7 @@ Remember: You're not just an AI assistant, you're a helpful friend who happens t
                      finalText = "*Content is based on search results.*";
                 }
                 streamTextBuffer.current = finalText;
-                performUiUpdateWithText(false); 
-
-                if (finalText.trim() && !isStoppingGenerationRef.current) { 
-                     if (isRegeneration) {
-                        await updateMessageInDb(chatIdForSaving, targetAiMessageUiId, 'model', finalText, {
-                            sources: streamSourcesBuffer.current.length > 0 ? [...streamSourcesBuffer.current] : null,
-                            searchUsed: useSearchForThisTurn
-                        });
-                    } else {
-                        const savedAiMsgId = await saveMessageToDb(chatIdForSaving, 'model', finalText, [], {
-                            sources: streamSourcesBuffer.current.length > 0 ? [...streamSourcesBuffer.current] : null,
-                            searchUsed: useSearchForThisTurn
-                        });
-                        if (savedAiMsgId) {
-                           setChatMessages(prev => prev.filter(m => m.id !== targetAiMessageUiId));
-                        }
-                    }
-                } else if (isStoppingGenerationRef.current && finalText.trim()) { 
-                     if (isRegeneration) {
-                        await updateMessageInDb(chatIdForSaving, targetAiMessageUiId, 'model', finalText, { 
-                            sources: streamSourcesBuffer.current.length > 0 ? [...streamSourcesBuffer.current] : null,
-                            searchUsed: useSearchForThisTurn
-                         });
-                    } else {
-                        const savedAiMsgId = await saveMessageToDb(chatIdForSaving, 'model', finalText, [], { 
-                            sources: streamSourcesBuffer.current.length > 0 ? [...streamSourcesBuffer.current] : null,
-                            searchUsed: useSearchForThisTurn
-                        });
-                        if (savedAiMsgId) {
-                           setChatMessages(prev => prev.filter(m => m.id !== targetAiMessageUiId));
-                        }
-                    }
-                }
-
+                performUiUpdateWithText(false); // Final update, not loading
 
             } catch (err) {
                 console.error("AI stream error in _streamAiResponse:", err);
@@ -2681,44 +2037,18 @@ Remember: You're not just an AI assistant, you're a helpful friend who happens t
                 else if (err.message?.toLowerCase().includes("quota")) errorTextForUser = "The API usage limit has been reached.";
                 
                 streamTextBuffer.current = errorTextForUser;
-                 setChatMessages(prev => prev.map(m => m.id === targetAiMessageUiId ? { 
-                    ...m, 
-                    role: 'model', 
-                    text: errorTextForUser, 
-                    parts: [{text: errorTextForUser}],
-                    isLoading: false, 
-                    isError: true, 
-                    searchUsed: useSearchForThisTurn,
-                    loadingText: ""
-                } : m));
-                 if (isRegeneration) {
-                    await updateMessageInDb(chatIdForSaving, targetAiMessageUiId, 'model', `Error: ${errorTextForUser}`, { searchUsed: useSearchForThisTurn, sources: null });
-                } else {
-                    const savedErrorMsgId = await saveMessageToDb(chatIdForSaving, 'model', `Error: ${errorTextForUser}`, [], { searchUsed: useSearchForThisTurn });
-                     if (savedErrorMsgId) {
-                        setChatMessages(prev => prev.filter(m => m.id !== targetAiMessageUiId));
-                     }
-                }
+                updateMessageInLocalChat(targetAiMessageUiId, errorTextForUser, {
+                    isLoading: false, isError: true, searchUsed: useSearchForThisTurn, loadingText: ""
+                });
             } finally {
                 setIsChatLoading(false);
             }
         };
 
         const handleSendChatMessage = useCallback(async (messageText, filesToSendFromInput, userWebSearchPreference) => {
-            if (!currentUser) {
-                setChatError("Please log in to send messages.");
-                return;
-            }
-            let activeChatId = currentChatId;
-            if (!activeChatId) {
-                const newChatIdAttempt = await handleNewChat();
-                if (!newChatIdAttempt) {
-                     setChatError("Please select or start a new chat first.");
-                     return;
-                }
-                activeChatId = newChatIdAttempt;
-            }
-
+            // currentUser check removed
+            // activeChatId logic for new chat creation via handleNewChat removed, using currentChatId directly
+            
             if (!messageText.trim() && filesToSendFromInput.length === 0) return;
 
             isStoppingGenerationRef.current = false; 
@@ -2728,12 +2058,9 @@ Remember: You're not just an AI assistant, you're a helpful friend who happens t
                 return;
             }
             
-            const userMessageDbId = await saveMessageToDb(activeChatId, 'user', messageText, filesToSendFromInput);
-            if (!userMessageDbId) {
-                setChatError("Failed to save your message. Please try again.");
-                return;
-            }
-            
+            const userMessageUiId = await addMessageToLocalChat('user', messageText, filesToSendFromInput);
+            // No need to check userMessageDbId as it's local now
+
             const aiPlaceholderUiId = Date.now().toString() + '_model_resp_temp_ui';
             const needsSearch = userWebSearchPreference;
             const finalLoadingText = needsSearch ? "Searching..." : "Thinking...";
@@ -2748,7 +2075,8 @@ Remember: You're not just an AI assistant, you're a helpful friend who happens t
                 isLoading: true, 
                 isError: false, 
                 sources: null, 
-                searchUsed: needsSearch, 
+                searchUsed: needsSearch,
+                modelUsed: selectedModelId
             };
 
             setChatMessages(prev => {
@@ -2768,8 +2096,9 @@ Remember: You're not just an AI assistant, you're a helpful friend who happens t
                 }
             });
             
-            const currentChatMessagesSnapshot = [...chatMessages]; 
-            const baseHistory = getGeminiHistory(currentChatMessagesSnapshot.filter(m => m.id !== aiPlaceholderUiId));
+            // Get history from current chatMessages state, up to *before* the new user message and placeholder AI message
+            const currentMessagesSnapshot = chatMessages.filter(m => m.id !== userMessageUiId && m.id !== aiPlaceholderUiId);
+            const baseHistory = getGeminiHistory(currentMessagesSnapshot); 
             
             const userMessageObjectForHistory = {
                 role: 'user',
@@ -2784,33 +2113,22 @@ Remember: You're not just an AI assistant, you're a helpful friend who happens t
                     historyForGemini, 
                     needsSearch, 
                     finalLoadingText,
-                    activeChatId,
-                    false 
+                    // currentChatId, // No longer needed for DB saving
+                    false, // Not a regeneration
+                    selectedModelId
                 );
             } else { 
-                 setChatMessages(prev => {
-                     return prev.map(m => {
-                        if (m.id === aiPlaceholderUiId) {
-                            return { ...m, role: 'model', text: "No valid content to send.", parts: [{text: "No valid content to send."}], isLoading: false, isError: true, loadingText: "" };
-                        }
-                        return m;
-                    }).filter(msg => msg.id !== aiPlaceholderUiId || msg.isError); 
+                 updateMessageInLocalChat(aiPlaceholderUiId, "No valid content to send.", {
+                     isLoading: false, isError: true, loadingText: ""
                  });
                 setIsChatLoading(false);
             }
             
-        }, [chatMessages, currentChatId, handleNewChat, currentUser]); 
+        }, [chatMessages, currentChatId, selectedModelId]); // currentUser dependency removed, handleNewChat dependency removed
 
 
         const handleRegenerateLastTextMessage = useCallback(async (aiMessageIdToRegenerate, userWebSearchPreference) => { 
-            if (!currentUser) {
-                setChatError("Please log in to regenerate messages.");
-                return;
-            }
-            if (!currentChatId) {
-                setChatError("No active chat to regenerate from.");
-                return;
-            }
+            // currentUser, currentChatId checks for existence removed (always guest, always a currentChatId)
             isStoppingGenerationRef.current = false; 
             setChatError(null);
             if (!API_KEY || API_KEY === "YOUR_GEMINI_API_KEY") {
@@ -2828,6 +2146,7 @@ Remember: You're not just an AI assistant, you're a helpful friend who happens t
                 setChatError("Cannot regenerate: Original AI message not found.");
                 return;
             }
+            const modelUsedForOriginalResponse = messagesForCurrentChat[aiMsgIndex].modelUsed || selectedModelId;
 
             for (let i = aiMsgIndex - 1; i >= 0; i--) {
                 if (messagesForCurrentChat[i].role === 'user') {
@@ -2856,20 +2175,26 @@ Remember: You're not just an AI assistant, you're a helpful friend who happens t
             const finalLoadingText = needsSearch ? "Searching..." : "Thinking...";
             
             const promptPartsForRegen = [];
-             if(userPromptMsgForRegen.parts && Array.isArray(userPromptMsgForRegen.parts)){
+            // Reconstruct prompt parts from the user message object (which might have uiOnlyAttachedFiles or attachedFiles)
+            if(userPromptMsgForRegen.parts && Array.isArray(userPromptMsgForRegen.parts)){
                 promptPartsForRegen.push(...userPromptMsgForRegen.parts.filter(p => p.text || p.inlineData)); 
             } else if (userPromptMsgForRegen.text) { 
                  promptPartsForRegen.push({text: userPromptMsgForRegen.text});
             }
-            if (userPromptMsgForRegen.attachedFiles && userPromptMsgForRegen.attachedFiles.length > 0) {
-                userPromptMsgForRegen.attachedFiles.forEach(fileMeta => {
-                    if(fileMeta.type?.startsWith('image/') && fileMeta.apiData) { 
-                        if (!promptPartsForRegen.some(p => p.inlineData && p.inlineData.data === fileMeta.apiData.data)) { 
-                           promptPartsForRegen.push({ inlineData: fileMeta.apiData });
-                        }
+            
+            const filesFromUserMessage = userPromptMsgForRegen.uiOnlyAttachedFiles || userPromptMsgForRegen.attachedFiles || [];
+            filesFromUserMessage.forEach(fileMeta => {
+                if(fileMeta.type?.startsWith('image/') && fileMeta.apiData) { 
+                    if (!promptPartsForRegen.some(p => p.inlineData && p.inlineData.data === fileMeta.apiData.data)) { 
+                       promptPartsForRegen.push({ inlineData: fileMeta.apiData });
                     }
-                });
-            }
+                } else if ((fileMeta.name?.toLowerCase().endsWith('.txt') || fileMeta.type === 'text/plain') && fileMeta.apiData?.textContent) {
+                     const fileContentMarker = `\n[Content of attached file: ${fileMeta.name}]\n`;
+                     if (!promptPartsForRegen.some(p => p.text && p.text.includes(fileContentMarker))) {
+                        promptPartsForRegen.push({ text: `${fileContentMarker}${fileMeta.apiData.textContent}\n[End of file: ${fileMeta.name}]\n` });
+                     }
+                }
+            });
 
 
             if (promptPartsForRegen.length > 0) {
@@ -2879,89 +2204,24 @@ Remember: You're not just an AI assistant, you're a helpful friend who happens t
                     historyUpToUserPrompt, 
                     needsSearch, 
                     finalLoadingText,
-                    currentChatId,
-                    true 
+                    // currentChatId, // Not needed for DB
+                    true, // Is regeneration
+                    modelUsedForOriginalResponse
                 );
             } else { 
-                 setChatMessages(prev => prev.map(m => {
-                    if(m.id === aiMessageIdToRegenerate) return {...m, isLoading: false, text: "No content found to regenerate.", parts: [{text:"No content found to regenerate."}], isError: true, loadingText:""};
-                    return m;
-                }));
+                 updateMessageInLocalChat(aiMessageIdToRegenerate, "No content found to regenerate.", {
+                     isLoading: false, isError: true, loadingText:""
+                 });
                 setIsChatLoading(false);
             }
-        }, [chatMessages, currentChatId, currentUser]); 
+        }, [chatMessages, currentChatId, selectedModelId]); // currentUser dependency removed
 
-        const handleRequestToggleSidebar = () => {
-            if (!currentUser) return;
-
-            if (!userPinFromDb) {
-                 setIsPinSettingsModalOpen(true); 
-                 setPinSettingsStatus({ message: 'Please set a PIN to secure your chat history.', type: 'info' });
-                 return;
-            }
-
-            if (isPinVerifiedForSession) {
-                setIsSidebarActuallyOpen(prev => !prev);
-            } else {
-                setPinUnlockError(null);
-                setIsPinUnlockModalOpen(true);
-                setIsSidebarActuallyOpen(false); 
-            }
-        };
-    
-        const handleSubmitUnlockPin = (enteredPin) => {
-            if (enteredPin === userPinFromDb) {
-                setIsPinVerifiedForSession(true);
-                setIsPinUnlockModalOpen(false);
-                setPinUnlockError(null);
-                setIsSidebarActuallyOpen(true); 
-            } else {
-                setPinUnlockError("Incorrect PIN. Please try again.");
-            }
-        };
-
-        const handleLogout = async () => {
-            if(!auth) return;
-            try {
-                await auth.signOut();
-                setIsSidebarActuallyOpen(false); 
-            } catch (error) {
-                console.error("Logout error:", error);
-                setChatError("Failed to log out.");
-            }
-        };
-
-        const handleSendPasswordReset = async (email, isErrorDirect = false, directMessage = "") => {
-            if (isErrorDirect) {
-                setForgotPasswordStatus({ message: directMessage, type: 'error' });
-                return;
-            }
-            if (!auth) {
-                 setForgotPasswordStatus({ message: "Authentication service unavailable.", type: 'error' });
-                return;
-            }
-            try {
-                await auth.sendPasswordResetEmail(email);
-                setForgotPasswordStatus({ message: "Password reset email sent. Check your inbox (and spam folder).", type: 'success' });
-            } catch (error) {
-                console.error("Forgot password error:", error);
-                let message = "Failed to send reset email. Please try again.";
-                if (error.code === 'auth/user-not-found') {
-                    message = "No user found with this email address.";
-                } else if (error.code === 'auth/invalid-email') {
-                    message = "The email address is not valid.";
-                }
-                setForgotPasswordStatus({ message, type: 'error' });
-            }
-        };
+        // handleRequestToggleSidebar, handleSubmitUnlockPin, handleLogout, handleSendPasswordReset removed
 
         const handleDeleteAiMessagePair = async (aiMessageId) => {
-            if (!currentUser || !currentChatId || !database) {
-                setChatError("Cannot delete messages: Not logged in or no active chat.");
-                return;
-            }
+            // currentUser, currentChatId, database checks removed
     
-            const currentMessages = [...chatMessages]; // Use a copy of the state
+            const currentMessages = [...chatMessages]; 
             const aiMessageIndex = currentMessages.findIndex(msg => msg.id === aiMessageId);
     
             if (aiMessageIndex === -1) {
@@ -2969,17 +2229,15 @@ Remember: You're not just an AI assistant, you're a helpful friend who happens t
                 return;
             }
     
-            const messagesToDelete = { [aiMessageId]: null }; 
+            let idsToDelete = [aiMessageId];
     
-            // Find the immediately preceding user message that is not a system message
             if (aiMessageIndex > 0) {
                 let precedingUserMessage = null;
                 for (let i = aiMessageIndex - 1; i >= 0; i--) {
-                    if (currentMessages[i].role === 'model') { // If we hit another model message, stop (shouldn't happen if logic is correct)
+                    if (currentMessages[i].role === 'model') { 
                         break; 
                     }
                     if (currentMessages[i].role === 'user') {
-                        // Check if there are any other user messages between this one and the AI message
                         let interveningUserMessage = false;
                         for (let k = i + 1; k < aiMessageIndex; k++) {
                             if (currentMessages[k].role === 'user') {
@@ -2990,25 +2248,20 @@ Remember: You're not just an AI assistant, you're a helpful friend who happens t
                         if (!interveningUserMessage) {
                            precedingUserMessage = currentMessages[i];
                         }
-                        break; // Found the closest user message (or determined there isn't one relevant)
+                        break; 
                     }
                 }
                 if (precedingUserMessage) {
-                    messagesToDelete[precedingUserMessage.id] = null;
+                    idsToDelete.push(precedingUserMessage.id);
                 }
             }
     
-            try {
-                await database.ref(`userChats/${currentUser.uid}/${currentChatId}/messages`).update(messagesToDelete);
-                // UI will update via Firebase listener, which now gets the filtered chatMessages
-            } catch (error) {
-                console.error("Error deleting message pair:", error);
-                setChatError("Failed to delete messages.");
-            }
+            setChatMessages(prev => prev.filter(msg => !idsToDelete.includes(msg.id)));
+            // DB deletion removed
         };
 
 
-        if (authLoading) {
+        if (authLoading) { // This will be false by default now
             return (
                 <div className="h-full flex items-center justify-center bg-surface-main">
                     <div className="w-10 h-10 border-4 border-brand-primary border-t-transparent rounded-full animate-spin-continuous"></div>
@@ -3016,73 +2269,12 @@ Remember: You're not just an AI assistant, you're a helpful friend who happens t
             );
         }
         
-        if (!currentUser) {
-            return (
-                <>
-                    <AuthPage onShowForgotPassword={() => {
-                        setForgotPasswordStatus({ message: '', type: ''});
-                        setIsForgotPasswordModalOpen(true);
-                    }} />
-                    <ForgotPasswordModal
-                        isOpen={isForgotPasswordModalOpen}
-                        onClose={() => setIsForgotPasswordModalOpen(false)}
-                        onSendResetEmail={handleSendPasswordReset}
-                        statusMessage={forgotPasswordStatus.message}
-                        statusType={forgotPasswordStatus.type}
-                    />
-                </>
-            );
-        }
-
+        // AuthPage and related modals removed from render path
 
         return (
             <div className="h-full text-text-primary flex font-sans bg-surface-main">
-                <PinUnlockModal
-                    isOpen={isPinUnlockModalOpen}
-                    onClose={() => setIsPinUnlockModalOpen(false)}
-                    onSubmitPin={handleSubmitUnlockPin}
-                    pinError={pinUnlockError}
-                />
-                <PinSettingsModal
-                    isOpen={isPinSettingsModalOpen}
-                    onClose={() => { setIsPinSettingsModalOpen(false); setPinSettingsStatus({ message: '', type: '' }); }}
-                    onSetPin={(newPin) => saveUserPin(currentUser.uid, newPin)}
-                    currentPin={userPinFromDb}
-                    statusMessage={pinSettingsStatus.message}
-                    statusType={pinSettingsStatus.type}
-                />
-                 <ForgotPasswordModal 
-                    isOpen={isForgotPasswordModalOpen} 
-                    onClose={() => setIsForgotPasswordModalOpen(false)}
-                    onSendResetEmail={handleSendPasswordReset}
-                    statusMessage={forgotPasswordStatus.message}
-                    statusType={forgotPasswordStatus.type}
-                />
-                {currentUser && ( 
-                    <Sidebar 
-                        chatHistory={chatHistoryList}
-                        onSelectChat={(chatId) => {
-                            setCurrentChatId(chatId);
-                            if (isSidebarActuallyOpen) setIsSidebarActuallyOpen(false);
-                            setSelectedUserMessageId(null); 
-                        }}
-                        currentChatId={currentChatId}
-                        onNewChat={() => {
-                            handleNewChat();
-                            if (isSidebarActuallyOpen) setIsSidebarActuallyOpen(false);
-                            setSelectedUserMessageId(null);
-                        }}
-                        isOpen={isSidebarActuallyOpen}
-                        setIsOpen={setIsSidebarActuallyOpen} 
-                        onDeleteChat={handleDeleteChat}
-                        onLogout={handleLogout}
-                        onOpenPinSettings={() => {
-                            setPinSettingsStatus({ message: '', type: ''}); 
-                            setIsPinSettingsModalOpen(true);
-                        }}
-                        userEmail={currentUser.email}
-                    />
-                )}
+                {/* PIN Modals Removed */}
+                {/* Sidebar Removed */}
                 <div className="flex-grow h-full flex flex-col min-w-0"> 
                     <ChatInterface 
                         messages={chatMessages} 
@@ -3093,11 +2285,13 @@ Remember: You're not just an AI assistant, you're a helpful friend who happens t
                         onNewChat={handleNewChat} 
                         setChatError={setChatError} 
                         currentChatId={currentChatId}
-                        onToggleSidebarRequest={handleRequestToggleSidebar}
-                        currentUser={currentUser}
+                        // onToggleSidebarRequest removed
+                        // currentUser removed (passed implicitly by App structure)
                         onDeleteAiMessagePair={handleDeleteAiMessagePair}
                         selectedUserMessageId={selectedUserMessageId}
                         setSelectedUserMessageId={setSelectedUserMessageId}
+                        selectedModelId={selectedModelId}
+                        onSelectModel={setSelectedModelId}
                     />
                 </div>
             </div>
