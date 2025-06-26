@@ -192,7 +192,7 @@
       import hljs from 'highlight.js';
 
       const renderer = new marked.Renderer();
-      renderer.link = (href, title, text) => { /* ... (same as before) ... */ 
+      renderer.link = (href, title, text) => { 
         const external = href && (href.startsWith('http://') || href.startsWith('https://'));
         const target = external ? ' target="_blank" rel="noopener noreferrer"' : '';
         const titleAttr = title ? ` title="${title}"` : '';
@@ -218,7 +218,7 @@
         { text: "Reviewing search results", completed: false },
         { text: "Filtering results to find recent and relevant", completed: false }
       ];
-      const FAKE_STEP_DELAY = 600; // Milliseconds between completing fake steps
+      const FAKE_STEP_DELAY = 500; // Milliseconds between completing fake steps
 
       function getSystemInstruction() { return `You are AlphaGPT, a highly advanced, friendly, and culturally aware assistant.
 
@@ -512,6 +512,7 @@ Internet Search Capability:
     - You can say phrases like (Roman Urdu): "Maine search karke yeh maloomat hasil ki hai" or "Internet search ke mutabiq..."
     - The UI will NOT display source URLs directly below your message.
 
+
 Search Prioritization:
 - When a user's query is general (not specifying a particular location or context) AND search is active (Web Search toggle is ON):
     - Your primary search context MUST BE **Pakistan**.
@@ -596,12 +597,12 @@ Remember: You're not just an AI assistant, you're a helpful friend who happens t
           const searchingShimmerDiv = ( <div className="absolute inset-0 bg-gradient-to-r from-transparent via-blue-200 to-transparent opacity-60 animate-shimmer" /> );
           // Note: Not using backgroundSize here as per user's specific HTML for this shimmer
 
-          if (isPotentiallySearching) {
+          if (isPotentiallySearching) { // This will now only be true for the very brief moment before fake steps start animating.
             return (
               <div className={mainIndicatorContainerClasses}>
-                <GlobeIcon className="w-3.5 h-3.5 text-text-secondary" /> {/* Size changed */}
+                <GlobeIcon className="w-3.5 h-3.5 text-text-secondary" />
                 <div className="relative overflow-hidden">
-                  <span className={textClasses}>Searching web...</span> {/* Text changed */}
+                  <span className={textClasses}>Searching web...</span>
                   {searchingShimmerDiv}
                 </div>
               </div>
@@ -653,7 +654,7 @@ Remember: You're not just an AI assistant, you're a helpful friend who happens t
                 alt="" 
                 width={size} 
                 height={size} 
-                className="flex-shrink-0 mr-2 rounded-sm" // Added margin and rounded
+                className="flex-shrink-0 mr-2 rounded-sm" 
                 onError={() => setImgError(true)} 
             />
         );
@@ -665,10 +666,9 @@ Remember: You're not just an AI assistant, you're a helpful friend who happens t
           const handleCopyText = () => { const textToCopy = message.finalAnswerText || message.parts?.[0]?.text || message.text || ""; if (textToCopy) { navigator.clipboard.writeText(textToCopy).then(() => { setCopied(true); setTimeout(() => setCopied(false), 1500); }).catch(err => console.error('Failed to copy text: ', err)); } setShowOptions(false); };
           const handleDelete = () => { onDeleteAiMessagePair(message.id); setShowOptions(false); };
           
-          // Allow options if it's a model message that's not loading, or if it's a search-enabled message (even if only analysis steps are there)
           let allowOptions = message.role === 'model' && !message.isLoading && !message.isError;
-          if (allowOptions && !(message.finalAnswerText || message.parts?.[0]?.text || message.text)) { // If no actual text content yet
-             if (!(message.searchUsed && message.analysisSteps && message.analysisSteps.length > 0)) { // but has search steps
+          if (allowOptions && !(message.finalAnswerText || message.parts?.[0]?.text || message.text)) { 
+             if (!(message.searchUsed && message.analysisSteps && message.analysisSteps.length > 0)) { 
                  allowOptions = false;
              }
           }
@@ -719,25 +719,14 @@ Remember: You're not just an AI assistant, you're a helpful friend who happens t
                   bubbleRoleClasses = `bg-red-50 border border-red-300 text-red-700 rounded-xl rounded-bl-md font-source-sans-pro`; 
                   const errorContent = typeof message.finalAnswerText === 'string' && message.finalAnswerText ? message.finalAnswerText : messageTextContent;
                   contentToShow = ( <div className="text-sm break-words"> <div className="flex items-center mb-1"><i className="fas fa-exclamation-triangle text-red-500 mr-2"></i><strong className="font-semibold">Error</strong></div>{errorContent.replace(/^Error:\s*/, '')} </div>); 
-              } else if (message.isLoading && message.searchUsed && (!message.analysisSteps || message.analysisSteps.length === 0) && !(typeof message.finalAnswerText === 'string' && message.finalAnswerText) && !FAKE_ANALYSIS_STEPS_DEFINITION.some(fakeStep => message.analysisSteps?.find(s => s.text === fakeStep.text))) {
-                  // This case is for the initial "Searching web..." shimmer before fake steps are populated
-                  bubbleRoleClasses = ''; bubbleBaseClasses = ''; 
-                  const searchingShimmerDiv = ( <div className="absolute inset-0 bg-gradient-to-r from-transparent via-blue-200 to-transparent opacity-60 animate-shimmer" /> );
-                  contentToShow = ( 
-                    <div className="flex items-center space-x-1.5 p-2.5 bg-gray-50 rounded-lg border border-gray-200 max-w-fit my-0 self-start ml-0"> 
-                        <GlobeIcon className="w-3.5 h-3.5 text-text-secondary" />
-                        <div className="relative overflow-hidden">
-                            <span className="text-sm text-gray-600 font-medium">Searching web...</span>
-                            {searchingShimmerDiv}
-                        </div>
-                    </div> 
-                  );
-              } else if (message.searchUsed && message.analysisSteps && message.analysisSteps.length > 0) { // Display fake steps
-                   bubbleRoleClasses = `bg-white text-text-primary rounded-xl rounded-bl-md border border-[#E5E8EB] p-3 md:p-4`; 
-                   contentToShow = (
+              
+              } else if (message.isLoading && message.searchUsed && message.analysisSteps && message.analysisSteps.length > 0 && !message.analysisSteps.every(s=>s.completed) && !(typeof message.finalAnswerText === 'string' && message.finalAnswerText.trim())) {
+                 // This is when fake steps are actively being animated (not all completed yet) AND no final answer text started
+                  bubbleRoleClasses = `bg-white text-text-primary rounded-xl rounded-bl-md border border-[#E5E8EB] p-3 md:p-4`; 
+                  contentToShow = (
                       <div className="w-full"> 
                           {message.analysisSteps.map((step, index) => (
-                              <div key={`fakestep-${index}`} className="flex items-center space-x-2 mb-1.5">
+                              <div key={`fakesteponload-${index}`} className="flex items-center space-x-2 mb-1.5">
                                   {step.completed ? ( 
                                     <CheckMarkIconSVG className="w-3.5 h-3.5 text-green-500 flex-shrink-0" />
                                   ) : ( 
@@ -748,14 +737,26 @@ Remember: You're not just an AI assistant, you're a helpful friend who happens t
                                   <span className="text-xs italic text-text-secondary">{step.text}</span>
                               </div>
                           ))}
-                          {/* Separator only if there's actual text answer following the fake steps */}
+                      </div>
+                  );
+
+              } else if (message.searchUsed && message.analysisSteps && message.analysisSteps.length > 0) { // Display fake steps (all completed) and potentially the answer
+                   bubbleRoleClasses = `bg-white text-text-primary rounded-xl rounded-bl-md border border-[#E5E8EB] p-3 md:p-4`; 
+                   contentToShow = (
+                      <div className="w-full"> 
+                          {message.analysisSteps.map((step, index) => ( // All should be completed here
+                              <div key={`fakestepfinal-${index}`} className="flex items-center space-x-2 mb-1.5">
+                                  <CheckMarkIconSVG className="w-3.5 h-3.5 text-green-500 flex-shrink-0" />
+                                  <span className="text-xs italic text-text-secondary">{step.text}</span>
+                              </div>
+                          ))}
                           {typeof message.finalAnswerText === 'string' && message.finalAnswerText.trim() && (
                               <hr className="my-3 border-border-light" /> 
                           )}
                           {typeof message.finalAnswerText === 'string' && message.finalAnswerText.trim() && (
                               <div ref={contentRef} className="markdown-content break-words" dangerouslySetInnerHTML={{ __html: marked.parse(message.finalAnswerText || '') }} />
                           )}
-                          {/* Spinner if still loading main answer after fake steps */}
+                           {/* Spinner if still loading main answer after fake steps have all been 'visually' completed */}
                           {message.isLoading && !(typeof message.finalAnswerText === 'string' && message.finalAnswerText.trim()) && (
                             <div className="flex items-center space-x-1.5 p-2 bg-gray-50 rounded-lg border border-gray-200 max-w-fit mt-2.5"> 
                                 <div className="w-3 h-3 border-2 border-gray-300 border-t-brand-primary rounded-full animate-spin"></div>
@@ -807,8 +808,8 @@ Remember: You're not just an AI assistant, you're a helpful friend who happens t
           return ( <div className="w-full h-full flex flex-col bg-white md:rounded-xl shadow-chat-window overflow-hidden"> <header className="p-3 flex items-center justify-between flex-shrink-0 bg-white border-b border-border-light shadow-header"> <h1 className="text-xl font-sans font-semibold text-gray-800 text-left flex-grow">AlphaGPT</h1> <button onClick={() => { onNewChat(); setSelectedUserMessageId(null); }} className="p-1.5 text-text-secondary hover:text-brand-primary rounded-full hover:bg-interactive-hover/70 transition-colors focus:outline-none" aria-label="New Chat" disabled={isLoading || isAiCurrentlyProcessing} > <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-6 h-6"> <path fillRule="evenodd" d="M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25zM12.75 9a.75.75 0 00-1.5 0v2.25H9a.75.75 0 000 1.5h2.25V15a.75.75 0 001.5 0v-2.25H15a.75.75 0 000-1.5h-2.25V9z" clipRule="evenodd" /> </svg> </button> </header> <div ref={chatContainerRef} className="flex-grow p-4 md:p-5 space-y-3 md:space-y-4 overflow-y-auto chat-messages-container relative bg-surface-chat-area"> { activeMessages.length === 0 && !isLoading ? ( <div className="absolute inset-0 flex flex-col items-center justify-center text-center pointer-events-none p-8 animate-fade-in-up opacity-0" style={{animationDelay: '0.2s', animationFillMode: 'forwards'}}> <NewEmptyStateIconSVG className="w-16 h-16 mb-5 text-brand-send-active" /> <p className="text-2xl lg:text-3xl font-serif text-gray-800 leading-tight"> How can I help you<br />today? </p> {currentChatId && <p className="text-xs text-text-subtle mt-3">Send a message to get started in this chat.</p>} </div> ) : null }
               {messages.map((msg, idx) => { 
                   const isThisMessageAiAndFinalized = msg.role === 'model' && !msg.isLoading && !msg.isError && 
-                                                   ( (typeof msg.finalAnswerText === 'string' && msg.finalAnswerText) || // Has final text
-                                                     (msg.searchUsed && msg.analysisSteps && msg.analysisSteps.length > 0) // Or is search and has steps (even if text is empty)
+                                                   ( (typeof msg.finalAnswerText === 'string' && msg.finalAnswerText) || 
+                                                     (msg.searchUsed && msg.analysisSteps && msg.analysisSteps.length > 0 && msg.analysisSteps.every(s => s.completed)) 
                                                    );
                   let canThisAiMessageBeRegenerated = false;
                   if(isThisMessageAiAndFinalized) {
@@ -822,8 +823,9 @@ Remember: You're not just an AI assistant, you're a helpful friend who happens t
       
       const App = () => { 
           const [currentUser, setCurrentUser] = useState({ uid: 'guest_user', email: 'Guest User' }); const [authLoading, setAuthLoading] = useState(false); const [chatMessages, setChatMessages] = useState([]); const [isChatLoading, setIsChatLoading] = useState(false); const [chatError, setChatError] = useState(null); const [currentChatId, setCurrentChatId] = useState('session_chat_init'); const [chatHistoryList, setChatHistoryList] = useState([]); const [selectedUserMessageId, setSelectedUserMessageId] = useState(null); const [selectedModelId, setSelectedModelId] = useState(DEFAULT_MODEL_ID);
-          const isStoppingGenerationRef = useRef(false); const streamTextBuffer = useRef(""); const streamSourcesBuffer = useRef([]); 
-          const fakeStepProgressRef = useRef(0);
+          const isStoppingGenerationRef = useRef(false); const streamTextBuffer = useRef(""); 
+          // streamSourcesBuffer is not used for UI display anymore based on new requirements, but kept for potential internal logic if needed.
+          const streamSourcesBuffer = useRef([]); 
 
 
           useEffect(() => { if (chatError) { const errorId = Date.now() + '_sys_validation_err'; const newErrorMsg = {id: errorId, role: 'system', text: chatError, isError: true, timestamp: new Date().getTime()}; setChatMessages(prev => { const lastMessage = prev[prev.length -1]; if(lastMessage && lastMessage.id.includes('_sys_validation_err') && lastMessage.text === chatError) return prev; return [...prev, newErrorMsg]; }); } }, [chatError]); 
@@ -834,10 +836,27 @@ Remember: You're not just an AI assistant, you're a helpful friend who happens t
           };
           useEffect(() => { if (!genAI || !API_KEY || API_KEY === "YOUR_GEMINI_API_KEY") { setChatError("Gemini API Key is not configured or client failed to initialize."); } }, []); 
           
+          const animateFakeSteps = async (aiMessageUiId) => {
+            for (let i = 0; i < FAKE_ANALYSIS_STEPS_DEFINITION.length; i++) {
+                if (isStoppingGenerationRef.current) break;
+                setChatMessages(prevMsgs => prevMsgs.map(msg => {
+                    if (msg.id === aiMessageUiId && msg.analysisSteps && msg.analysisSteps[i]) {
+                        const newAnalysisSteps = [...msg.analysisSteps];
+                        newAnalysisSteps[i] = { ...newAnalysisSteps[i], completed: true };
+                        return { ...msg, analysisSteps: newAnalysisSteps };
+                    }
+                    return msg;
+                }));
+                if (i < FAKE_ANALYSIS_STEPS_DEFINITION.length - 1) { // Don't delay after the last step
+                    await new Promise(resolve => setTimeout(resolve, FAKE_STEP_DELAY));
+                }
+                 if (isStoppingGenerationRef.current) break;
+            }
+          };
+
           const handleStopGeneration = useCallback(() => {
               isStoppingGenerationRef.current = true;
               setIsChatLoading(false);
-              fakeStepProgressRef.current = 0; // Reset for next potential search
 
               setChatMessages(prevMessages => {
                   return prevMessages.map(msg => {
@@ -845,12 +864,10 @@ Remember: You're not just an AI assistant, you're a helpful friend who happens t
                           let finalStoppedText = streamTextBuffer.current || "";
                           let finalAnalysisSteps = msg.analysisSteps ? [...msg.analysisSteps] : [];
 
-                          if (msg.searchUsed) { // If it was a search, we were using fake steps
-                              finalAnalysisSteps = (finalAnalysisSteps.length > 0 ? finalAnalysisSteps : FAKE_ANALYSIS_STEPS_DEFINITION.map(s => ({...s})))
-                                                 .map(s => ({ ...s, completed: true }));
-                              // Clean any stray real markers from the answer part if model sent them
+                          if (msg.searchUsed) { 
+                              finalAnalysisSteps = FAKE_ANALYSIS_STEPS_DEFINITION.map(s => ({ ...s, completed: true }));
                               finalStoppedText = finalStoppedText.replace(/\[ANALYSIS_STEP\].*?\n/g, '').replace(/\[ANALYSIS_END\]\n?/g, '');
-                          } else { // Not a search, no analysis steps should be shown
+                          } else { 
                               finalAnalysisSteps = [];
                           }
 
@@ -870,7 +887,7 @@ Remember: You're not just an AI assistant, you're a helpful friend who happens t
                               text: finalStoppedText,
                               parts: [{text: finalStoppedText}],
                               isLoading: false,
-                              sources: streamSourcesBuffer.current.length > 0 ? [...streamSourcesBuffer.current] : msg.sources,
+                              sources: null, // Sources are not displayed
                           };
                       }
                       return msg;
@@ -879,59 +896,41 @@ Remember: You're not just an AI assistant, you're a helpful friend who happens t
           }, []); 
 
           const mergeCitations = (existingSources, newSources) => { if (!newSources || newSources.length === 0) return existingSources; const existingUris = new Set((existingSources || []).map(s => s.uri)); const uniqueNewSources = newSources.filter(src => src.uri && !existingUris.has(src.uri)); return [...(existingSources || []), ...uniqueNewSources]; };
-          const addMessageToLocalChat = async (role, text, filesForDisplay, aiSpecificData = {}) => { const messageId = Date.now().toString(36) + Math.random().toString(36).substring(2); const messagePartsForDisplay = []; if (text) messagePartsForDisplay.push({ text: text }); const attachedFilesForLocalState = filesForDisplay.map(f => ({ id: f.id, name: f.name, type: f.type, apiData: f.apiData })); const messageData = { id: messageId, role: role, parts: messagePartsForDisplay.length > 0 ? messagePartsForDisplay : [{text: ""}], text: text || "", timestamp: new Date().getTime(), ...(role === 'user' && attachedFilesForLocalState.length > 0 && { uiOnlyAttachedFiles: attachedFilesForLocalState }), ...(role === 'model' && aiSpecificData.sources && { sources: aiSpecificData.sources }), ...(role === 'model' && aiSpecificData.searchUsed !== undefined && { searchUsed: aiSpecificData.searchUsed }), ...(role === 'model' && aiSpecificData.modelUsed && { modelUsed: aiSpecificData.modelUsed }), }; setChatMessages(prev => [...prev, messageData]); return messageId; };
+          const addMessageToLocalChat = async (role, text, filesForDisplay, aiSpecificData = {}) => { const messageId = Date.now().toString(36) + Math.random().toString(36).substring(2); const messagePartsForDisplay = []; if (text) messagePartsForDisplay.push({ text: text }); const attachedFilesForLocalState = filesForDisplay.map(f => ({ id: f.id, name: f.name, type: f.type, apiData: f.apiData })); const messageData = { id: messageId, role: role, parts: messagePartsForDisplay.length > 0 ? messagePartsForDisplay : [{text: ""}], text: text || "", timestamp: new Date().getTime(), ...(role === 'user' && attachedFilesForLocalState.length > 0 && { uiOnlyAttachedFiles: attachedFilesForLocalState }), ...(role === 'model' && aiSpecificData.searchUsed !== undefined && { searchUsed: aiSpecificData.searchUsed }), ...(role === 'model' && aiSpecificData.modelUsed && { modelUsed: aiSpecificData.modelUsed }), }; setChatMessages(prev => [...prev, messageData]); return messageId; };
           
           const _streamAiResponse = async ( originalPromptPartsForGemini, targetAiMessageUiId, historyForGeminiInit, useSearchForThisTurn, currentLoadingText, isRegeneration = false, modelToUse ) => {
               if (!genAI) { setChatError("Gemini AI Client not initialized. Check API Key."); setIsChatLoading(false); setChatMessages(prev => prev.map(m => m.id === targetAiMessageUiId ? { ...m, isLoading: false, isError: true, finalAnswerText: "AI Client Error.", text: "AI Client Error.", parts:[{text:"AI Client Error."}] } : m)); return; }
               
               setIsChatLoading(true); 
               streamTextBuffer.current = ""; 
-              streamSourcesBuffer.current = []; // Reset sources buffer for this call
-              fakeStepProgressRef.current = 0; // Reset fake step progress
+              streamSourcesBuffer.current = []; 
               let firstChunkReceived = false; 
               
               if (isStoppingGenerationRef.current) { setIsChatLoading(false); return; }
               
-              setChatMessages(prev => prev.map(m => {
-                  if (m.id === targetAiMessageUiId) {
-                      return {
-                          ...m,
-                          isLoading: true,
-                          isError: false,
-                          searchUsed: useSearchForThisTurn,
-                          loadingText: currentLoadingText, // Initial loading text if any
-                          text: "",
-                          parts: [{text: ""}],
-                          analysisSteps: useSearchForThisTurn ? FAKE_ANALYSIS_STEPS_DEFINITION.map(s => ({...s, completed: false })) : [],
-                          finalAnswerText: "", // Always start with empty final answer text
-                          sources: null, 
-                          timestamp: new Date().getTime(),
-                          modelUsed: modelToUse
-                      };
-                  }
-                  return m;
-              }));
+              // Initial message state is already set by handleSendChatMessage or handleRegenerateLastTextMessage
+              // It includes the fake steps (all completed: false) if useSearchForThisTurn is true.
               
               const performUiUpdateInStream = (isLoading = true) => { 
                   if (!isStoppingGenerationRef.current || !isLoading) { 
                       setChatMessages(prevMsgs => prevMsgs.map(msg => { 
                           if (msg.id === targetAiMessageUiId) { 
                               let currentTextForAnswer = streamTextBuffer.current;
-                              if (useSearchForThisTurn) { // Clean potential real markers if showing fake ones
+                              if (useSearchForThisTurn) { 
                                   currentTextForAnswer = currentTextForAnswer.replace(/\[ANALYSIS_STEP\].*?\n/g, '').replace(/\[ANALYSIS_END\]\n?/g, '');
                               }
                               
-                              // Analysis steps are managed by the fake step progression logic, just pass them through
-                              const currentAnalysisSteps = msg.analysisSteps || (useSearchForThisTurn ? FAKE_ANALYSIS_STEPS_DEFINITION.map(s=>({...s, completed: false})) : []);
+                              // analysisSteps are taken from the current message state, which animateFakeSteps is updating
+                              const currentAnalysisSteps = msg.analysisSteps || [];
 
                               return { 
                                   ...msg,
                                   analysisSteps: currentAnalysisSteps, 
                                   finalAnswerText: currentTextForAnswer,
                                   isLoading: isLoading,
-                                  text: currentTextForAnswer || (useSearchForThisTurn && currentAnalysisSteps.length > 0 ? "" : ""), // Show empty if only fake steps are visible and no answer yet
+                                  text: currentTextForAnswer || (useSearchForThisTurn && currentAnalysisSteps.length > 0 ? "" : ""),
                                   parts: [{ text: currentTextForAnswer || (useSearchForThisTurn && currentAnalysisSteps.length > 0 ? "" : "") }],
-                                  sources: streamSourcesBuffer.current.length > 0 ? [...streamSourcesBuffer.current] : msg.sources, // Keep sources if any
+                                  sources: null, // Sources not displayed
                                   loadingText: isLoading ? (firstChunkReceived || (useSearchForThisTurn && currentAnalysisSteps.some(s=>s.completed)) ? "" : currentLoadingText) : "",
                               }; 
                           } 
@@ -960,7 +959,8 @@ Remember: You're not just an AI assistant, you're a helpful friend who happens t
                           chunkTextForProcessing = filteredLines.join('\n');
                       } 
                       
-                      if (chunk.candidates && chunk.candidates[0]?.groundingMetadata?.groundingChunks) { 
+                      // Sources are not used for UI but can be collected if needed for other logic
+                      if (useSearchForThisTurn && chunk.candidates && chunk.candidates[0]?.groundingMetadata?.groundingChunks) { 
                           const sourcesDelta = chunk.candidates[0].groundingMetadata.groundingChunks.filter(gc => gc.web && gc.web.uri).map(gc => ({ uri: gc.web.uri, title: gc.web.title || gc.web.uri })); 
                           if (sourcesDelta && sourcesDelta.length > 0) { 
                               streamSourcesBuffer.current = mergeCitations(streamSourcesBuffer.current, sourcesDelta); 
@@ -968,41 +968,20 @@ Remember: You're not just an AI assistant, you're a helpful friend who happens t
                       } 
                       
                       if (chunkTextForProcessing) {
-                          const textParts = chunkTextForProcessing.split(/(\s+|\*+|`+|_|~|---|===|\n)/); // Split more granularly for typing effect
+                          const textParts = chunkTextForProcessing.split(/(\s+|\*+|`+|_|~|---|===|\n)/); 
                           for (const part of textParts) {
                               if (isStoppingGenerationRef.current) break;
                               if (part.length === 0) continue;
                               
                               streamTextBuffer.current += part;
-                              performUiUpdateInStream(true); // Update UI with new text part
+                              performUiUpdateInStream(true); 
                               
                               await new Promise(resolve => setTimeout(resolve, Math.min(25, Math.max(3, part.length * 2.5))));
-                          }
-                      }
-
-                      // Progress fake steps if search is on and chunk had content
-                      if (useSearchForThisTurn && firstChunkReceived && (chunkTextForProcessing.trim().length > 0 || (chunk.candidates && chunk.candidates[0]?.groundingMetadata?.groundingChunks))) {
-                          if (fakeStepProgressRef.current < FAKE_ANALYSIS_STEPS_DEFINITION.length) {
-                              const currentStepIndexToComplete = fakeStepProgressRef.current;
-                              setChatMessages(prevMsgs => prevMsgs.map(msg => {
-                                  if (msg.id === targetAiMessageUiId && msg.analysisSteps && msg.analysisSteps[currentStepIndexToComplete] && !msg.analysisSteps[currentStepIndexToComplete].completed) {
-                                      const newAnalysisSteps = msg.analysisSteps.map((step, index) =>
-                                          index === currentStepIndexToComplete ? { ...step, completed: true } : step
-                                      );
-                                      return { ...msg, analysisSteps: newAnalysisSteps };
-                                  }
-                                  return msg;
-                              }));
-                              fakeStepProgressRef.current++;
-                              if (fakeStepProgressRef.current < FAKE_ANALYSIS_STEPS_DEFINITION.length) {
-                                 await new Promise(resolve => setTimeout(resolve, FAKE_STEP_DELAY));
-                              }
                           }
                       }
                       if (isStoppingGenerationRef.current) break; 
                   }
                   
-                  // Final UI update after stream ends
                   let finalAnswerForUi = streamTextBuffer.current;
                   let analysisStepsForUi = [];
 
@@ -1018,23 +997,19 @@ Remember: You're not just an AI assistant, you're a helpful friend who happens t
                       const isInCodeBlock = (finalAnswerForUi.match(/```/g) || []).length % 2 !== 0; 
                       if (isInCodeBlock) finalAnswerForUi += "\n```"; 
                       finalAnswerForUi += (finalAnswerForUi.trim() ? "\n\n---\n" : "") + stopNoticeStr; 
-                  } else if (!isStoppingGenerationRef.current && !finalAnswerForUi.trim() && analysisStepsForUi.length === 0 && streamSourcesBuffer.current.length === 0) { 
+                  } else if (!isStoppingGenerationRef.current && !finalAnswerForUi.trim() && analysisStepsForUi.length === 0 ) { 
                       if (useSearchForThisTurn) { 
                           finalAnswerForUi = "I'm having a little trouble searching right now, or perhaps clear information isn't available on this topic. You could try regenerating the message, or ask your question a bit differently or more clearly. Thank you! 🙏"; 
-                          analysisStepsForUi = FAKE_ANALYSIS_STEPS_DEFINITION.map(s => ({ ...s, completed: true, text: s.text + " (encountered an issue)" })); // Mark fake steps as completed with issue
+                          analysisStepsForUi = FAKE_ANALYSIS_STEPS_DEFINITION.map(s => ({ ...s, completed: true, text: s.text + " (encountered an issue)" }));
                       } else { 
                           finalAnswerForUi = "I think I had some trouble understanding. Could you please clarify your question? 🤔"; 
                           analysisStepsForUi = [];
                       } 
                   } else if (!isStoppingGenerationRef.current && !finalAnswerForUi.trim() && analysisStepsForUi.length > 0 && useSearchForThisTurn) { 
                       // All fake steps shown, but no actual text answer from AI.
-                      // finalAnswerForUi can remain empty, UI will just show completed fake steps.
-                  } else if (!isStoppingGenerationRef.current && !finalAnswerForUi.trim() && analysisStepsForUi.length === 0 && streamSourcesBuffer.current.length > 0 && useSearchForThisTurn) { 
-                      finalAnswerForUi = "*Content may be based on unlisted search results.*"; // Should not happen if sources are hidden
-                      analysisStepsForUi = FAKE_ANALYSIS_STEPS_DEFINITION.map(s => ({ ...s, completed: true }));
                   }
                   
-                  setChatMessages(prev => prev.map(msg => msg.id === targetAiMessageUiId ? { ...msg, isLoading: false, analysisSteps: analysisStepsForUi, finalAnswerText: finalAnswerForUi, text: finalAnswerForUi, parts: [{text: finalAnswerForUi}], sources: streamSourcesBuffer.current.length > 0 ? [...streamSourcesBuffer.current] : null } : msg ));
+                  setChatMessages(prev => prev.map(msg => msg.id === targetAiMessageUiId ? { ...msg, isLoading: false, analysisSteps: analysisStepsForUi, finalAnswerText: finalAnswerForUi, text: finalAnswerForUi, parts: [{text: finalAnswerForUi}], sources: null } : msg ));
               } catch (err) { 
                   console.error("AI stream error in _streamAiResponse:", err); 
                   let errorTextForUser = "A technical difficulty occurred. Please try again."; 
@@ -1043,14 +1018,13 @@ Remember: You're not just an AI assistant, you're a helpful friend who happens t
                   else if (err.message?.toLowerCase().includes("quota")) errorTextForUser = "The API usage limit has been reached."; 
                   
                   let errorAnalysisSteps = [];
-                  if(useSearchForThisTurn){ // If search was attempted, show completed fake steps
+                  if(useSearchForThisTurn){ 
                      errorAnalysisSteps = FAKE_ANALYSIS_STEPS_DEFINITION.map(s => ({...s, completed: true, text: s.text + " (error)"}));
                   }
 
-                  setChatMessages(prev => prev.map(msg => msg.id === targetAiMessageUiId ? { ...msg, isLoading: false, isError: true, finalAnswerText: errorTextForUser, text: errorTextForUser, parts: [{text: errorTextForUser}], analysisSteps: errorAnalysisSteps } : msg ));
+                  setChatMessages(prev => prev.map(msg => msg.id === targetAiMessageUiId ? { ...msg, isLoading: false, isError: true, finalAnswerText: errorTextForUser, text: errorTextForUser, parts: [{text: errorTextForUser}], analysisSteps: errorAnalysisSteps, sources: null } : msg ));
               } finally { 
                   setIsChatLoading(false); 
-                  fakeStepProgressRef.current = 0; // Reset for next time
               }
           };
 
@@ -1063,7 +1037,7 @@ Remember: You're not just an AI assistant, you're a helpful friend who happens t
               const userMessageUiId = await addMessageToLocalChat('user', messageText, filesToSendFromInput); 
               const aiPlaceholderUiId = Date.now().toString() + '_model_resp_temp_ui'; 
               const needsSearch = userWebSearchPreference; 
-              const initialLoadingText = needsSearch ? "" : "Thinking..."; // No loading text if fake steps will show immediately
+              const initialLoadingText = needsSearch ? "" : "Thinking..."; 
 
               const preliminaryAiPlaceholder = { 
                   id: aiPlaceholderUiId, 
@@ -1074,7 +1048,7 @@ Remember: You're not just an AI assistant, you're a helpful friend who happens t
                   analysisSteps: needsSearch ? FAKE_ANALYSIS_STEPS_DEFINITION.map(s => ({...s, completed: false })) : [], 
                   loadingText: initialLoadingText, 
                   timestamp: new Date().getTime(), 
-                  isLoading: true, 
+                  isLoading: true, // Will be set to false after fake steps or immediately if no search
                   isError: false, 
                   sources: null, 
                   searchUsed: needsSearch, 
@@ -1082,6 +1056,18 @@ Remember: You're not just an AI assistant, you're a helpful friend who happens t
               }; 
               setChatMessages(prev => { const cleanPrev = prev.filter(m => m.id !== 'loading_chat_indicator' && m.id !== 'error_loading_messages'); return [...cleanPrev, preliminaryAiPlaceholder]; }); 
               
+              if (needsSearch) {
+                  await animateFakeSteps(aiPlaceholderUiId);
+                  if(isStoppingGenerationRef.current) { // If stopped during fake animation
+                     handleStopGeneration(); // Finalize the message state
+                     return;
+                  }
+              }
+              // Update isLoading to true *before* calling _streamAiResponse if it wasn't set by fake steps
+              // Or ensure it remains true if fake steps just finished.
+               setChatMessages(prev => prev.map(m => m.id === aiPlaceholderUiId ? {...m, isLoading: true, loadingText: "Thinking..." } : m));
+
+
               const currentUserMessagePartsForGemini = []; 
               if (messageText.trim()) { currentUserMessagePartsForGemini.push({ text: messageText.trim() }); } 
               filesToSendFromInput.forEach(file => { if (file.type.startsWith('image/') && file.apiData.mimeType && file.apiData.data) { currentUserMessagePartsForGemini.push({ inlineData: file.apiData }); } else if ((file.name.toLowerCase().endsWith('.txt') || file.type === 'text/plain') && file.apiData.textContent) { currentUserMessagePartsForGemini.push({ text: `\n[Content of attached file: ${file.name}]\n${file.apiData.textContent}\n[End of file: ${file.name}]\n` }); } }); 
@@ -1092,7 +1078,7 @@ Remember: You're not just an AI assistant, you're a helpful friend who happens t
               const historyForGemini = [...baseHistory, userMessageObjectForHistory]; 
               
               if (currentUserMessagePartsForGemini.length > 0) { 
-                  await _streamAiResponse( currentUserMessagePartsForGemini, aiPlaceholderUiId, historyForGemini, needsSearch, initialLoadingText, false, selectedModelId ); 
+                  await _streamAiResponse( currentUserMessagePartsForGemini, aiPlaceholderUiId, historyForGemini, needsSearch, "Thinking...", false, selectedModelId ); 
               } else { 
                   setChatMessages(prev => prev.map(msg => msg.id === aiPlaceholderUiId ? { ...msg, isLoading: false, isError: true, finalAnswerText: "No valid content to send.", text: "No valid content to send.", parts: [{text:"No valid content to send."}]} : msg )); 
                   setIsChatLoading(false); 
@@ -1120,16 +1106,46 @@ Remember: You're not just an AI assistant, you're a helpful friend who happens t
               const needsSearch = userWebSearchPreference; 
               const initialLoadingText = needsSearch ? "" : "Thinking..."; 
               
+              // Replace the old AI message with a new placeholder for regeneration
+              const newAiMessageId = Date.now().toString() + '_model_regen_ui';
+              setChatMessages(prev => {
+                  const newMessages = prev.filter(m => m.id !== aiMessageIdToRegenerate);
+                  newMessages.push({
+                      id: newAiMessageId, // Use a new ID for the regenerated message
+                      role: 'model',
+                      text: '',
+                      parts: [{text: ''}],
+                      finalAnswerText: "",
+                      analysisSteps: needsSearch ? FAKE_ANALYSIS_STEPS_DEFINITION.map(s => ({...s, completed: false })) : [],
+                      loadingText: initialLoadingText,
+                      timestamp: new Date().getTime(),
+                      isLoading: true,
+                      isError: false,
+                      sources: null,
+                      searchUsed: needsSearch,
+                      modelUsed: modelUsedForOriginalResponse
+                  });
+                  return newMessages;
+              });
+
+              if (needsSearch) {
+                  await animateFakeSteps(newAiMessageId);
+                   if(isStoppingGenerationRef.current) {
+                     handleStopGeneration();
+                     return;
+                  }
+              }
+               setChatMessages(prev => prev.map(m => m.id === newAiMessageId ? {...m, isLoading: true, loadingText: "Thinking..." } : m));
+              
               const promptPartsForRegen = []; 
               if(userPromptMsgForRegen.parts && Array.isArray(userPromptMsgForRegen.parts)){ promptPartsForRegen.push(...userPromptMsgForRegen.parts.filter(p => p.text || p.inlineData)); } else if (typeof userPromptMsgForRegen.text === 'string') { promptPartsForRegen.push({text: userPromptMsgForRegen.text}); } else { promptPartsForRegen.push({text: ''});} 
               const filesFromUserMessage = userPromptMsgForRegen.uiOnlyAttachedFiles || userPromptMsgForRegen.attachedFiles || []; 
               filesFromUserMessage.forEach(fileMeta => { if(fileMeta.type?.startsWith('image/') && fileMeta.apiData) { if (!promptPartsForRegen.some(p => p.inlineData && p.inlineData.data === fileMeta.apiData.data)) { promptPartsForRegen.push({ inlineData: fileMeta.apiData }); } } else if ((fileMeta.name?.toLowerCase().endsWith('.txt') || fileMeta.type === 'text/plain') && fileMeta.apiData?.textContent) { const fileContentMarker = `\n[Content of attached file: ${fileMeta.name}]\n`; if (!promptPartsForRegen.some(p => typeof p.text === 'string' && p.text.includes(fileContentMarker))) { promptPartsForRegen.push({ text: `${fileContentMarker}${fileMeta.apiData.textContent}\n[End of file: ${fileMeta.name}]\n` }); } } }); 
               
               if (promptPartsForRegen.length > 0 && promptPartsForRegen.some(p => (p.inlineData || (typeof p.text === 'string' && p.text.trim())))) { 
-                  setChatMessages(prev => prev.map(m => m.id === aiMessageIdToRegenerate ? { ...m, isLoading: true, isError: false, finalAnswerText: "", analysisSteps: needsSearch ? FAKE_ANALYSIS_STEPS_DEFINITION.map(s => ({...s, completed: false })) : [], text: "", parts: [{text:""}], searchUsed: needsSearch, loadingText: initialLoadingText, modelUsed: modelUsedForOriginalResponse, timestamp: new Date().getTime(), sources: null } : m )); 
-                  await _streamAiResponse( promptPartsForRegen, aiMessageIdToRegenerate, historyUpToUserPrompt, needsSearch, initialLoadingText, true, modelUsedForOriginalResponse ); 
+                  await _streamAiResponse( promptPartsForRegen, newAiMessageId, historyUpToUserPrompt, needsSearch, "Thinking...", true, modelUsedForOriginalResponse ); 
               } else { 
-                  setChatMessages(prev => prev.map(msg => msg.id === aiMessageIdToRegenerate ? { ...msg, isLoading: false, isError: true, finalAnswerText: "No content found to regenerate.", text: "No content found to regenerate.", parts: [{text: "No content found to regenerate."}]} : msg )); 
+                  setChatMessages(prev => prev.map(msg => msg.id === newAiMessageId ? { ...msg, isLoading: false, isError: true, finalAnswerText: "No content found to regenerate.", text: "No content found to regenerate.", parts: [{text: "No content found to regenerate."}]} : msg )); 
                   setIsChatLoading(false); 
               } 
           }, [chatMessages, currentChatId, selectedModelId]); 
