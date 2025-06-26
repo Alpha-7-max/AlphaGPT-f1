@@ -58,7 +58,7 @@
               'happy-bounce': 'happyBounce 0.5s ease-out', 'empty-state-glow': 'emptyStateGlow 3.5s infinite alternate ease-in-out',
               'shiny-text': 'shinyText 2.5s linear infinite', 'modal-fade-in': 'modal-fade-in 0.3s ease-out forwards', 
               'modal-fade-out': 'modal-fade-out 0.3s ease-in forwards', 
-              'shimmer': 'shimmer 2s ease-in-out infinite', // Updated duration
+              'shimmer': 'shimmer 2s ease-in-out infinite', 
               'spin-continuous': 'spinContinuous 2s linear infinite',
             },
             keyframes: {
@@ -88,7 +88,7 @@
                 'header': '0 1px 2px rgba(var(--text-primary), 0.03), 0 1px 1px rgba(var(--text-primary), 0.015)',
                 'input-focus': '0 0 0 1px rgb(var(--focus-ring-color) / 1)', 
                 'chat-window': '0 15px 50px -8px rgba(var(--text-primary), 0.08), 0 8px 25px -8px rgba(var(--text-primary),0.05)',
-                'input-active-glow': '0 0 6px rgba(var(--text-secondary),0.15)',
+                'input-active-glow': '0 0 7px rgba(var(--text-secondary),0.18)', // Slightly more intense glow
             },
              maxWidth: { '18rem': '18rem', }
           },
@@ -201,11 +201,11 @@
       marked.setOptions({ gfm: true, breaks: true, smartypants: true, renderer });
 
       const AVAILABLE_MODELS = [
-        { id: 'gemini-2.5-flash-preview-04-17', uiName: 'Alpha 2.5' },
-        { id: 'gemini-2.5-flash-lite-preview-06-17', uiName: 'Alpha 2.5-lite' },
-        { id: 'gemini-2.0-flash', uiName: 'Alpha 2.0' },
+        { id: 'gemini-2.5-flash-preview-04-17', uiName: 'Smart' },
+        { id: 'gemini-2.5-flash-lite-preview-06-17', uiName: 'Lite' },
+        { id: 'gemini-2.0-flash', uiName: 'Normal' },
       ];
-      const DEFAULT_MODEL_ID = 'gemini-2.0-flash'; // Updated Default Model
+      const DEFAULT_MODEL_ID = 'gemini-2.0-flash'; 
 
       const API_KEY = "AIzaSyDgEdgBX2VWf2PO4X29haQzISTDTemzuW4"; 
 
@@ -421,7 +421,7 @@ User:Socho meri 1 khubsoort queet si wife hoti jiski saath main apni zindgai ki 
 AI (Inspired):Wah! Kya khoobsurat soch hai — ek aisi zindagi jisme har pal kisi apne ke saath jeeya jaaye.
 Chalo zara aankhein band karo aur socho…
 
-Ek shaam hai, halki thandi hawa chal rahi hai. Tum aur tumhari khubsoort, qute si wife terrace pe baithe ho.
+Ek shaam hai, halki thandi hawa chal rahi hai. Tum aur tumhari khubsurat, qute si wife terrace pe baithe ho.
 
 Uske haathon mein tumhaari pasand ki chai hai, aur tum dono ek hi mug se peete ho, muskurate hue. Tum dono ke beech mein woh silence hai jo sirf gehre pyaar mein hoti hai — jahan bolne ki zarurat nahi hoti.
 
@@ -512,24 +512,6 @@ Internet Search Capability:
     - You can say phrases like (Roman Urdu): "Maine search karke yeh maloomat hasil ki hai" or "Internet search ke mutabiq..."
     - The UI will NOT display source URLs directly below your message.
 
-    SEARCH POLICY:
-User-Controlled: "Web Search" toggle. ON = Use search tool (unless identity q). OFF = Training data.
-User-Initiated Search Command (e.g., "search krke"): MANDATORY if toggle ON (unless identity q). If toggle OFF, state inability and suggest toggle.
-WHEN WEB SEARCH TOGGLE IS ON (Search Response Format):
-1.  FIRST line MUST be: \`[ANALYSIS_STEP] Beginning analysis.\`
-2.  Next, 2-4 concise analysis steps, each on new line, prefixed \`[ANALYSIS_STEP]\`. Examples:
-    \`[ANALYSIS_STEP] Identifying query type as: {type}.\`
-    \`[ANALYSIS_STEP] Reviewing search results for key information.\`
-    \`[ANALYSIS_STEP] Structuring answer to cover: {points}.\`
-3.  After ALL analysis steps, MUST output \`[ANALYSIS_END]\` on new line.
-4.  FINALLY, after \`[ANALYSIS_END]\`, provide comprehensive, Markdown-formatted answer.
-    (The UI will display the actual source list based on grounding metadata, you do not need to list them textually.)
-Natural Source Acknowledgment (after final answer from search): Conversational mention, e.g., "Maine yeh maloomat internet se search ki hai."
-SEARCH FAILURE FALLBACK (Toggle ON, search failed/poor results):
-If general query, try answering from training (no [ANALYSIS_STEP]). If not possible or query needs fresh data: Polite fallback message (e.g., "I'm having a little trouble searching..."). No [ANALYSIS_STEP] for this fallback.
-WHEN WEB SEARCH TOGGLE IS OFF: Respond from training data. No [ANALYSIS_STEP] or [ANALYSIS_END].
-IDENTITY QUESTIONS ("Who are you?", "Who made you?"): Answer as AlphaGPT by Azeem. NO web search, NO [ANALYSIS_STEP], NO mention of Google/Gemini.
-CREATOR (Azeem): DO NOT search for info about Azeem. If asked for details, state you don't have personal info.
 
 Search Prioritization:
 - When a user's query is general (not specifying a particular location or context) AND search is active (Web Search toggle is ON):
@@ -602,16 +584,13 @@ Remember: You're not just an AI assistant, you're a helpful friend who happens t
       const FileImageIcon = (props) => (<i className={`fa-solid fa-file-image ${props.className || ''}`}></i>);
       const GlobeIcon = (props) => ( <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" fill="currentColor" viewBox="0 0 16 16" {...props} className={`relative z-10 ${props.className || 'w-4 h-4'}`}> <path d="M0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8m7.5-6.923c-.67.204-1.335.82-1.887 1.855A8 8 0 0 0 5.145 4H7.5zM4.09 4a9.3 9.3 0 0 1 .64-1.539 7 7 0 0 1 .597-.933A7.03 7.03 0 0 0 2.255 4zm-.582 3.5c.03-.877.138-1.718.312-2.5H1.674a7 7 0 0 0-.656 2.5zM4.847 5a12.5 12.5 0 0 0-.338 2.5H7.5V5zM8.5 5v2.5h2.99a12.5 12.5 0 0 0-.337-2.5zM4.51 8.5a12.5 12.5 0 0 0 .337 2.5H7.5V8.5zm3.99 0V11h2.653c.187-.765.306-1.608.338-2.5zM5.145 12q.208.58.468 1.068c.552 1.035 1.218 1.65 1.887 1.855V12zm.182 2.472a7 7 0 0 1-.597-.933A9.3 9.3 0 0 1 4.09 12H2.255a7 7 0 0 0 3.072 2.472M3.82 11a13.7 13.7 0 0 1-.312-2.5h-2.49c.062.89.291 1.733.656 2.5zm6.853 3.472A7 7 0 0 0 13.745 12H11.91a9.3 9.3 0 0 1-.64 1.539 7 7 0 0 1-.597.933M8.5 12v2.923c.67-.204 1.335.82 1.887-1.855q.26-.487.468-1.068zm3.68-1h2.146c.365-.767.594-1.61.656-2.5h-2.49a13.7 13.7 0 0 1-.312 2.5m2.802-3.5a7 7 0 0 0-.656-2.5H12.18c.174.782.282 1.623.312 2.5zM11.27 2.461c.247.464.462.98.64 1.539h1.835a7 7 0 0 0-3.072-2.472c.218.284.418.598.597.933M10.855 4a8 8 0 0 0-.468-1.068C9.835 1.897 9.17 1.282 8.5 1.077V4z"/> </svg> );
       
-      const ThinkingAnimation = ({ isPotentiallySearching }) => { // isPotentiallySearching will likely be false when this is directly called
+      const ThinkingAnimation = () => { 
           const mainIndicatorContainerClasses = "flex items-center space-x-1.5 p-2.5 bg-gray-50 rounded-lg border border-gray-200 max-w-fit my-2 self-start ml-0";
           const textClasses = "text-sm text-gray-600 font-medium";
           const thinkingShimmerDiv = ( <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white to-transparent opacity-30 animate-shimmer" style={{ backgroundSize: '200% 100%' }} /> );
           
-          // The "Searching web..." variant with GlobeIcon is effectively replaced by the fake steps animation,
-          // so this component will primarily render the "Thinking..." state.
           return (
             <div className={mainIndicatorContainerClasses}>
-              {/* Spinner removed from here */}
               <div className="relative overflow-hidden">
                 <span className={textClasses}>Thinking...</span>
                 {thinkingShimmerDiv}
@@ -766,7 +745,7 @@ Remember: You're not just an AI assistant, you're a helpful friend who happens t
                   );
               } else if (message.isLoading && !message.searchUsed && !(typeof message.finalAnswerText === 'string' && message.finalAnswerText)) { 
                   bubbleRoleClasses = ''; bubbleBaseClasses = '';
-                  contentToShow = <ThinkingAnimation isPotentiallySearching={false} />;
+                  contentToShow = <ThinkingAnimation />;
               } else { 
                   const textForMarkdown = (typeof message.finalAnswerText === 'string' && message.finalAnswerText) ? message.finalAnswerText : messageTextContent;
                   contentToShow = ( <div ref={contentRef}> <div className={`markdown-content break-words`} dangerouslySetInnerHTML={{ __html: marked.parse(textForMarkdown || '') }} /> </div> );
@@ -783,7 +762,8 @@ Remember: You're not just an AI assistant, you're a helpful friend who happens t
       };
 
       const ChatInterface = ({ messages, onSendMessage, isLoading, onStopGeneration, onRegenerateLastTextMessage, onNewChat, setChatError, currentChatId, onDeleteAiMessagePair, selectedUserMessageId, setSelectedUserMessageId, selectedModelId, onSelectModel }) => { 
-          const [inputText, setInputText] = useState(''); const [selectedFiles, setSelectedFiles] = useState([]); const [userHasScrolledUp, setUserHasScrolledUp] = useState(false); const [isWebSearchEnabledState, setIsWebSearchEnabledState] = useState(true); // Default to true
+          const [inputText, setInputText] = useState(''); const [selectedFiles, setSelectedFiles] = useState([]); const [userHasScrolledUp, setUserHasScrolledUp] = useState(false); 
+          const [isWebSearchEnabledState, setIsWebSearchEnabledState] = useState(false); // Default to OFF
           const fileInputRef = useRef(null); const messagesEndRef = useRef(null); const chatContainerRef = useRef(null); const contentEditableRef = useRef(null);
           useEffect(() => { const container = chatContainerRef.current; if (!container) return; const handleScroll = () => { const { scrollTop, scrollHeight, clientHeight } = container; setUserHasScrolledUp(scrollHeight - scrollTop - clientHeight >= 20);}; container.addEventListener('scroll', handleScroll, { passive: true }); const handleClickOutsideMessages = (event) => { if (chatContainerRef.current && !event.target.closest('.group') && !event.target.closest('.ai-message-options-trigger')) { setSelectedUserMessageId(null); } }; document.addEventListener('click', handleClickOutsideMessages); return () => { container.removeEventListener('scroll', handleScroll); document.removeEventListener('click', handleClickOutsideMessages); }; }, [setSelectedUserMessageId]); 
           useEffect(() => { const lastMessage = messages[messages.length - 1]; const messagesEndEl = messagesEndRef.current; if (!messagesEndEl) return; const isLastItemIndicator = lastMessage && lastMessage.role === 'model' && lastMessage.isLoading && !(typeof lastMessage.finalAnswerText === 'string' && lastMessage.finalAnswerText) && (!lastMessage.analysisSteps || lastMessage.analysisSteps.length === 0); if (lastMessage && (lastMessage.role === 'user' || isLastItemIndicator || (lastMessage.role === 'system' && lastMessage.id === 'loading_chat'))) { messagesEndEl.scrollIntoView({ behavior: (isLastItemIndicator || lastMessage.id === 'loading_chat') ? "auto" : "smooth" }); } else if (lastMessage && lastMessage.role === 'model' && !userHasScrolledUp) { messagesEndEl.scrollIntoView({ behavior: lastMessage.isLoading ? "auto" : "smooth" }); } }, [messages, userHasScrolledUp]);
@@ -806,7 +786,7 @@ Remember: You're not just an AI assistant, you're a helpful friend who happens t
               if (contentEditableRef.current) { contentEditableRef.current.innerText = ''; } 
               setInputText(''); 
               setSelectedFiles([]); 
-              // setIsWebSearchEnabledState(false); // Removed to persist toggle state
+              // setIsWebSearchEnabledState(false); // Kept commented to persist toggle state
           }, [currentChatId]); 
 
           const activeMessages = messages.filter(m => (m.role !== 'system' || m.isError) && m.id !== 'loading_chat_indicator');
@@ -817,18 +797,58 @@ Remember: You're not just an AI assistant, you're a helpful friend who happens t
                                                    ( (typeof msg.finalAnswerText === 'string' && msg.finalAnswerText) || 
                                                      (msg.searchUsed && msg.analysisSteps && msg.analysisSteps.length > 0 && msg.analysisSteps.every(s => s.completed)) 
                                                    );
+                  
+                  let isEffectivelyLastAiMessageForButtons = false;
+                  if (isThisMessageAiAndFinalized) {
+                      isEffectivelyLastAiMessageForButtons = true; // Assume true initially
+                      for (let k = idx + 1; k < messages.length; k++) {
+                          const nextMsg = messages[k];
+                          // Ignore system messages or loading indicators when determining "conversation moved on"
+                          if (nextMsg.role === 'system' || (nextMsg.role === 'model' && nextMsg.isLoading)) continue;
+                          if (nextMsg.role === 'user') {
+                              isEffectivelyLastAiMessageForButtons = false;
+                              break;
+                          }
+                          // If another finalized AI message follows, this one is not the last for buttons
+                          if (nextMsg.role === 'model' && !nextMsg.isLoading && !nextMsg.isError) {
+                               isEffectivelyLastAiMessageForButtons = false;
+                               break;
+                          }
+                      }
+                  }
+
                   let canThisAiMessageBeRegenerated = false;
-                  if(isThisMessageAiAndFinalized) {
+                  if(isEffectivelyLastAiMessageForButtons) { // Only check for regeneration if buttons are potentially shown
                       let userPromptIndex = -1;
-                      for(let i = idx - 1; i >= 0; i--) { if (messages[i].role === 'user') { let interveningUserMessageBetweenThisAiAndItsUserPrompt = false; for (let j = i + 1; j < idx; j++) { if (messages[j].role === 'user') { interveningUserMessageBetweenThisAiAndItsUserPrompt = true; break; } } if (!interveningUserMessageBetweenThisAiAndItsUserPrompt) { userPromptIndex = i; break; } } }
+                      for(let i = idx - 1; i >= 0; i--) { 
+                          if (messages[i].role === 'user') { 
+                              let interveningUserMessageBetweenThisAiAndItsUserPrompt = false; 
+                              for (let j = i + 1; j < idx; j++) { 
+                                  if (messages[j].role === 'user') { 
+                                      interveningUserMessageBetweenThisAiAndItsUserPrompt = true; break; 
+                                  } 
+                              } 
+                              if (!interveningUserMessageBetweenThisAiAndItsUserPrompt) { 
+                                  userPromptIndex = i; break; 
+                              } 
+                          } 
+                      }
                       canThisAiMessageBeRegenerated = userPromptIndex !== -1;
                   }
-                  return ( <React.Fragment key={msg.id}> {((msg.role === 'user' && ( (msg.parts && msg.parts[0]?.text) || msg.text || msg.attachedFiles?.length > 0 || msg.uiOnlyAttachedFiles?.length > 0)) || (msg.role === 'model') || msg.role === 'system' || msg.isError) && ( <div> <ChatMessageItem message={msg} onDeleteAiMessagePair={onDeleteAiMessagePair} selectedUserMessageId={selectedUserMessageId} onSelectUserMessage={setSelectedUserMessageId} /> </div> )} {isThisMessageAiAndFinalized && ( <div className={`flex items-center space-x-2 mt-1 ml-0 justify-start mb-2`}> {canThisAiMessageBeRegenerated && ( <button onClick={() => { setChatError(null); onRegenerateLastTextMessage(msg.id, isWebSearchEnabledState); setSelectedUserMessageId(null); }} className="p-1.5 rounded-full text-text-subtle hover:text-brand-primary hover:bg-interactive-hover/70 transition-all duration-150 group focus:outline-none focus:ring-1 focus:ring-brand-primary/50" aria-label="Regenerate response" disabled={isLoading || isAiCurrentlyProcessing} > <NewRefreshIcon className="w-5 h-5 transition-transform duration-200" /> </button> )} <ChatMessageItemOptions message={msg} onDeleteAiMessagePair={onDeleteAiMessagePair} /> </div> )} </React.Fragment> )
+
+                  return ( <React.Fragment key={msg.id}> {((msg.role === 'user' && ( (msg.parts && msg.parts[0]?.text) || msg.text || msg.attachedFiles?.length > 0 || msg.uiOnlyAttachedFiles?.length > 0)) || (msg.role === 'model') || msg.role === 'system' || msg.isError) && ( <div> <ChatMessageItem message={msg} onDeleteAiMessagePair={onDeleteAiMessagePair} selectedUserMessageId={selectedUserMessageId} onSelectUserMessage={setSelectedUserMessageId} /> </div> )} 
+                  {isEffectivelyLastAiMessageForButtons && ( 
+                    <div className={`flex items-center space-x-2 mt-1 ml-0 justify-start mb-2`}> 
+                      {canThisAiMessageBeRegenerated && ( <button onClick={() => { setChatError(null); onRegenerateLastTextMessage(msg.id, isWebSearchEnabledState); setSelectedUserMessageId(null); }} className="p-1.5 rounded-full text-text-subtle hover:text-brand-primary hover:bg-interactive-hover/70 transition-all duration-150 group focus:outline-none focus:ring-1 focus:ring-brand-primary/50" aria-label="Regenerate response" disabled={isLoading || isAiCurrentlyProcessing} > <NewRefreshIcon className="w-5 h-5 transition-transform duration-200" /> </button> )} 
+                      <ChatMessageItemOptions message={msg} onDeleteAiMessagePair={onDeleteAiMessagePair} /> 
+                    </div> 
+                  )} 
+                  </React.Fragment> )
               })} <div ref={messagesEndRef} className="h-1" /> </div> 
               <form onSubmit={handleSubmit} className="bg-surface-chat-area flex-shrink-0"> 
                 <div className="p-2 md:p-3"> 
                   <div 
-                    className="flex flex-col bg-white border border-gray-300 rounded-xl p-2.5 shadow-sm shadow-input-active-glow transition-all duration-150" // Updated: Static border and glow
+                    className="flex flex-col bg-white border border-gray-300 rounded-xl p-2.5 shadow-sm shadow-input-active-glow transition-all duration-150" 
                     onClick={(e) => { if (contentEditableRef.current && !contentEditableRef.current.contains(e.target) && e.target.tagName !== 'BUTTON' && !e.target.closest('button') && !e.target.closest('[aria-label="Attach file"]') && !e.target.closest('[aria-label="Toggle Web Search"]') && !e.target.closest('.relative') ) { contentEditableRef.current.focus(); } }} > 
                     {selectedFiles.some(f => f.type.startsWith('image/')) && ( <div className="image-preview-container-input"> {selectedFiles.filter(f => f.type.startsWith('image/')).map(file => ( <div key={file.id} className="relative w-14 h-14 rounded-md overflow-hidden shadow-sm group border border-gray-200"> <img src={`data:${file.apiData.mimeType};base64,${file.apiData.data}`} alt={file.name} className="w-full h-full object-cover" /> <button type="button" onClick={() => removeSelectedFile(file.id)} className="absolute top-0.5 right-0.5 w-5 h-5 bg-black/50 hover:bg-black/70 text-white rounded-full flex items-center justify-center transition-opacity focus:outline-none opacity-100" aria-label="Remove image" > <NewCloseIconSVG className="w-3 h-3"/> </button> </div> ))} </div> )} {selectedFiles.some(f => !f.type.startsWith('image/')) && ( <div className={`file-pill-container ${selectedFiles.some(f => f.type.startsWith('image/')) ? 'mt-1.5' : ''}`}> {selectedFiles.filter(f => !f.type.startsWith('image/')).map(file => ( <div key={file.id} className="file-pill"> <FileTextIcon className="file-pill-icon"/> <span className="file-pill-name">{file.name}</span> <button type="button" onClick={() => removeSelectedFile(file.id)} className="file-pill-remove"> <i className="fas fa-times"></i> </button> </div> ))} </div> )} <div ref={contentEditableRef} contentEditable={!(isLoading || isAiCurrentlyProcessing)} onInput={handleInputFromContentEditable} onPaste={handlePaste} onKeyDown={handleContentEditableKeyDown} data-placeholder={"Ask AlphaGPT..."} className={`content-editable-input w-full flex-1 text-sm md:text-[15px] focus:outline-none resize-none overflow-y-auto relative`} style={{ maxHeight: '100px', minHeight: '40px' }} suppressContentEditableWarning={true} > </div> <div className="flex justify-between items-end w-full pt-2.5 mt-auto"> <div className="flex items-center"> <input type="file" ref={fileInputRef} onChange={handleFileChange} className="hidden" multiple accept="image/*,.txt,text/plain" disabled={isLoading || isAiCurrentlyProcessing} /> <button type="button" onClick={() => fileInputRef.current?.click()} className="w-8 h-8 flex items-center justify-center text-gray-500 hover:text-gray-700 rounded-full hover:bg-gray-200/70 border border-gray-300 transition-colors duration-150 disabled:opacity-50 flex-shrink-0 focus:outline-none" aria-label="Attach file" disabled={isLoading || isAiCurrentlyProcessing} > <PlusIcon /> </button> <button type="button" onClick={() => handleToggleWebSearch(!isWebSearchEnabledState)} className={`w-8 h-8 flex items-center justify-center rounded-full border transition-colors duration-150 disabled:opacity-50 flex-shrink-0 focus:outline-none ml-1.5 ${isWebSearchEnabledState ? 'bg-blue-500/10 border-blue-500/30 text-blue-500 hover:bg-blue-500/20' : 'border-gray-300 text-gray-500 hover:text-gray-700 hover:bg-gray-200/70' } `} aria-label="Toggle Web Search" aria-pressed={isWebSearchEnabledState} disabled={isLoading || isAiCurrentlyProcessing} > <GlobeIcon className="w-4 h-4" /> </button> </div> <div className="flex items-end space-x-2"> <ModelSelector models={AVAILABLE_MODELS} selectedModelId={selectedModelId} onSelectModel={onSelectModel} isLoading={isLoading} isAiCurrentlyProcessing={isAiCurrentlyProcessing} /> <button type={isAiCurrentlyProcessing ? "button" : "submit"} onClick={isAiCurrentlyProcessing ? onStopGeneration : undefined } disabled={isSendButtonActuallyDisabled} className={`${sendOrStopButtonBaseClasses} ${sendOrStopButtonDynamicClasses}`} style={{ overflow: 'hidden' }} aria-label={isAiCurrentlyProcessing ? "Stop generation" : "Send message"} > {isAiCurrentlyProcessing ? ( <i className="fas fa-stop text-sm"></i> ) : ( <UpArrowSendIcon /> )} </button> </div> </div> 
                   </div> 
@@ -859,7 +879,7 @@ Remember: You're not just an AI assistant, you're a helpful friend who happens t
                     if (msg.id === aiMessageUiId && msg.analysisSteps && msg.analysisSteps[i]) {
                         const newAnalysisSteps = [...msg.analysisSteps];
                         newAnalysisSteps[i] = { ...newAnalysisSteps[i], completed: true };
-                        return { ...msg, analysisSteps: newAnalysisSteps, isLoading: true }; // Keep isLoading true during animation
+                        return { ...msg, analysisSteps: newAnalysisSteps, isLoading: true }; 
                     }
                     return msg;
                 }));
@@ -924,19 +944,16 @@ Remember: You're not just an AI assistant, you're a helpful friend who happens t
               
               if (isStoppingGenerationRef.current) { setIsChatLoading(false); return; }
               
-              setChatMessages(prev => prev.map(m => {
+              // Initial message state (isLoading, analysisSteps if search) is set by the caller
+              // We just need to ensure loadingText is appropriate here if search steps didn't animate it away
+               setChatMessages(prev => prev.map(m => {
                   if (m.id === targetAiMessageUiId) {
+                      const currentMsg = prev.find(p => p.id === targetAiMessageUiId);
+                      const stillShowLoadingText = !useSearchForThisTurn || !(currentMsg?.analysisSteps?.some(s=>s.completed));
                       return {
                           ...m,
-                          isLoading: true, // Ensure isLoading is true when stream starts
-                          loadingText: useSearchForThisTurn ? "" : currentLoadingText, // No "Thinking..." if fake steps animated
-                          text: "",
-                          parts: [{text: ""}],
-                          // analysisSteps already set by caller (handleSend or handleRegenerate)
-                          finalAnswerText: "", 
-                          sources: null, 
-                          timestamp: new Date().getTime(),
-                          modelUsed: modelToUse
+                          isLoading: true, 
+                          loadingText: stillShowLoadingText ? currentLoadingText : "", 
                       };
                   }
                   return m;
@@ -961,7 +978,7 @@ Remember: You're not just an AI assistant, you're a helpful friend who happens t
                                   text: currentTextForAnswer || (useSearchForThisTurn && currentAnalysisSteps.length > 0 && currentAnalysisSteps.every(s=>s.completed) ? "" : ""),
                                   parts: [{ text: currentTextForAnswer || (useSearchForThisTurn && currentAnalysisSteps.length > 0 && currentAnalysisSteps.every(s=>s.completed) ? "" : "") }],
                                   sources: null, 
-                                  loadingText: isLoading ? "" : "", // Clear loading text once stream starts or fake steps done
+                                  loadingText: isLoading ? "" : "", // Clear loading text once stream updates
                               }; 
                           } 
                           return msg; 
@@ -982,7 +999,6 @@ Remember: You're not just an AI assistant, you're a helpful friend who happens t
                       const rawChunkText = chunk.text(); 
                       if(!firstChunkReceived && rawChunkText?.trim()){ 
                           firstChunkReceived = true; 
-                          // Once first actual text chunk arrives, ensure any initial "Thinking..." is cleared if it wasn't a search
                           setChatMessages(prev => prev.map(m => m.id === targetAiMessageUiId ? {...m, loadingText: ""} : m));
                       }
                       
@@ -1039,7 +1055,7 @@ Remember: You're not just an AI assistant, you're a helpful friend who happens t
                           analysisStepsForUi = [];
                       } 
                   } else if (!isStoppingGenerationRef.current && !finalAnswerForUi.trim() && analysisStepsForUi.length > 0 && useSearchForThisTurn) { 
-                     // All fake steps shown, no actual text, this is fine. UI will show completed steps.
+                     // All fake steps shown, no actual text, this is fine.
                   }
                   
                   setChatMessages(prev => prev.map(msg => msg.id === targetAiMessageUiId ? { ...msg, isLoading: false, analysisSteps: analysisStepsForUi, finalAnswerText: finalAnswerForUi, text: finalAnswerForUi, parts: [{text: finalAnswerForUi}], sources: null } : msg ));
@@ -1097,6 +1113,7 @@ Remember: You're not just an AI assistant, you're a helpful friend who happens t
                   }
               }
               
+              // Ensure isLoading is true for _streamAiResponse and loadingText is appropriate
               setChatMessages(prev => prev.map(m => m.id === aiPlaceholderUiId ? {...m, isLoading: true, loadingText: needsSearch ? "" : "Thinking..." } : m));
 
               const currentUserMessagePartsForGemini = []; 
@@ -1138,23 +1155,27 @@ Remember: You're not just an AI assistant, you're a helpful friend who happens t
               const initialLoadingText = needsSearch ? "" : "Thinking..."; 
               
               const newAiMessageId = Date.now().toString() + '_model_regen_ui';
+              // Find the index of the message to regenerate to insert the new one correctly
+              const oldAiMessageIndex = chatMessages.findIndex(m => m.id === aiMessageIdToRegenerate);
+
               setChatMessages(prev => {
-                  const newMessages = prev.filter(m => m.id !== aiMessageIdToRegenerate); // Remove old AI message
-                  newMessages.splice(aiMsgIndex, 0, { // Insert new placeholder at the same index
-                      id: newAiMessageId, 
-                      role: 'model',
-                      text: '',
-                      parts: [{text: ''}],
-                      finalAnswerText: "",
-                      analysisSteps: needsSearch ? FAKE_ANALYSIS_STEPS_DEFINITION.map(s => ({...s, completed: false })) : [],
-                      loadingText: initialLoadingText,
-                      timestamp: new Date().getTime(),
-                      isLoading: true,
-                      isError: false,
-                      sources: null,
-                      searchUsed: needsSearch,
-                      modelUsed: modelUsedForOriginalResponse
-                  });
+                  let newMessages = prev.filter(m => m.id !== aiMessageIdToRegenerate); // Remove old AI message
+                  if(oldAiMessageIndex !== -1 && oldAiMessageIndex < newMessages.length) {
+                    newMessages.splice(oldAiMessageIndex, 0, { // Insert new placeholder at the old message's index
+                        id: newAiMessageId, 
+                        role: 'model', text: '', parts: [{text: ''}], finalAnswerText: "",
+                        analysisSteps: needsSearch ? FAKE_ANALYSIS_STEPS_DEFINITION.map(s => ({...s, completed: false })) : [],
+                        loadingText: initialLoadingText, timestamp: new Date().getTime(), isLoading: true,
+                        isError: false, sources: null, searchUsed: needsSearch, modelUsed: modelUsedForOriginalResponse
+                    });
+                  } else { // Fallback if index is out of bounds (should not happen ideally)
+                     newMessages.push({
+                        id: newAiMessageId, role: 'model', text: '', parts: [{text: ''}], finalAnswerText: "",
+                        analysisSteps: needsSearch ? FAKE_ANALYSIS_STEPS_DEFINITION.map(s => ({...s, completed: false })) : [],
+                        loadingText: initialLoadingText, timestamp: new Date().getTime(), isLoading: true,
+                        isError: false, sources: null, searchUsed: needsSearch, modelUsed: modelUsedForOriginalResponse
+                     });
+                  }
                   return newMessages;
               });
 
