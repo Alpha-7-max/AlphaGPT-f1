@@ -207,10 +207,28 @@
       ];
       const DEFAULT_MODEL_ID = 'gemini-2.0-flash'; 
 
-      const API_KEY = "AIzaSyDgEdgBX2VWf2PO4X29haQzISTDTemzuW4"; 
+      const API_KEYS = {
+        'gemini-2.0-flash': "AIzaSyDgEdgBX2VWf2PO4X29haQzISTDTemzuW4",
+        'gemini-2.5-flash-lite-preview-06-17': "AIzaSyBx2-nzwDEmvil677vHCnfFmWk0bjc2ktc",
+        'gemini-2.5-flash-preview-04-17': "AIzaSyCP0_JSlzsnNKczFe-dBTZyoyKBwvvP6UE",
+      };
 
       const MAX_FILE_SIZE_MB = 5; const MAX_TOTAL_FILES_SIZE_MB = 20;
-      let genAI; try { if (!API_KEY || API_KEY === "YOUR_GEMINI_API_KEY") { console.error("CRITICAL ERROR: Gemini API Key is not set or is still the placeholder. The application will not work."); } genAI = new GoogleGenerativeAI(API_KEY); } catch (e) { console.error("CRITICAL ERROR: Failed to initialize GoogleGenerativeAI. Check API Key and network.", e); }
+      
+      const genAIInstances = {};
+      for (const modelId in API_KEYS) {
+        if (Object.hasOwnProperty.call(API_KEYS, modelId)) {
+          const key = API_KEYS[modelId];
+          try {
+            if (!key || key.startsWith("YOUR_GEMINI_API_KEY")) {
+              console.error(`CRITICAL ERROR: Gemini API Key for model ${modelId} is not set or is still the placeholder.`);
+            }
+            genAIInstances[modelId] = new GoogleGenerativeAI(key);
+          } catch (e) {
+            console.error(`CRITICAL ERROR: Failed to initialize GoogleGenerativeAI for model ${modelId}. Check API Key and network.`, e);
+          }
+        }
+      }
       
       const FAKE_ANALYSIS_STEPS_DEFINITION = [
         { text: "Searching web", completed: false },
@@ -640,30 +658,24 @@ Remember: You're not just an AI assistant, you're a helpful friend who happens t
         );
       };
 
-      const ChatMessageItemOptions = ({ message, onDeleteAiMessagePair }) => { 
+      const ChatMessageItemOptions = ({ message, onDeleteAiMessagePair, onStartEdit }) => { 
           const [showOptions, setShowOptions] = useState(false); const optionsRef = useRef(null); const [copied, setCopied] = useState(false);
           useEffect(() => { const handleClickOutside = (event) => { if (optionsRef.current && !optionsRef.current.contains(event.target) && !event.target.closest('.ai-message-options-trigger')) { setShowOptions(false); } }; document.addEventListener('mousedown', handleClickOutside); return () => document.removeEventListener('mousedown', handleClickOutside); }, []);
           const handleCopyText = () => { const textToCopy = message.finalAnswerText || message.parts?.[0]?.text || message.text || ""; if (textToCopy) { navigator.clipboard.writeText(textToCopy).then(() => { setCopied(true); setTimeout(() => setCopied(false), 1500); }).catch(err => console.error('Failed to copy text: ', err)); } setShowOptions(false); };
           const handleDelete = () => { onDeleteAiMessagePair(message.id); setShowOptions(false); };
-          
-          let allowOptions = message.role === 'model' && !message.isLoading && !message.isError;
-          if (allowOptions && !(message.finalAnswerText || message.parts?.[0]?.text || message.text)) { 
-             if (!(message.searchUsed && message.analysisSteps && message.analysisSteps.length > 0)) { 
-                 allowOptions = false;
-             }
-          }
-          if (!allowOptions) return null;
+          const handleEdit = () => { onStartEdit(message.id, message.finalAnswerText || message.text || ""); setShowOptions(false); };
 
-          return ( <div className="relative"> <button onClick={(e) => { e.stopPropagation(); setShowOptions(prev => !prev); }} className="ai-message-options-trigger p-1.5 rounded-full text-text-subtle hover:text-brand-primary hover:bg-interactive-hover/70 transition-all duration-150 focus:outline-none focus:ring-1 focus:ring-brand-primary/50" aria-label="AI Message Options"> <i className="fas fa-ellipsis-v fa-sm"></i> </button> {showOptions && ( <div ref={optionsRef} className="absolute left-0 bottom-full mb-1 w-32 bg-white border border-border-default rounded-md shadow-xl z-20 p-1 animate-scale-in-subtle origin-bottom-left"> <button onClick={handleCopyText} className="w-full text-left px-2.5 py-1.5 text-xs text-text-secondary hover:bg-interactive-hover/70 rounded-md flex items-center space-x-1.5 transition-colors"> {copied ? <CheckMarkIconSVG className="w-4 h-4 mr-1.5" /> : <NewCopyIconSVG className="w-4 h-4 mr-1.5 fill-current" />} <span>{copied ? "Copied!" : "Copy"}</span> </button> <button onClick={handleDelete} className="w-full text-left px-2.5 py-1.5 text-xs text-red-600 hover:bg-red-500/10 rounded-md flex items-center space-x-1.5 transition-colors"> <i className="fas fa-trash-alt fa-fw mr-1.5"></i> <span>Delete</span> </button> </div> )} </div> );
+          return ( <div className="relative"> <button onClick={(e) => { e.stopPropagation(); setShowOptions(prev => !prev); }} className="ai-message-options-trigger p-1.5 rounded-full text-text-subtle hover:text-brand-primary hover:bg-interactive-hover/70 transition-all duration-150 focus:outline-none focus:ring-1 focus:ring-brand-primary/50" aria-label="AI Message Options"> <i className="fas fa-ellipsis-v fa-sm"></i> </button> {showOptions && ( <div ref={optionsRef} className="absolute left-0 bottom-full mb-1 w-32 bg-white border border-border-default rounded-md shadow-xl z-20 p-1 animate-scale-in-subtle origin-bottom-left"> <button onClick={handleCopyText} className="w-full text-left px-2.5 py-1.5 text-xs text-text-secondary hover:bg-interactive-hover/70 rounded-md flex items-center space-x-1.5 transition-colors"> {copied ? <CheckMarkIconSVG className="w-4 h-4 mr-1.5" /> : <NewCopyIconSVG className="w-4 h-4 mr-1.5 fill-current" />} <span>{copied ? "Copied!" : "Copy"}</span> </button> <button onClick={handleEdit} className="w-full text-left px-2.5 py-1.5 text-xs text-text-secondary hover:bg-interactive-hover/70 rounded-md flex items-center space-x-1.5 transition-colors"> <i className="fas fa-pencil-alt fa-fw mr-1.5"></i> <span>Edit</span> </button> <button onClick={handleDelete} className="w-full text-left px-2.5 py-1.5 text-xs text-red-600 hover:bg-red-500/10 rounded-md flex items-center space-x-1.5 transition-colors"> <i className="fas fa-trash-alt fa-fw mr-1.5"></i> <span>Delete</span> </button> </div> )} </div> );
       };
 
-      const ChatMessageItem = ({ message, onDeleteAiMessagePair, selectedUserMessageId, onSelectUserMessage  }) => { 
+      const ChatMessageItem = ({ message, onDeleteAiMessagePair, selectedUserMessageId, onSelectUserMessage, editingMessageId, editText, setEditText, onSaveEdit, onCancelEdit, onStartEdit }) => { 
           const isUser = message.role === 'user'; const isError = message.isError === true; 
           const contentRef = useRef(null); const [userCopied, setUserCopied] = useState(false);
+          const isEditing = message.id === editingMessageId;
           const messageLineAnimationClasses = (message.role === 'model' && !isError) ? '' : 'animate-fade-in-up opacity-0';
           const messageLineAnimationStyles = (message.role === 'model' && !isError) ? {} : { animationFillMode: 'forwards' };
           useEffect(() => { 
-            if (message.role === 'model' && !isError && !message.isLoading && typeof message.finalAnswerText === 'string' && message.finalAnswerText && contentRef.current) {
+            if (message.role === 'model' && !isError && !isEditing && !message.isLoading && typeof message.finalAnswerText === 'string' && message.finalAnswerText && contentRef.current) {
                 const preElements = contentRef.current.querySelectorAll('pre');
                 preElements.forEach(preEl => { 
                     if (preEl.parentNode && preEl.parentNode.classList.contains('code-block-wrapper')) { const codeElement = preEl.querySelector('code'); if(codeElement && !codeElement.dataset.highlighted){ hljs.highlightElement(codeElement); codeElement.dataset.highlighted = 'true'; } return;  }
@@ -680,7 +692,7 @@ Remember: You're not just an AI assistant, you're a helpful friend who happens t
                     if (codeElement && !codeElement.dataset.highlighted) { hljs.highlightElement(codeElement); codeElement.dataset.highlighted = 'true'; }
                 });
             }
-          }, [message.finalAnswerText, message.role, message.isLoading, isError]);
+          }, [message.finalAnswerText, message.role, message.isLoading, isError, isEditing]);
           const handleCopyUserText = (textToCopy) => { navigator.clipboard.writeText(textToCopy).then(() => { setUserCopied(true); setTimeout(() => setUserCopied(false), 1500); }).catch(err => console.error('Failed to copy text: ', err)); };
           if (message.role === 'system') { 
             const systemText = message.text || (message.parts?.[0]?.text || ""); const systemMessageStyle = isError ? "px-4 py-2 text-xs text-red-700 bg-red-100 border border-red-300 rounded-full shadow-sm italic" : "px-4 py-2 text-xs text-text-subtle bg-surface-accent border border-border-light rounded-full shadow-sm italic"; 
@@ -747,11 +759,36 @@ Remember: You're not just an AI assistant, you're a helpful friend who happens t
                   bubbleRoleClasses = ''; bubbleBaseClasses = '';
                   contentToShow = <ThinkingAnimation />;
               } else { 
-                  const textForMarkdown = (typeof message.finalAnswerText === 'string' && message.finalAnswerText) ? message.finalAnswerText : messageTextContent;
-                  contentToShow = ( <div ref={contentRef}> <div className={`markdown-content break-words`} dangerouslySetInnerHTML={{ __html: marked.parse(textForMarkdown || '') }} /> </div> );
+                  if (isEditing) {
+                      contentToShow = (
+                          <div>
+                              <textarea
+                                  value={editText}
+                                  onChange={(e) => setEditText(e.target.value)}
+                                  className="w-full h-48 bg-gray-50 border border-border-default rounded-lg p-2.5 text-sm text-text-primary focus:ring-1 focus:ring-brand-primary focus:outline-none resize-y font-source-sans-pro"
+                                  autoFocus
+                              />
+                              <div className="flex justify-end items-center space-x-2 mt-2">
+                                 <button onClick={onCancelEdit} className="px-4 py-1.5 text-xs font-medium text-text-secondary bg-gray-100 hover:bg-gray-200 border border-gray-300 rounded-md transition-colors">Cancel</button>
+                                 <button onClick={() => onSaveEdit(message.id)} className="px-4 py-1.5 text-xs font-medium text-white bg-brand-primary hover:bg-brand-primary/80 border border-transparent rounded-md transition-colors">Save</button>
+                              </div>
+                          </div>
+                      );
+                  } else {
+                      const textForMarkdown = (typeof message.finalAnswerText === 'string' && message.finalAnswerText) ? message.finalAnswerText : messageTextContent;
+                      contentToShow = ( <div ref={contentRef}> <div className={`markdown-content break-words`} dangerouslySetInnerHTML={{ __html: marked.parse(textForMarkdown || '') }} /> </div> );
+                  }
               } 
           }
-          return ( <div className={`flex items-start ${isUser ? 'justify-end' : 'justify-start'} ${messageLineAnimationClasses} mb-1`} style={messageLineAnimationStyles}> <div className={`${bubbleBaseClasses} ${bubbleWidthClasses} ${bubbleRoleClasses}`} onClick={isUser ? () => onSelectUserMessage(message.id === selectedUserMessageId ? null : message.id) : undefined}> {contentToShow} {isUser && selectedUserMessageId === message.id && messageTextContent && ( <button onClick={(e) => { e.stopPropagation(); handleCopyUserText(messageTextContent); }} className="absolute -bottom-3 -right-1 p-1.5 bg-gray-100 text-gray-600 border border-gray-300 rounded-full shadow-md hover:bg-gray-200 transition-all" aria-label="Copy user message"> {userCopied ? <CheckMarkIconSVG className="w-4 h-4" /> : <NewCopyIconSVG className="w-4 h-4 fill-current" />} </button> )} </div> </div> );
+          
+          let allowOptions = message.role === 'model' && !message.isLoading && !message.isError && !isEditing;
+           if (allowOptions && !(message.finalAnswerText || message.parts?.[0]?.text || message.text)) { 
+             if (!(message.searchUsed && message.analysisSteps && message.analysisSteps.length > 0)) { 
+                 allowOptions = false;
+             }
+          }
+
+          return ( <div className={`flex items-start ${isUser ? 'justify-end' : 'justify-start'} ${messageLineAnimationClasses} mb-1`} style={messageLineAnimationStyles}> <div className={`${bubbleBaseClasses} ${bubbleWidthClasses} ${bubbleRoleClasses}`} onClick={isUser ? () => onSelectUserMessage(message.id === selectedUserMessageId ? null : message.id) : undefined}> {contentToShow} {isUser && selectedUserMessageId === message.id && messageTextContent && ( <button onClick={(e) => { e.stopPropagation(); handleCopyUserText(messageTextContent); }} className="absolute -bottom-3 -right-1 p-1.5 bg-gray-100 text-gray-600 border border-gray-300 rounded-full shadow-md hover:bg-gray-200 transition-all" aria-label="Copy user message"> {userCopied ? <CheckMarkIconSVG className="w-4 h-4" /> : <NewCopyIconSVG className="w-4 h-4 fill-current" />} </button> )} {allowOptions && ( <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity"> <ChatMessageItemOptions message={message} onDeleteAiMessagePair={onDeleteAiMessagePair} onStartEdit={onStartEdit} /> </div> )} </div> </div> );
       };
       
        const ModelSelector = ({ models, selectedModelId, onSelectModel, isLoading, isAiCurrentlyProcessing }) => { 
@@ -806,7 +843,7 @@ Remember: You're not just an AI assistant, you're a helpful friend who happens t
           );
       };
 
-      const ChatInterface = ({ messages, onSendMessage, isLoading, onStopGeneration, onRegenerateLastTextMessage, onNewChat, setChatError, currentChatId, onDeleteAiMessagePair, selectedUserMessageId, setSelectedUserMessageId, selectedModelId, onSelectModel }) => { 
+      const ChatInterface = ({ messages, onSendMessage, isLoading, onStopGeneration, onRegenerateLastTextMessage, onNewChat, setChatError, currentChatId, onDeleteAiMessagePair, selectedUserMessageId, setSelectedUserMessageId, selectedModelId, onSelectModel, editingMessageId, editText, setEditText, onSaveEdit, onCancelEdit, onStartEdit }) => { 
           const [inputText, setInputText] = useState(''); const [selectedFiles, setSelectedFiles] = useState([]); const [userHasScrolledUp, setUserHasScrolledUp] = useState(false); 
           const [isWebSearchEnabledState, setIsWebSearchEnabledState] = useState(false); 
           const fileInputRef = useRef(null); const messagesEndRef = useRef(null); const chatContainerRef = useRef(null); const contentEditableRef = useRef(null);
@@ -885,11 +922,10 @@ Remember: You're not just an AI assistant, you're a helpful friend who happens t
                       canThisAiMessageBeRegenerated = userPromptIndex !== -1;
                   }
 
-                  return ( <React.Fragment key={msg.id}> {((msg.role === 'user' && ( (msg.parts && msg.parts[0]?.text) || msg.text || msg.attachedFiles?.length > 0 || msg.uiOnlyAttachedFiles?.length > 0)) || (msg.role === 'model') || msg.role === 'system' || msg.isError) && ( <div> <ChatMessageItem message={msg} onDeleteAiMessagePair={onDeleteAiMessagePair} selectedUserMessageId={selectedUserMessageId} onSelectUserMessage={setSelectedUserMessageId} /> </div> )} 
-                  {isEffectivelyLastAiMessageForButtons && ( 
+                  return ( <React.Fragment key={msg.id}> {((msg.role === 'user' && ( (msg.parts && msg.parts[0]?.text) || msg.text || msg.attachedFiles?.length > 0 || msg.uiOnlyAttachedFiles?.length > 0)) || (msg.role === 'model') || msg.role === 'system' || msg.isError) && ( <div> <ChatMessageItem message={msg} onDeleteAiMessagePair={onDeleteAiMessagePair} selectedUserMessageId={selectedUserMessageId} onSelectUserMessage={setSelectedUserMessageId} editingMessageId={editingMessageId} editText={editText} setEditText={setEditText} onSaveEdit={onSaveEdit} onCancelEdit={onCancelEdit} onStartEdit={onStartEdit} /> </div> )} 
+                  {isEffectivelyLastAiMessageForButtons && msg.id !== editingMessageId && ( 
                     <div className={`flex items-center space-x-2 mt-1 ml-0 justify-start mb-2`}> 
                       {canThisAiMessageBeRegenerated && ( <button onClick={() => { setChatError(null); onRegenerateLastTextMessage(msg.id, isWebSearchEnabledState); setSelectedUserMessageId(null); }} className="p-1.5 rounded-full text-text-subtle hover:text-brand-primary hover:bg-interactive-hover/70 transition-all duration-150 group focus:outline-none focus:ring-1 focus:ring-brand-primary/50" aria-label="Regenerate response" disabled={isLoading || isAiCurrentlyProcessing} > <NewRefreshIcon className="w-5 h-5 transition-transform duration-200" /> </button> )} 
-                      <ChatMessageItemOptions message={msg} onDeleteAiMessagePair={onDeleteAiMessagePair} /> 
                     </div> 
                   )} 
                   </React.Fragment> )
@@ -909,6 +945,8 @@ Remember: You're not just an AI assistant, you're a helpful friend who happens t
       
       const App = () => { 
           const [currentUser, setCurrentUser] = useState({ uid: 'guest_user', email: 'Guest User' }); const [authLoading, setAuthLoading] = useState(false); const [chatMessages, setChatMessages] = useState([]); const [isChatLoading, setIsChatLoading] = useState(false); const [chatError, setChatError] = useState(null); const [currentChatId, setCurrentChatId] = useState('session_chat_init'); const [chatHistoryList, setChatHistoryList] = useState([]); const [selectedUserMessageId, setSelectedUserMessageId] = useState(null); const [selectedModelId, setSelectedModelId] = useState(DEFAULT_MODEL_ID);
+          const [editingMessageId, setEditingMessageId] = useState(null);
+          const [editText, setEditText] = useState('');
           const isStoppingGenerationRef = useRef(false); const streamTextBuffer = useRef(""); 
           const streamSourcesBuffer = useRef([]); 
 
@@ -919,7 +957,12 @@ Remember: You're not just an AI assistant, you're a helpful friend who happens t
             const geminiMessages = currentMessagesFromState.filter(msg => !( msg.role === 'system' || (msg.role === 'model' && msg.isLoading && !(typeof msg.finalAnswerText === 'string' && msg.finalAnswerText) && (!msg.analysisSteps || msg.analysisSteps.length === 0)) || msg.isError )).map(msg => { let partsForGemini = []; if (msg.role === 'user') { if (msg.parts && Array.isArray(msg.parts)) { partsForGemini = [...msg.parts]; } else if (typeof msg.text === 'string') { partsForGemini = [{text: msg.text}]; } else { partsForGemini = [{text: ''}]; } const filesToConsider = msg.uiOnlyAttachedFiles || msg.attachedFiles || []; filesToConsider.forEach(file => { if (file.type.startsWith('image/') && file.apiData?.mimeType && file.apiData?.data) { partsForGemini.push({ inlineData: file.apiData }); } else if ((file.name?.toLowerCase().endsWith('.txt') || file.type === 'text/plain') && file.apiData?.textContent) { const fileContentMarker = `\n[Content of attached file: ${file.name}]\n`; if (!partsForGemini.some(p => typeof p.text === 'string' && p.text.includes(fileContentMarker))) { partsForGemini.push({ text: `${fileContentMarker}${file.apiData.textContent}\n[End of file: ${file.name}]\n` }); } } }); } else if (msg.role === 'model') { let textContent = ""; if (typeof msg.finalAnswerText === 'string') { textContent = msg.finalAnswerText; } else if (typeof msg.text === 'string') { textContent = msg.text; } partsForGemini = [{text: textContent}]; } return { role: msg.role, parts: partsForGemini }; }).filter(entry => entry.parts && entry.parts.length > 0 && entry.parts.some(p => (p.inlineData || (typeof p.text === 'string' && p.text.trim())) ));
             if (geminiMessages.length > 0 && geminiMessages[0].role === 'model') { const firstUserIndex = geminiMessages.findIndex(m => m.role === 'user'); if (firstUserIndex === -1) return []; const slicedHistory = geminiMessages.slice(firstUserIndex); if (slicedHistory.length > 1 && slicedHistory[0].role === slicedHistory[1].role) { return [slicedHistory[0]]; } return slicedHistory; } return geminiMessages;
           };
-          useEffect(() => { if (!genAI || !API_KEY || API_KEY === "YOUR_GEMINI_API_KEY") { setChatError("Gemini API Key is not configured or client failed to initialize."); } }, []); 
+          useEffect(() => { 
+              const hasValidInstance = Object.values(genAIInstances).length > 0;
+              if (!hasValidInstance) {
+                setChatError("Gemini API Key is not configured or client failed to initialize.");
+              }
+          }, []);
           
           const animateFakeSteps = async (aiMessageUiId) => {
             for (let i = 0; i < FAKE_ANALYSIS_STEPS_DEFINITION.length; i++) {
@@ -984,7 +1027,8 @@ Remember: You're not just an AI assistant, you're a helpful friend who happens t
           const addMessageToLocalChat = async (role, text, filesForDisplay, aiSpecificData = {}) => { const messageId = Date.now().toString(36) + Math.random().toString(36).substring(2); const messagePartsForDisplay = []; if (text) messagePartsForDisplay.push({ text: text }); const attachedFilesForLocalState = filesForDisplay.map(f => ({ id: f.id, name: f.name, type: f.type, apiData: f.apiData })); const messageData = { id: messageId, role: role, parts: messagePartsForDisplay.length > 0 ? messagePartsForDisplay : [{text: ""}], text: text || "", timestamp: new Date().getTime(), ...(role === 'user' && attachedFilesForLocalState.length > 0 && { uiOnlyAttachedFiles: attachedFilesForLocalState }), ...(role === 'model' && aiSpecificData.searchUsed !== undefined && { searchUsed: aiSpecificData.searchUsed }), ...(role === 'model' && aiSpecificData.modelUsed && { modelUsed: aiSpecificData.modelUsed }), }; setChatMessages(prev => [...prev, messageData]); return messageId; };
           
           const _streamAiResponse = async ( originalPromptPartsForGemini, targetAiMessageUiId, historyForGeminiInit, useSearchForThisTurn, currentLoadingText, isRegeneration = false, modelToUse ) => {
-              if (!genAI) { setChatError("Gemini AI Client not initialized. Check API Key."); setIsChatLoading(false); setChatMessages(prev => prev.map(m => m.id === targetAiMessageUiId ? { ...m, isLoading: false, isError: true, finalAnswerText: "AI Client Error.", text: "AI Client Error.", parts:[{text:"AI Client Error."}] } : m)); return; }
+              const genAI = genAIInstances[modelToUse];
+              if (!genAI) { setChatError(`Gemini AI Client for model ${modelToUse} not initialized. Check API Key.`); setIsChatLoading(false); setChatMessages(prev => prev.map(m => m.id === targetAiMessageUiId ? { ...m, isLoading: false, isError: true, finalAnswerText: "AI Client Error.", text: "AI Client Error.", parts:[{text:"AI Client Error."}] } : m)); return; }
               
               setIsChatLoading(true); 
               streamTextBuffer.current = ""; 
@@ -1128,7 +1172,7 @@ Remember: You're not just an AI assistant, you're a helpful friend who happens t
               if (!messageText.trim() && filesToSendFromInput.length === 0) return; 
               isStoppingGenerationRef.current = false; 
               setChatError(null); 
-              if (!genAI || !API_KEY || API_KEY === "YOUR_GEMINI_API_KEY") { setChatError("Gemini API Key is not configured or client failed."); return; } 
+              if (!genAIInstances[selectedModelId]) { setChatError(`Gemini API client for model ${selectedModelId} is not configured.`); return; } 
               
               const userMessageUiId = await addMessageToLocalChat('user', messageText, filesToSendFromInput); 
               const aiPlaceholderUiId = Date.now().toString() + '_model_resp_temp_ui'; 
@@ -1182,7 +1226,6 @@ Remember: You're not just an AI assistant, you're a helpful friend who happens t
           const handleRegenerateLastTextMessage = useCallback(async (aiMessageIdToRegenerate, userWebSearchPreference) => { 
               isStoppingGenerationRef.current = false; 
               setChatError(null); 
-              if (!genAI || !API_KEY || API_KEY === "YOUR_GEMINI_API_KEY") { setChatError("API Key is not configured or client failed for regeneration."); return; } 
               
               const messagesForCurrentChat = [...chatMessages]; 
               let userPromptMsgForRegen = null; 
@@ -1192,6 +1235,7 @@ Remember: You're not just an AI assistant, you're a helpful friend who happens t
               if (aiMsgIndex === -1) { setChatError("Cannot regenerate: Original AI message not found."); return; } 
               
               const modelUsedForOriginalResponse = messagesForCurrentChat[aiMsgIndex].modelUsed || selectedModelId; 
+              if (!genAIInstances[modelUsedForOriginalResponse]) { setChatError(`API Client for model ${modelUsedForOriginalResponse} not found for regeneration.`); return; }
               
               for (let i = aiMsgIndex - 1; i >= 0; i--) { if (messagesForCurrentChat[i].role === 'user') { let interveningUserMessage = false; for (let j = i + 1; j < aiMsgIndex; j++) { if (messagesForCurrentChat[j].role === 'user') { interveningUserMessage = true; break; } } if (!interveningUserMessage) { userPromptMsgForRegen = messagesForCurrentChat[i]; historyUpToUserPrompt = getGeminiHistory(messagesForCurrentChat.slice(0, i)); break; } } } 
               
@@ -1248,8 +1292,12 @@ Remember: You're not just an AI assistant, you're a helpful friend who happens t
           }, [chatMessages, currentChatId, selectedModelId]); 
 
           const handleDeleteAiMessagePair = async (aiMessageId) => { const currentMessages = [...chatMessages]; const aiMessageIndex = currentMessages.findIndex(msg => msg.id === aiMessageId); if (aiMessageIndex === -1) { setChatError("Could not find the AI message to delete."); return; } let idsToDelete = [aiMessageId]; if (aiMessageIndex > 0) { let precedingUserMessage = null; for (let i = aiMessageIndex - 1; i >= 0; i--) { if (currentMessages[i].role === 'model') { break; } if (currentMessages[i].role === 'user') { let interveningUserMessage = false; for (let k = i + 1; k < aiMessageIndex; k++) { if (currentMessages[k].role === 'user') { interveningUserMessage = true; break; } } if (!interveningUserMessage) { precedingUserMessage = currentMessages[i]; } break; } } if (precedingUserMessage) { idsToDelete.push(precedingUserMessage.id); } } setChatMessages(prev => prev.filter(msg => !idsToDelete.includes(msg.id))); };
+          const handleStartEdit = (id, currentText) => { setEditingMessageId(id); setEditText(currentText || ''); };
+          const handleCancelEdit = () => { setEditingMessageId(null); setEditText(''); };
+          const handleSaveEdit = (id) => { setChatMessages(prev => prev.map(msg => msg.id === id ? { ...msg, finalAnswerText: editText, text: editText, parts: [{ text: editText }] } : msg)); handleCancelEdit(); };
+
           if (authLoading) { return ( <div className="h-full flex items-center justify-center bg-surface-main"> <div className="w-10 h-10 border-4 border-brand-primary border-t-transparent rounded-full animate-spin-continuous"></div> </div> ); }
-          return ( <div className="h-full text-text-primary flex font-sans bg-surface-main"> <div className="flex-grow h-full flex flex-col min-w-0"> <ChatInterface messages={chatMessages} onSendMessage={handleSendChatMessage} isLoading={isChatLoading} onStopGeneration={handleStopGeneration} onRegenerateLastTextMessage={handleRegenerateLastTextMessage} onNewChat={handleNewChat} setChatError={setChatError} currentChatId={currentChatId} onDeleteAiMessagePair={handleDeleteAiMessagePair} selectedUserMessageId={selectedUserMessageId} setSelectedUserMessageId={setSelectedUserMessageId} selectedModelId={selectedModelId} onSelectModel={setSelectedModelId} /> </div> </div> );
+          return ( <div className="h-full text-text-primary flex font-sans bg-surface-main"> <div className="flex-grow h-full flex flex-col min-w-0"> <ChatInterface messages={chatMessages} onSendMessage={handleSendChatMessage} isLoading={isChatLoading} onStopGeneration={handleStopGeneration} onRegenerateLastTextMessage={handleRegenerateLastTextMessage} onNewChat={handleNewChat} setChatError={setChatError} currentChatId={currentChatId} onDeleteAiMessagePair={handleDeleteAiMessagePair} selectedUserMessageId={selectedUserMessageId} setSelectedUserMessageId={setSelectedUserMessageId} selectedModelId={selectedModelId} onSelectModel={setSelectedModelId} editingMessageId={editingMessageId} editText={editText} setEditText={setEditText} onSaveEdit={handleSaveEdit} onCancelEdit={handleCancelEdit} onStartEdit={handleStartEdit} /> </div> </div> );
       };
       const root = ReactDOM.createRoot(document.getElementById('root'));
       root.render(<React.StrictMode><App /></React.StrictMode>);
