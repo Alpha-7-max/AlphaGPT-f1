@@ -658,23 +658,24 @@ Remember: You're not just an AI assistant, you're a helpful friend who happens t
         );
       };
 
-      const ChatMessageItemOptions = ({ message, onDeleteAiMessagePair, onShowSelectTextView }) => { 
+      const ChatMessageItemOptions = ({ message, onDeleteAiMessagePair, onStartEdit }) => { 
           const [showOptions, setShowOptions] = useState(false); const optionsRef = useRef(null); const [copied, setCopied] = useState(false);
           useEffect(() => { const handleClickOutside = (event) => { if (optionsRef.current && !optionsRef.current.contains(event.target) && !event.target.closest('.ai-message-options-trigger')) { setShowOptions(false); } }; document.addEventListener('mousedown', handleClickOutside); return () => document.removeEventListener('mousedown', handleClickOutside); }, []);
           const handleCopyText = () => { const textToCopy = message.finalAnswerText || message.parts?.[0]?.text || message.text || ""; if (textToCopy) { navigator.clipboard.writeText(textToCopy).then(() => { setCopied(true); setTimeout(() => setCopied(false), 1500); }).catch(err => console.error('Failed to copy text: ', err)); } setShowOptions(false); };
           const handleDelete = () => { onDeleteAiMessagePair(message.id); setShowOptions(false); };
-          const handleSelectText = () => { onShowSelectTextView(message.finalAnswerText || message.text || ""); setShowOptions(false); };
+          const handleEdit = () => { onStartEdit(message.id, message.finalAnswerText || message.text || ""); setShowOptions(false); };
 
-          return ( <div className="relative"> <button onClick={(e) => { e.stopPropagation(); setShowOptions(prev => !prev); }} className="ai-message-options-trigger p-1.5 rounded-full text-text-subtle hover:text-brand-primary hover:bg-interactive-hover/70 transition-all duration-150 focus:outline-none focus:ring-1 focus:ring-brand-primary/50" aria-label="AI Message Options"> <i className="fas fa-ellipsis-v fa-sm"></i> </button> {showOptions && ( <div ref={optionsRef} className="absolute left-0 bottom-full mb-1 w-32 bg-white border border-border-default rounded-md shadow-xl z-20 p-1 animate-scale-in-subtle origin-bottom-left"> <button onClick={handleCopyText} className="w-full text-left px-2.5 py-1.5 text-xs text-text-secondary hover:bg-interactive-hover/70 rounded-md flex items-center space-x-1.5 transition-colors"> {copied ? <CheckMarkIconSVG className="w-4 h-4 mr-1.5" /> : <NewCopyIconSVG className="w-4 h-4 mr-1.5 fill-current" />} <span>{copied ? "Copied!" : "Copy"}</span> </button> <button onClick={handleSelectText} className="w-full text-left px-2.5 py-1.5 text-xs text-text-secondary hover:bg-interactive-hover/70 rounded-md flex items-center space-x-1.5 transition-colors"> <i className="fas fa-pencil-alt fa-fw mr-1.5"></i> <span>Edit</span> </button> <button onClick={handleDelete} className="w-full text-left px-2.5 py-1.5 text-xs text-red-600 hover:bg-red-500/10 rounded-md flex items-center space-x-1.5 transition-colors"> <i className="fas fa-trash-alt fa-fw mr-1.5"></i> <span>Delete</span> </button> </div> )} </div> );
+          return ( <div className="relative"> <button onClick={(e) => { e.stopPropagation(); setShowOptions(prev => !prev); }} className="ai-message-options-trigger p-1.5 rounded-full text-text-subtle hover:text-brand-primary hover:bg-interactive-hover/70 transition-all duration-150 focus:outline-none focus:ring-1 focus:ring-brand-primary/50" aria-label="AI Message Options"> <i className="fas fa-ellipsis-v fa-sm"></i> </button> {showOptions && ( <div ref={optionsRef} className="absolute left-0 bottom-full mb-1 w-32 bg-white border border-border-default rounded-md shadow-xl z-20 p-1 animate-scale-in-subtle origin-bottom-left"> <button onClick={handleCopyText} className="w-full text-left px-2.5 py-1.5 text-xs text-text-secondary hover:bg-interactive-hover/70 rounded-md flex items-center space-x-1.5 transition-colors"> {copied ? <CheckMarkIconSVG className="w-4 h-4 mr-1.5" /> : <NewCopyIconSVG className="w-4 h-4 mr-1.5 fill-current" />} <span>{copied ? "Copied!" : "Copy"}</span> </button> <button onClick={handleEdit} className="w-full text-left px-2.5 py-1.5 text-xs text-text-secondary hover:bg-interactive-hover/70 rounded-md flex items-center space-x-1.5 transition-colors"> <i className="fas fa-pencil-alt fa-fw mr-1.5"></i> <span>Edit</span> </button> <button onClick={handleDelete} className="w-full text-left px-2.5 py-1.5 text-xs text-red-600 hover:bg-red-500/10 rounded-md flex items-center space-x-1.5 transition-colors"> <i className="fas fa-trash-alt fa-fw mr-1.5"></i> <span>Delete</span> </button> </div> )} </div> );
       };
 
-      const ChatMessageItem = ({ message, selectedUserMessageId, onSelectUserMessage }) => { 
+      const ChatMessageItem = ({ message, selectedUserMessageId, onSelectUserMessage, editingMessageId, editText, setEditText, onSaveEdit, onCancelEdit }) => { 
           const isUser = message.role === 'user'; const isError = message.isError === true; 
           const contentRef = useRef(null); const [userCopied, setUserCopied] = useState(false);
+          const isEditing = message.id === editingMessageId;
           const messageLineAnimationClasses = (message.role === 'model' && !isError) ? '' : 'animate-fade-in-up opacity-0';
           const messageLineAnimationStyles = (message.role === 'model' && !isError) ? {} : { animationFillMode: 'forwards' };
           useEffect(() => { 
-            if (message.role === 'model' && !isError && !message.isLoading && typeof message.finalAnswerText === 'string' && message.finalAnswerText && contentRef.current) {
+            if (message.role === 'model' && !isError && !isEditing && !message.isLoading && typeof message.finalAnswerText === 'string' && message.finalAnswerText && contentRef.current) {
                 const preElements = contentRef.current.querySelectorAll('pre');
                 preElements.forEach(preEl => { 
                     if (preEl.parentNode && preEl.parentNode.classList.contains('code-block-wrapper')) { const codeElement = preEl.querySelector('code'); if(codeElement && !codeElement.dataset.highlighted){ hljs.highlightElement(codeElement); codeElement.dataset.highlighted = 'true'; } return;  }
@@ -691,7 +692,7 @@ Remember: You're not just an AI assistant, you're a helpful friend who happens t
                     if (codeElement && !codeElement.dataset.highlighted) { hljs.highlightElement(codeElement); codeElement.dataset.highlighted = 'true'; }
                 });
             }
-          }, [message.finalAnswerText, message.role, message.isLoading, isError]);
+          }, [message.finalAnswerText, message.role, message.isLoading, isError, isEditing]);
           const handleCopyUserText = (textToCopy) => { navigator.clipboard.writeText(textToCopy).then(() => { setUserCopied(true); setTimeout(() => setUserCopied(false), 1500); }).catch(err => console.error('Failed to copy text: ', err)); };
           if (message.role === 'system') { 
             const systemText = message.text || (message.parts?.[0]?.text || ""); const systemMessageStyle = isError ? "px-4 py-2 text-xs text-red-700 bg-red-100 border border-red-300 rounded-full shadow-sm italic" : "px-4 py-2 text-xs text-text-subtle bg-surface-accent border border-border-light rounded-full shadow-sm italic"; 
@@ -758,8 +759,25 @@ Remember: You're not just an AI assistant, you're a helpful friend who happens t
                   bubbleRoleClasses = ''; bubbleBaseClasses = '';
                   contentToShow = <ThinkingAnimation />;
               } else { 
-                  const textForMarkdown = (typeof message.finalAnswerText === 'string' && message.finalAnswerText) ? message.finalAnswerText : messageTextContent;
-                  contentToShow = ( <div ref={contentRef}> <div className={`markdown-content break-words`} dangerouslySetInnerHTML={{ __html: marked.parse(textForMarkdown || '') }} /> </div> );
+                  if (isEditing) {
+                      contentToShow = (
+                          <div>
+                              <textarea
+                                  value={editText}
+                                  onChange={(e) => setEditText(e.target.value)}
+                                  className="w-full h-48 bg-gray-50 border border-border-default rounded-lg p-2.5 text-sm text-text-primary focus:ring-1 focus:ring-brand-primary focus:outline-none resize-y font-source-sans-pro"
+                                  autoFocus
+                              />
+                              <div className="flex justify-end items-center space-x-2 mt-2">
+                                 <button onClick={onCancelEdit} className="px-4 py-1.5 text-xs font-medium text-text-secondary bg-gray-100 hover:bg-gray-200 border border-gray-300 rounded-md transition-colors">Cancel</button>
+                                 <button onClick={() => onSaveEdit(message.id)} className="px-4 py-1.5 text-xs font-medium text-white bg-brand-primary hover:bg-brand-primary/80 border border-transparent rounded-md transition-colors">Save</button>
+                              </div>
+                          </div>
+                      );
+                  } else {
+                      const textForMarkdown = (typeof message.finalAnswerText === 'string' && message.finalAnswerText) ? message.finalAnswerText : messageTextContent;
+                      contentToShow = ( <div ref={contentRef}> <div className={`markdown-content break-words`} dangerouslySetInnerHTML={{ __html: marked.parse(textForMarkdown || '') }} /> </div> );
+                  }
               } 
           }
           
@@ -818,7 +836,7 @@ Remember: You're not just an AI assistant, you're a helpful friend who happens t
           );
       };
 
-      const ChatInterface = ({ messages, onSendMessage, isLoading, onStopGeneration, onRegenerateLastTextMessage, onNewChat, setChatError, currentChatId, onDeleteAiMessagePair, selectedUserMessageId, setSelectedUserMessageId, selectedModelId, onSelectModel, onShowSelectTextView }) => { 
+      const ChatInterface = ({ messages, onSendMessage, isLoading, onStopGeneration, onRegenerateLastTextMessage, onNewChat, setChatError, currentChatId, onDeleteAiMessagePair, selectedUserMessageId, setSelectedUserMessageId, selectedModelId, onSelectModel, editingMessageId, editText, setEditText, onSaveEdit, onCancelEdit, onStartEdit }) => { 
           const [inputText, setInputText] = useState(''); const [selectedFiles, setSelectedFiles] = useState([]); const [userHasScrolledUp, setUserHasScrolledUp] = useState(false); 
           const [isWebSearchEnabledState, setIsWebSearchEnabledState] = useState(false); 
           const fileInputRef = useRef(null); const messagesEndRef = useRef(null); const chatContainerRef = useRef(null); const contentEditableRef = useRef(null);
@@ -852,6 +870,7 @@ Remember: You're not just an AI assistant, you're a helpful friend who happens t
               <div className="absolute inset-0 flex flex-col items-center justify-center text-center pointer-events-none p-8 animate-fade-in-up opacity-0" style={{animationDelay: '0.2s', animationFillMode: 'forwards'}}> 
                 <NewEmptyStateIconSVG className="w-16 h-16 mb-5 text-brand-send-active" /> 
                 <p className="text-2xl lg:text-3xl font-serif text-gray-800 leading-tight"> How can I help you<br />today? </p> 
+                {/* Removed "Send a message to get started" text */}
               </div> 
             ) : null }
               {messages.map((msg, idx) => { 
@@ -896,11 +915,11 @@ Remember: You're not just an AI assistant, you're a helpful friend who happens t
                       canThisAiMessageBeRegenerated = userPromptIndex !== -1;
                   }
 
-                  return ( <React.Fragment key={msg.id}> {((msg.role === 'user' && ( (msg.parts && msg.parts[0]?.text) || msg.text || msg.attachedFiles?.length > 0 || msg.uiOnlyAttachedFiles?.length > 0)) || (msg.role === 'model') || msg.role === 'system' || msg.isError) && ( <div> <ChatMessageItem message={msg} selectedUserMessageId={selectedUserMessageId} onSelectUserMessage={setSelectedUserMessageId} /> </div> )} 
-                  {isEffectivelyLastAiMessageForButtons && ( 
+                  return ( <React.Fragment key={msg.id}> {((msg.role === 'user' && ( (msg.parts && msg.parts[0]?.text) || msg.text || msg.attachedFiles?.length > 0 || msg.uiOnlyAttachedFiles?.length > 0)) || (msg.role === 'model') || msg.role === 'system' || msg.isError) && ( <div> <ChatMessageItem message={msg} selectedUserMessageId={selectedUserMessageId} onSelectUserMessage={setSelectedUserMessageId} editingMessageId={editingMessageId} editText={editText} setEditText={setEditText} onSaveEdit={onSaveEdit} onCancelEdit={onCancelEdit} /> </div> )} 
+                  {isEffectivelyLastAiMessageForButtons && msg.id !== editingMessageId && ( 
                     <div className={`flex items-center space-x-2 mt-1 ml-0 justify-start mb-2`}> 
                       {canThisAiMessageBeRegenerated && ( <button onClick={() => { setChatError(null); onRegenerateLastTextMessage(msg.id, isWebSearchEnabledState); setSelectedUserMessageId(null); }} className="p-1.5 rounded-full text-text-subtle hover:text-brand-primary hover:bg-interactive-hover/70 transition-all duration-150 group focus:outline-none focus:ring-1 focus:ring-brand-primary/50" aria-label="Regenerate response" disabled={isLoading || isAiCurrentlyProcessing} > <NewRefreshIcon className="w-5 h-5 transition-transform duration-200" /> </button> )} 
-                      <ChatMessageItemOptions message={msg} onDeleteAiMessagePair={onDeleteAiMessagePair} onShowSelectTextView={onShowSelectTextView} /> 
+                      <ChatMessageItemOptions message={msg} onDeleteAiMessagePair={onDeleteAiMessagePair} onStartEdit={onStartEdit} /> 
                     </div> 
                   )} 
                   </React.Fragment> )
@@ -918,41 +937,13 @@ Remember: You're not just an AI assistant, you're a helpful friend who happens t
           );
       };
       
-      const SelectTextView = ({ content, onClose }) => {
-        const parsedContent = marked.parse(content || '');
-        const contentRef = useRef(null);
-  
-        useEffect(() => {
-          if (contentRef.current) {
-            const preElements = contentRef.current.querySelectorAll('pre code');
-            preElements.forEach(el => {
-              hljs.highlightElement(el);
-            });
-          }
-        }, [content]);
-  
-        return (
-          <div className="absolute inset-0 bg-surface-main z-50 flex flex-col animate-modal-fade-in">
-            <header className="flex-shrink-0 flex items-center p-3 bg-white border-b border-border-light shadow-header">
-              <button onClick={onClose} className="p-2 rounded-full hover:bg-interactive-hover/70 transition-colors" aria-label="Go back">
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-                </svg>
-              </button>
-              <h2 className="text-xl font-sans font-semibold text-gray-800 ml-4">Select Text</h2>
-            </header>
-            <div className="flex-grow p-4 overflow-y-auto" style={{ userSelect: 'text', WebkitUserSelect: 'text' }}>
-              <div ref={contentRef} className="markdown-content" dangerouslySetInnerHTML={{ __html: parsedContent }} />
-            </div>
-          </div>
-        );
-      };
-      
       const App = () => { 
           const [currentUser, setCurrentUser] = useState({ uid: 'guest_user', email: 'Guest User' }); const [authLoading, setAuthLoading] = useState(false); const [chatMessages, setChatMessages] = useState([]); const [isChatLoading, setIsChatLoading] = useState(false); const [chatError, setChatError] = useState(null); const [currentChatId, setCurrentChatId] = useState('session_chat_init'); const [chatHistoryList, setChatHistoryList] = useState([]); const [selectedUserMessageId, setSelectedUserMessageId] = useState(null); const [selectedModelId, setSelectedModelId] = useState(DEFAULT_MODEL_ID);
-          const [selectableMessageContent, setSelectableMessageContent] = useState(null);
+          const [editingMessageId, setEditingMessageId] = useState(null);
+          const [editText, setEditText] = useState('');
           const isStoppingGenerationRef = useRef(false); const streamTextBuffer = useRef(""); 
           const streamSourcesBuffer = useRef([]); 
+
 
           useEffect(() => { if (chatError) { const errorId = Date.now() + '_sys_validation_err'; const newErrorMsg = {id: errorId, role: 'system', text: chatError, isError: true, timestamp: new Date().getTime()}; setChatMessages(prev => { const lastMessage = prev[prev.length -1]; if(lastMessage && lastMessage.id.includes('_sys_validation_err') && lastMessage.text === chatError) return prev; return [...prev, newErrorMsg]; }); } }, [chatError]); 
           const handleNewChat = useCallback(() => { const newSessionId = 'session_chat_' + Date.now().toString(36) + Math.random().toString(36).substring(2); setCurrentChatId(newSessionId); setChatMessages([]); setChatError(null); return newSessionId; }, []); 
@@ -1253,6 +1244,7 @@ Remember: You're not just an AI assistant, you're a helpful friend who happens t
               setChatMessages(prev => {
                   let newMessages = [...prev];
                   if(oldAiMessageIndex !== -1) {
+                    // Replace the old message directly
                     newMessages[oldAiMessageIndex] = {
                         id: newAiMessageId, 
                         role: 'model', text: '', parts: [{text: ''}], finalAnswerText: "",
@@ -1260,7 +1252,7 @@ Remember: You're not just an AI assistant, you're a helpful friend who happens t
                         loadingText: initialLoadingText, timestamp: new Date().getTime(), isLoading: true,
                         isError: false, sources: null, searchUsed: needsSearch, modelUsed: modelUsedForOriginalResponse
                     };
-                  } else {
+                  } else { // Fallback if old message somehow not found (should ideally not happen)
                      newMessages.push({
                         id: newAiMessageId, role: 'model', text: '', parts: [{text: ''}], finalAnswerText: "",
                         analysisSteps: needsSearch ? FAKE_ANALYSIS_STEPS_DEFINITION.map(s => ({...s, completed: false })) : [],
@@ -1294,41 +1286,12 @@ Remember: You're not just an AI assistant, you're a helpful friend who happens t
           }, [chatMessages, currentChatId, selectedModelId]); 
 
           const handleDeleteAiMessagePair = async (aiMessageId) => { const currentMessages = [...chatMessages]; const aiMessageIndex = currentMessages.findIndex(msg => msg.id === aiMessageId); if (aiMessageIndex === -1) { setChatError("Could not find the AI message to delete."); return; } let idsToDelete = [aiMessageId]; if (aiMessageIndex > 0) { let precedingUserMessage = null; for (let i = aiMessageIndex - 1; i >= 0; i--) { if (currentMessages[i].role === 'model') { break; } if (currentMessages[i].role === 'user') { let interveningUserMessage = false; for (let k = i + 1; k < aiMessageIndex; k++) { if (currentMessages[k].role === 'user') { interveningUserMessage = true; break; } } if (!interveningUserMessage) { precedingUserMessage = currentMessages[i]; } break; } } if (precedingUserMessage) { idsToDelete.push(precedingUserMessage.id); } } setChatMessages(prev => prev.filter(msg => !idsToDelete.includes(msg.id))); };
-          
-          const handleShowSelectTextView = (content) => {
-            setSelectableMessageContent(content);
-          };
+          const handleStartEdit = (id, currentText) => { setEditingMessageId(id); setEditText(currentText || ''); };
+          const handleCancelEdit = () => { setEditingMessageId(null); setEditText(''); };
+          const handleSaveEdit = (id) => { setChatMessages(prev => prev.map(msg => msg.id === id ? { ...msg, finalAnswerText: editText, text: editText, parts: [{ text: editText }] } : msg)); handleCancelEdit(); };
 
           if (authLoading) { return ( <div className="h-full flex items-center justify-center bg-surface-main"> <div className="w-10 h-10 border-4 border-brand-primary border-t-transparent rounded-full animate-spin-continuous"></div> </div> ); }
-          
-          return ( 
-            <div className="h-full text-text-primary flex font-sans bg-surface-main relative"> 
-              <div className="flex-grow h-full flex flex-col min-w-0"> 
-                <ChatInterface 
-                  messages={chatMessages} 
-                  onSendMessage={handleSendChatMessage} 
-                  isLoading={isChatLoading} 
-                  onStopGeneration={handleStopGeneration} 
-                  onRegenerateLastTextMessage={handleRegenerateLastTextMessage} 
-                  onNewChat={handleNewChat} 
-                  setChatError={setChatError} 
-                  currentChatId={currentChatId} 
-                  onDeleteAiMessagePair={handleDeleteAiMessagePair} 
-                  selectedUserMessageId={selectedUserMessageId} 
-                  setSelectedUserMessageId={setSelectedUserMessageId} 
-                  selectedModelId={selectedModelId} 
-                  onSelectModel={setSelectedModelId} 
-                  onShowSelectTextView={handleShowSelectTextView}
-                /> 
-              </div> 
-              {selectableMessageContent !== null && (
-                <SelectTextView 
-                  content={selectableMessageContent} 
-                  onClose={() => setSelectableMessageContent(null)} 
-                />
-              )}
-            </div> 
-          );
+          return ( <div className="h-full text-text-primary flex font-sans bg-surface-main"> <div className="flex-grow h-full flex flex-col min-w-0"> <ChatInterface messages={chatMessages} onSendMessage={handleSendChatMessage} isLoading={isChatLoading} onStopGeneration={handleStopGeneration} onRegenerateLastTextMessage={handleRegenerateLastTextMessage} onNewChat={handleNewChat} setChatError={setChatError} currentChatId={currentChatId} onDeleteAiMessagePair={handleDeleteAiMessagePair} selectedUserMessageId={selectedUserMessageId} setSelectedUserMessageId={setSelectedUserMessageId} selectedModelId={selectedModelId} onSelectModel={setSelectedModelId} editingMessageId={editingMessageId} editText={editText} setEditText={setEditText} onSaveEdit={handleSaveEdit} onCancelEdit={handleCancelEdit} onStartEdit={handleStartEdit} /> </div> </div> );
       };
       const root = ReactDOM.createRoot(document.getElementById('root'));
       root.render(<React.StrictMode><App /></React.StrictMode>);
