@@ -232,14 +232,6 @@
         }
       }
       
-      const FAKE_ANALYSIS_STEPS_DEFINITION = [
-        { text: "Searching web", completed: false },
-        { text: "Beginning analysis", completed: false },
-        { text: "Reviewing search results", completed: false },
-        { text: "Filtering results to find recent and relevant", completed: false }
-      ];
-      const FAKE_STEP_DELAY = 500; 
-
       function getSystemInstruction() { return `You are AlphaGPT. Your persona is a friendly, creative, and funny "Dostana" (friend-like) assistant.
 
 **Core Rules:**
@@ -379,49 +371,9 @@ Your goal is to be a helpful, knowledgeable, and entertaining friend. Make every
                   const errorContent = typeof message.finalAnswerText === 'string' && message.finalAnswerText ? message.finalAnswerText : messageTextContent;
                   contentToShow = ( <div className="text-sm break-words"> <div className="flex items-center mb-1"><i className="fas fa-exclamation-triangle text-red-500 mr-2"></i><strong className="font-semibold">Error</strong></div>{errorContent.replace(/^Error:\s*/, '')} </div>); 
               
-              } else if (message.isLoading && message.searchUsed && message.analysisSteps && message.analysisSteps.length > 0 && !message.analysisSteps.every(s=>s.completed) && !(typeof message.finalAnswerText === 'string' && message.finalAnswerText.trim())) {
-                  bubbleRoleClasses = `bg-white text-text-primary rounded-xl rounded-bl-md border border-[#E5E8EB] p-3 md:p-4`; 
-                  contentToShow = (
-                      <div className="w-full"> 
-                          {message.analysisSteps.map((step, index) => (
-                              <div key={`fakesteponload-${message.id}-${index}`} className="flex items-center space-x-2 mb-1.5">
-                                  {step.completed ? ( 
-                                    <CheckMarkIconSVG className="w-3.5 h-3.5 text-green-500 flex-shrink-0" />
-                                  ) : ( 
-                                    <div className="w-3.5 h-3.5 flex items-center justify-center flex-shrink-0">
-                                        <div className="w-2 h-2 bg-text-subtle rounded-full animate-pulse"></div> 
-                                    </div>
-                                  )}
-                                  <span className="text-xs italic text-text-secondary">{step.text}</span>
-                              </div>
-                          ))}
-                      </div>
-                  );
-
-              } else if (message.searchUsed && message.analysisSteps && message.analysisSteps.length > 0) { 
-                   bubbleRoleClasses = `bg-white text-text-primary rounded-xl rounded-bl-md border border-[#E5E8EB] p-3 md:p-4`; 
-                   contentToShow = (
-                      <div className="w-full"> 
-                          {message.analysisSteps.map((step, index) => ( 
-                              <div key={`fakestepfinal-${message.id}-${index}`} className="flex items-center space-x-2 mb-1.5">
-                                  <CheckMarkIconSVG className="w-3.5 h-3.5 text-green-500 flex-shrink-0" />
-                                  <span className="text-xs italic text-text-secondary">{step.text}</span>
-                              </div>
-                          ))}
-                          {typeof message.finalAnswerText === 'string' && message.finalAnswerText.trim() && (
-                              <hr className="my-3 border-border-light" /> 
-                          )}
-                          {typeof message.finalAnswerText === 'string' && message.finalAnswerText.trim() && (
-                              <div ref={contentRef} className="markdown-content break-words" dangerouslySetInnerHTML={{ __html: marked.parse(message.finalAnswerText || '') }} />
-                          )}
-                          {message.isLoading && !(typeof message.finalAnswerText === 'string' && message.finalAnswerText.trim()) && (
-                            <div className="flex items-center space-x-1.5 p-2 bg-gray-50 rounded-lg border border-gray-200 max-w-fit mt-2.5"> 
-                                <div className="w-3 h-3 border-2 border-gray-300 border-t-brand-primary rounded-full animate-spin"></div>
-                                <div className="relative overflow-hidden"> <span className="text-xs text-gray-500 font-medium">Processing...</span> </div>
-                            </div>
-                          )}
-                      </div>
-                  );
+              } else if (message.isLoading && message.searchUsed && !message.finalAnswerText) {
+                  bubbleRoleClasses = ''; bubbleBaseClasses = '';
+                  contentToShow = <div className="flex items-center space-x-1.5 p-2.5 bg-gray-50 rounded-lg border border-gray-200 max-w-fit my-2 self-start ml-0"><div className="relative overflow-hidden"><span className="text-sm text-gray-600 font-medium">Searching...</span><div className="absolute inset-0 bg-gradient-to-r from-transparent via-white to-transparent opacity-30 animate-shimmer" style={{ backgroundSize: '200% 100%' }} /></div></div>;
               } else if (message.isLoading && !message.searchUsed && !(typeof message.finalAnswerText === 'string' && message.finalAnswerText)) { 
                   bubbleRoleClasses = ''; bubbleBaseClasses = '';
                   contentToShow = <ThinkingAnimation />;
@@ -633,24 +585,6 @@ const base64Data = await new Promise((resolve, reject) => { const reader = new F
               }
           }, []);
           
-          const animateFakeSteps = async (aiMessageUiId) => {
-            for (let i = 0; i < FAKE_ANALYSIS_STEPS_DEFINITION.length; i++) {
-                if (isStoppingGenerationRef.current) break;
-                setChatMessages(prevMsgs => prevMsgs.map(msg => {
-                    if (msg.id === aiMessageUiId && msg.analysisSteps && msg.analysisSteps[i]) {
-                        const newAnalysisSteps = [...msg.analysisSteps];
-                        newAnalysisSteps[i] = { ...newAnalysisSteps[i], completed: true };
-                        return { ...msg, analysisSteps: newAnalysisSteps, isLoading: true }; 
-                    }
-                    return msg;
-                }));
-                if (i < FAKE_ANALYSIS_STEPS_DEFINITION.length - 1) { 
-                    await new Promise(resolve => setTimeout(resolve, FAKE_STEP_DELAY));
-                }
-                 if (isStoppingGenerationRef.current) break;
-            }
-          };
-
           const handleStopGeneration = useCallback(() => {
               isStoppingGenerationRef.current = true;
               setIsChatLoading(false);
@@ -659,11 +593,10 @@ const base64Data = await new Promise((resolve, reject) => { const reader = new F
                   return prevMessages.map(msg => {
                       if (msg.role === 'model' && msg.isLoading) {
                           let finalStoppedText = streamTextBuffer.current || "";
-                          let finalAnalysisSteps = msg.analysisSteps ? [...msg.analysisSteps] : [];
+                          let finalAnalysisSteps = [];
 
                           if (msg.searchUsed) { 
-                              finalAnalysisSteps = FAKE_ANALYSIS_STEPS_DEFINITION.map(s => ({ ...s, completed: true }));
-                              finalStoppedText = finalStoppedText.replace(/\[ANALYSIS_STEP\].*?\n/g, '').replace(/\[ANALYSIS_END\]\n?/g, '');
+                              finalStoppedText = finalStoppedText.replace(/\[ANALYSIS_STEP\]\.*?\n/g, '').replace(/\[ANALYSIS_END\]\n?/g, '');
                           } else { 
                               finalAnalysisSteps = [];
                           }
@@ -804,7 +737,6 @@ const base64Data = await new Promise((resolve, reject) => { const reader = new F
                   let analysisStepsForUi = [];
 
                   if (useSearchForThisTurn) {
-                      analysisStepsForUi = FAKE_ANALYSIS_STEPS_DEFINITION.map(s => ({ ...s, completed: true }));
                       finalAnswerForUi = finalAnswerForUi.replace(/\[ANALYSIS_STEP\].*?\n/g, '').replace(/\[ANALYSIS_END\]\n?/g, '').trim();
                   } else {
                       finalAnswerForUi = finalAnswerForUi.trim();
@@ -818,7 +750,6 @@ const base64Data = await new Promise((resolve, reject) => { const reader = new F
                   } else if (!isStoppingGenerationRef.current && !finalAnswerForUi.trim() && analysisStepsForUi.length === 0 ) { 
                       if (useSearchForThisTurn) { 
                           finalAnswerForUi = "I'm having a little trouble searching right now, or perhaps clear information isn't available on this topic. You could try regenerating the message, or ask your question a bit differently or more clearly. Thank you! 🙏"; 
-                          analysisStepsForUi = FAKE_ANALYSIS_STEPS_DEFINITION.map(s => ({ ...s, completed: true, text: s.text + " (encountered an issue)" }));
                       } else { 
                           finalAnswerForUi = "I think I had some trouble understanding. Could you please clarify your question? 🤔"; 
                           analysisStepsForUi = [];
@@ -837,7 +768,6 @@ const base64Data = await new Promise((resolve, reject) => { const reader = new F
                   
                   let errorAnalysisSteps = [];
                   if(useSearchForThisTurn){ 
-                     errorAnalysisSteps = FAKE_ANALYSIS_STEPS_DEFINITION.map(s => ({...s, completed: true, text: s.text + " (error)"}));
                   }
 
                   setChatMessages(prev => prev.map(msg => msg.id === targetAiMessageUiId ? { ...msg, isLoading: false, isError: true, finalAnswerText: errorTextForUser, text: errorTextForUser, parts: [{text: errorTextForUser}], analysisSteps: errorAnalysisSteps, sources: null } : msg ));
@@ -864,7 +794,7 @@ const base64Data = await new Promise((resolve, reject) => { const reader = new F
                   text: '', 
                   parts: [{text:''}], 
                   finalAnswerText: "", 
-                  analysisSteps: needsSearch ? FAKE_ANALYSIS_STEPS_DEFINITION.map(s => ({...s, completed: false })) : [], 
+                  analysisSteps: [], 
                   loadingText: initialLoadingText, 
                   timestamp: new Date().getTime(), 
                   isLoading: true, 
@@ -876,7 +806,6 @@ const base64Data = await new Promise((resolve, reject) => { const reader = new F
               setChatMessages(prev => { const cleanPrev = prev.filter(m => m.id !== 'loading_chat_indicator' && m.id !== 'error_loading_messages'); return [...cleanPrev, preliminaryAiPlaceholder]; }); 
               
               if (needsSearch) {
-                  await animateFakeSteps(aiPlaceholderUiId);
                   if(isStoppingGenerationRef.current) { 
                      handleStopGeneration(); 
                      return;
@@ -933,14 +862,14 @@ const base64Data = await new Promise((resolve, reject) => { const reader = new F
                     newMessages[oldAiMessageIndex] = {
                         id: newAiMessageId, 
                         role: 'model', text: '', parts: [{text: ''}], finalAnswerText: "",
-                        analysisSteps: needsSearch ? FAKE_ANALYSIS_STEPS_DEFINITION.map(s => ({...s, completed: false })) : [],
+                        analysisSteps: [],
                         loadingText: initialLoadingText, timestamp: new Date().getTime(), isLoading: true,
                         isError: false, sources: null, searchUsed: needsSearch, modelUsed: modelUsedForOriginalResponse
                     };
                   } else { // Fallback if old message somehow not found (should ideally not happen)
                      newMessages.push({
                         id: newAiMessageId, role: 'model', text: '', parts: [{text: ''}], finalAnswerText: "",
-                        analysisSteps: needsSearch ? FAKE_ANALYSIS_STEPS_DEFINITION.map(s => ({...s, completed: false })) : [],
+                        analysisSteps: [],
                         loadingText: initialLoadingText, timestamp: new Date().getTime(), isLoading: true,
                         isError: false, sources: null, searchUsed: needsSearch, modelUsed: modelUsedForOriginalResponse
                      });
@@ -949,7 +878,6 @@ const base64Data = await new Promise((resolve, reject) => { const reader = new F
               });
 
               if (needsSearch) {
-                  await animateFakeSteps(newAiMessageId);
                    if(isStoppingGenerationRef.current) {
                      handleStopGeneration();
                      return;
