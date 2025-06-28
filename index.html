@@ -177,7 +177,8 @@
           "@google/genai": "https://esm.sh/@google/generative-ai@^0.11.3",
           "react": "https://esm.sh/react@^18.2.0", "react/": "https://esm.sh/react@^18.2.0/",
           "react-dom/client": "https://esm.sh/react-dom@^18.2.0/client",
-          "marked": "https://esm.sh/marked@^12.0.2", "highlight.js": "https://esm.sh/highlight.js@^11.9.0"
+          "marked": "https://esm.sh/marked@^12.0.2", "highlight.js": "https://esm.sh/highlight.js@^11.9.0",
+          "browser-image-compression": "https://esm.sh/browser-image-compression@2.0.2"
         }
       }
     </script>
@@ -190,6 +191,7 @@
       import { GoogleGenerativeAI } from '@google/genai';
       import { marked } from 'marked';
       import hljs from 'highlight.js';
+      import imageCompression from 'browser-image-compression';
 
       const renderer = new marked.Renderer();
       renderer.link = (href, title, text) => { 
@@ -213,7 +215,7 @@
         'gemini-2.5-flash-preview-04-17': "AIzaSyCP0_JSlzsnNKczFe-dBTZyoyKBwvvP6UE",
       };
 
-      const MAX_FILE_SIZE_MB = 25; const MAX_TOTAL_FILES_SIZE_MB = 50;
+      const MAX_FILE_SIZE_MB = 10; const MAX_TOTAL_FILES_SIZE_MB = 20;
       
       const genAIInstances = {};
       for (const modelId in API_KEYS) {
@@ -845,7 +847,15 @@ Remember: You're not just an AI assistant, you're a helpful friend who happens t
           useEffect(() => { if (contentEditableRef.current) { contentEditableRef.current.style.height = 'auto'; const maxHeight = parseInt(getComputedStyle(contentEditableRef.current).maxHeight, 10); let newHeight = contentEditableRef.current.scrollHeight; if (maxHeight && newHeight > maxHeight) { newHeight = maxHeight; } contentEditableRef.current.style.height = `${newHeight}px`; } }, [inputText, selectedFiles]); 
           const handleFileChange = (event) => { const files = Array.from(event.target.files); processAndSetFiles(files); if (fileInputRef.current) fileInputRef.current.value = ""; };
           const handlePaste = (event) => { const pastedText = event.clipboardData.getData('text/plain'); const pastedFiles = Array.from(event.clipboardData.files); if (pastedFiles.length > 0) { event.preventDefault(); processAndSetFiles(pastedFiles, true); } else if (pastedText && contentEditableRef.current && document.activeElement === contentEditableRef.current) { event.preventDefault(); document.execCommand('insertText', false, pastedText); setInputText(contentEditableRef.current.innerText);  } };
-          const processAndSetFiles = (filesArray, isFromPaste = false) => { if (!filesArray.length) return false; let filesToProcess = []; let currentTotalSize = selectedFiles.reduce((acc, curr) => acc + (curr.file?.size || 0), 0); let didProcessAnyFile = false; let localErrorMessage = null; for (const file of filesArray) { const isImage = file.type.startsWith('image/'); const isTxt = file.type === 'text/plain' || (file.name && file.name.toLowerCase().endsWith('.txt')); if (!isImage && !isTxt) { if (isFromPaste) console.log(`Pasted unsupported file: ${file.name} (${file.type})`); else localErrorMessage = `File "${file.name}" (type: ${file.type}) is not supported. Only images and .txt files are allowed.`; continue; } if (file.size > MAX_FILE_SIZE_MB * 1024 * 1024) { localErrorMessage = `File "${file.name}" is larger than ${MAX_FILE_SIZE_MB}MB.`; continue; } if (currentTotalSize + file.size > MAX_TOTAL_FILES_SIZE_MB * 1024 * 1024) { localErrorMessage = `Total file size cannot exceed ${MAX_TOTAL_FILES_SIZE_MB}MB.`; break; } filesToProcess.push(file); currentTotalSize += file.size; didProcessAnyFile = true; } if(localErrorMessage){ setChatError(localErrorMessage); } else { setChatError(null); } if (filesToProcess.length > 0) { const placeholderFiles = filesToProcess.map(file => ({ id: Date.now().toString(36) + Math.random().toString(36).substring(2) + file.name, name: file.name, type: file.type, isLoading: true, file: file, })); setSelectedFiles(prev => [...prev, ...placeholderFiles]); placeholderFiles.forEach(placeholder => { const { id, file } = placeholder; const processSingleFile = async () => { try { let apiData; if (file.type.startsWith('image/')) { const base64Data = await new Promise((resolve, reject) => { const reader = new FileReader(); reader.readAsDataURL(file); reader.onloadend = () => resolve(reader.result.split(',')[1]); reader.onerror = (error) => reject(error); }); apiData = { mimeType: file.type, data: base64Data }; } else { const textContent = await file.text(); apiData = { textContent: textContent }; } setSelectedFiles(prev => prev.map(f => f.id === id ? { ...f, isLoading: false, apiData } : f)); } catch(e){ console.error("Error processing file:", file.name, e); setChatError(`Error processing file: ${file.name}`); setSelectedFiles(prev => prev.filter(f => f.id !== id)); } }; processSingleFile(); }); } return didProcessAnyFile; };
+          const processAndSetFiles = (filesArray, isFromPaste = false) => { if (!filesArray.length) return false; let filesToProcess = []; let currentTotalSize = selectedFiles.reduce((acc, curr) => acc + (curr.file?.size || 0), 0); let didProcessAnyFile = false; let localErrorMessage = null; for (const file of filesArray) { const isImage = file.type.startsWith('image/'); const isTxt = file.type === 'text/plain' || (file.name && file.name.toLowerCase().endsWith('.txt')); if (!isImage && !isTxt) { if (isFromPaste) console.log(`Pasted unsupported file: ${file.name} (${file.type})`); else localErrorMessage = `File "${file.name}" (type: ${file.type}) is not supported. Only images and .txt files are allowed.`; continue; } if (file.size > MAX_FILE_SIZE_MB * 1024 * 1024) { localErrorMessage = `File "${file.name}" is larger than ${MAX_FILE_SIZE_MB}MB.`; continue; } if (currentTotalSize + file.size > MAX_TOTAL_FILES_SIZE_MB * 1024 * 1024) { localErrorMessage = `Total file size cannot exceed ${MAX_TOTAL_FILES_SIZE_MB}MB.`; break; } filesToProcess.push(file); currentTotalSize += file.size; didProcessAnyFile = true; } if(localErrorMessage){ setChatError(localErrorMessage); } else { setChatError(null); } if (filesToProcess.length > 0) { const placeholderFiles = filesToProcess.map(file => ({ id: Date.now().toString(36) + Math.random().toString(36).substring(2) + file.name, name: file.name, type: file.type, isLoading: true, file: file, })); setSelectedFiles(prev => [...prev, ...placeholderFiles]); placeholderFiles.forEach(placeholder => { const { id, file } = placeholder; const processSingleFile = async () => { try { let apiData; if (file.type.startsWith('image/')) { const compressionOptions = {
+    maxSizeMB: 1,          
+    maxWidthOrHeight: 1920,   
+    useWebWorker: true,       
+    maxIteration: 10,         
+    initialQuality: 0.8,      
+};
+const compressedFile = await imageCompression(file, compressionOptions);
+const base64Data = await new Promise((resolve, reject) => { const reader = new FileReader(); reader.readAsDataURL(compressedFile); reader.onloadend = () => resolve(reader.result.split(',')[1]); reader.onerror = (error) => reject(error); }); apiData = { mimeType: compressedFile.type, data: base64Data }; } else { const textContent = await file.text(); apiData = { textContent: textContent }; } setSelectedFiles(prev => prev.map(p => p.id === id ? { ...p, isLoading: false, apiData: apiData } : p)); } catch (error) { console.error('Error processing file:', error); setChatError(`Error processing file "${file.name}".`); setSelectedFiles(prev => prev.filter(p => p.id !== id)); } }; processSingleFile(); }); return didProcessAnyFile; } return false; };
           const removeSelectedFile = (fileId) => { setSelectedFiles(prev => prev.filter(f => f.id !== fileId)); };
           const handleInputFromContentEditable = () => { setInputText(contentEditableRef.current?.innerText || ''); };
           const handleSubmit = (e) => { if(e) e.preventDefault(); const currentText = contentEditableRef.current?.innerText.trim() || ''; if (!currentText && selectedFiles.length === 0) return; setUserHasScrolledUp(false); setChatError(null); onSendMessage(currentText, selectedFiles, isWebSearchEnabledState); if(contentEditableRef.current) contentEditableRef.current.innerText = ''; setInputText(''); setSelectedFiles([]); };
