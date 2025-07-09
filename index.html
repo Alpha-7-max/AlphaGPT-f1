@@ -84,7 +84,7 @@
                 'chat-window': '0 15px 50px -8px rgba(var(--text-primary), 0.08), 0 8px 25px -8px rgba(var(--text-primary),0.05)',
                 'input-active-glow': '0 0 7px rgba(var(--text-secondary),0.18)',
             },
-             maxWidth: { '18rem': '18rem', }
+             maxWidth: { '18rem': '18rem', '90vw': '90vw' }
           },
         },
       }
@@ -189,8 +189,8 @@
       const A4F_BASE_URL = 'https://api.a4f.co/v1/chat/completions';
       
       const MODELS = [
-          { id: 'provider-5/gpt-4.1-nano', uiName: 'Fast' },
-          { id: 'provider-3/gpt-4o-mini', uiName: 'Smart' }
+          { id: 'provider-5/gpt-4.1-nano', uiName: 'Fast', supportsVision: true },
+          { id: 'provider-6/gpt-4.1', uiName: 'Smart', supportsVision: false }
       ];
 
       const MAX_FILE_SIZE_MB = 10; const MAX_TOTAL_FILES_SIZE_MB = 20;
@@ -342,7 +342,7 @@ Your goal is to be a helpful, knowledgeable, and entertaining friend. Make every
           return ( <div className={`flex items-start ${isUser ? 'justify-end group' : 'justify-start'} ${messageLineAnimationClasses} mb-1`}> <div className={`${bubbleBaseClasses} ${bubbleWidthClasses} ${bubbleRoleClasses}`} onClick={isUser ? () => onSelectUserMessage(message.id === selectedUserMessageId ? null : message.id) : undefined}> {contentToShow} {isUser && selectedUserMessageId === message.id && messageTextContent && ( <button onClick={(e) => { e.stopPropagation(); handleCopyUserText(messageTextContent); }} className="absolute -bottom-3 -right-1 p-1.5 bg-gray-100 text-gray-600 border border-gray-300 rounded-full shadow-md hover:bg-gray-200 transition-all" aria-label="Copy user message"> {userCopied ? <CheckMarkIconSVG className="w-4 h-4" /> : <NewCopyIconSVG className="w-4 h-4 fill-current" />} </button> )} </div> </div> );
       };
       
-      const ChatInterface = ({ messages, onSendMessage, isLoading, onStopGeneration, onRegenerateLastTextMessage, onNewChat, setChatError, currentChatId, onDeleteAiMessagePair, selectedUserMessageId, setSelectedUserMessageId, editingMessageId, editText, setEditText, onSaveEdit, onCancelEdit, onStartEdit, selectedModel, setSelectedModel }) => { 
+      const ChatInterface = ({ messages, onSendMessage, isLoading, onStopGeneration, onRegenerateLastTextMessage, onNewChat, setChatError, currentChatId, onDeleteAiMessagePair, selectedUserMessageId, setSelectedUserMessageId, editingMessageId, editText, setEditText, onSaveEdit, onCancelEdit, onStartEdit, selectedModel, setSelectedModel, setToast }) => { 
           const [inputText, setInputText] = useState(''); const [selectedFiles, setSelectedFiles] = useState([]);
           const [isModelSelectorOpen, setIsModelSelectorOpen] = useState(false);
           const modelSelectorRef = useRef(null);
@@ -381,7 +381,6 @@ Your goal is to be a helpful, knowledgeable, and entertaining friend. Make every
 
           useEffect(() => { if (contentEditableRef.current) { contentEditableRef.current.style.height = 'auto'; const maxHeight = parseInt(getComputedStyle(contentEditableRef.current).maxHeight, 10); let newHeight = contentEditableRef.current.scrollHeight; if (maxHeight && newHeight > maxHeight) { newHeight = maxHeight; } contentEditableRef.current.style.height = `${newHeight}px`; } }, [inputText, selectedFiles]); 
 
-          // CHANGE 1: Image Resizing Helper Function
           const resizeImage = (file, maxDimension = 1280, quality = 0.85) => {
             return new Promise((resolve, reject) => {
               const reader = new FileReader();
@@ -407,7 +406,6 @@ Your goal is to be a helpful, knowledgeable, and entertaining friend. Make every
                   canvas.height = height;
                   const ctx = canvas.getContext('2d');
                   ctx.drawImage(img, 0, 0, width, height);
-                  // Get data URL and extract base64 part
                   const dataUrl = canvas.toDataURL(file.type === 'image/png' ? 'image/png' : 'image/jpeg', quality);
                   resolve(dataUrl.split(',')[1]);
                 };
@@ -421,18 +419,29 @@ Your goal is to be a helpful, knowledgeable, and entertaining friend. Make every
           const handlePaste = (event) => { const pastedText = event.clipboardData.getData('text/plain'); const pastedFiles = Array.from(event.clipboardData.files); if (pastedFiles.length > 0) { event.preventDefault(); processAndSetFiles(pastedFiles, true); } else if (pastedText && contentEditableRef.current && document.activeElement === contentEditableRef.current) { event.preventDefault(); document.execCommand('insertText', false, pastedText); setInputText(contentEditableRef.current.innerText);  } };
           
           const processAndSetFiles = (filesArray, isFromPaste = false) => { 
-              if (!filesArray.length) return false; 
+              if (!filesArray.length) return false;
+              const currentModelInfo = MODELS.find(m => m.id === selectedModel);
+
               let filesToProcess = []; let currentTotalSize = selectedFiles.reduce((acc, curr) => acc + (curr.file?.size || 0), 0); 
               let didProcessAnyFile = false; let localErrorMessage = null; 
-              for (const file of filesArray) { 
+              
+              for (const file of filesArray) {
                   const isImage = file.type.startsWith('image/'); 
                   const isTxt = file.type === 'text/plain' || (file.name && file.name.toLowerCase().endsWith('.txt')); 
+                  
+                  if (isImage && currentModelInfo && !currentModelInfo.supportsVision) {
+                      setToast({ text: `'Smart' model can't use images. Switch to 'Fast'.`, type: 'error' });
+                      continue; 
+                  }
+
                   if (!isImage && !isTxt) { if (isFromPaste) console.log(`Pasted unsupported file: ${file.name} (${file.type})`); else localErrorMessage = `File "${file.name}" (type: ${file.type}) is not supported. Only images and .txt files are allowed.`; continue; } 
                   if (file.size > MAX_FILE_SIZE_MB * 1024 * 1024) { localErrorMessage = `File "${file.name}" is larger than ${MAX_FILE_SIZE_MB}MB.`; continue; } 
                   if (currentTotalSize + file.size > MAX_TOTAL_FILES_SIZE_MB * 1024 * 1024) { localErrorMessage = `Total file size cannot exceed ${MAX_TOTAL_FILES_SIZE_MB}MB.`; break; } 
                   filesToProcess.push(file); currentTotalSize += file.size; didProcessAnyFile = true; 
               } 
+              
               if(localErrorMessage){ setChatError(localErrorMessage); } else { setChatError(null); } 
+              
               if (filesToProcess.length > 0) { 
                   const placeholderFiles = filesToProcess.map(file => ({ id: Date.now().toString(36) + Math.random().toString(36).substring(2) + file.name, name: file.name, type: file.type, isLoading: true, file: file, })); 
                   setSelectedFiles(prev => [...prev, ...placeholderFiles]); 
@@ -462,7 +471,6 @@ Your goal is to be a helpful, knowledgeable, and entertaining friend. Make every
           const removeSelectedFile = (fileId) => { setSelectedFiles(prev => prev.filter(f => f.id !== fileId)); };
           const handleInputFromContentEditable = () => { setInputText(contentEditableRef.current?.innerText || ''); };
           
-          // CHANGE 2: handleSubmit updated for smoother UI
           const handleSubmit = (e) => { 
             if(e) e.preventDefault(); 
             const currentText = contentEditableRef.current?.innerText.trim() || ''; 
@@ -470,7 +478,6 @@ Your goal is to be a helpful, knowledgeable, and entertaining friend. Make every
             setChatError(null); 
             onSendMessage(currentText, selectedFiles); 
             
-            // Delay clearing the input to make the UI transition smoother
             setTimeout(() => {
                 if(contentEditableRef.current) contentEditableRef.current.innerText = ''; 
                 setInputText(''); 
@@ -591,14 +598,47 @@ Your goal is to be a helpful, knowledgeable, and entertaining friend. Make every
             </div> 
           );
       };
+
+      // CHANGE 1: Toast component updated for horizontal layout
+      const Toast = ({ message, type = 'info', onDismiss }) => {
+        const baseClasses = "flex items-center p-3 space-x-2.5 rounded-lg shadow-lg max-w-[90vw] sm:max-w-sm";
+        const typeClasses = {
+            info: 'text-gray-600 bg-white border border-gray-200',
+            error: 'text-red-700 bg-red-100 border border-red-200',
+            success: 'text-green-700 bg-green-100 border border-green-200',
+        };
+        const iconClasses = {
+            info: 'fa-info-circle text-blue-500',
+            error: 'fa-exclamation-triangle text-red-500',
+            success: 'fa-check-circle text-green-500',
+        };
+
+        return (
+            <div className={`${baseClasses} ${typeClasses[type]} animate-fade-in-up`} role="alert">
+                <i className={`fas ${iconClasses[type]} flex-shrink-0 w-5 h-5`}></i>
+                <span className="text-xs font-medium">{message}</span>
+                <button onClick={onDismiss} className="p-1.5 -m-1.5 ml-auto text-gray-400 hover:text-gray-900 rounded-lg hover:bg-gray-100/50 focus:outline-none focus:ring-2 focus:ring-gray-300 flex-shrink-0">
+                    <NewCloseIconSVG className="w-3.5 h-3.5" />
+                </button>
+            </div>
+        );
+      };
       
       const App = () => { 
           const [currentUser, setCurrentUser] = useState({ uid: 'guest_user', email: 'Guest User' }); const [authLoading, setAuthLoading] = useState(false); const [chatMessages, setChatMessages] = useState([]); const [isChatLoading, setIsChatLoading] = useState(false); const [chatError, setChatError] = useState(null); const [currentChatId, setCurrentChatId] = useState('session_chat_init');
           const [selectedUserMessageId, setSelectedUserMessageId] = useState(null);
           const [editingMessageId, setEditingMessageId] = useState(null);
           const [editText, setEditText] = useState('');
-          const [selectedModel, setSelectedModel] = useState(MODELS[0].id);
+          const [selectedModel, setSelectedModel] = useState(MODELS[1].id);
+          const [toast, setToast] = useState(null);
           const isStoppingGenerationRef = useRef(false); const streamTextBuffer = useRef(""); 
+
+          useEffect(() => {
+            if (toast) {
+                const timer = setTimeout(() => setToast(null), 4000);
+                return () => clearTimeout(timer);
+            }
+          }, [toast]);
 
           useEffect(() => { if (chatError) { const errorId = Date.now() + '_sys_validation_err'; const newErrorMsg = {id: errorId, role: 'system', text: chatError, isError: true, timestamp: new Date().getTime()}; setChatMessages(prev => { const lastMessage = prev[prev.length -1]; if(lastMessage && lastMessage.id.includes('_sys_validation_err') && lastMessage.text === chatError) return prev; return [...prev, newErrorMsg]; }); } }, [chatError]); 
           const handleNewChat = useCallback(() => { const newSessionId = 'session_chat_' + Date.now().toString(36) + Math.random().toString(36).substring(2); setCurrentChatId(newSessionId); setChatMessages([]); setChatError(null); return newSessionId; }, []); 
@@ -696,7 +736,6 @@ Your goal is to be a helpful, knowledgeable, and entertaining friend. Make every
 
           const addMessageToLocalChat = async (role, text, filesForDisplay, aiSpecificData = {}) => { const messageId = Date.now().toString(36) + Math.random().toString(36).substring(2); const messagePartsForDisplay = []; if (text) messagePartsForDisplay.push({ text: text }); const attachedFilesForLocalState = filesForDisplay.map(f => ({ id: f.id, name: f.name, type: f.type, apiData: f.apiData, isLoading: f.isLoading })); const messageData = { id: messageId, role: role, parts: messagePartsForDisplay.length > 0 ? messagePartsForDisplay : [{text: ""}], text: text || "", timestamp: new Date().getTime(), ...(role === 'user' && attachedFilesForLocalState.length > 0 && { uiOnlyAttachedFiles: attachedFilesForLocalState }), ...(role === 'model' && aiSpecificData.modelUsed && { modelUsed: aiSpecificData.modelUsed }), ...(aiSpecificData.searchUsed && { searchUsed: true })}; setChatMessages(prev => [...prev, messageData]); return messageId; };
           
-          // CHANGE 3: _streamAiResponse updated for better error handling
           const _streamAiResponse = async (targetAiMessageUiId, historyForA4f, modelToUse) => {
               setIsChatLoading(true);
               streamTextBuffer.current = "";
@@ -779,7 +818,7 @@ Your goal is to be a helpful, knowledgeable, and entertaining friend. Make every
                                         if (isStoppingGenerationRef.current) break;
                                         streamTextBuffer.current += char;
                                         performUiUpdateInStream(true);
-                                        await new Promise(resolve => setTimeout(resolve, 15));
+                                        await new Promise(resolve => setTimeout(resolve, 8));
                                       }
                                   }
                               } catch (e) {
@@ -808,7 +847,7 @@ Your goal is to be a helpful, knowledgeable, and entertaining friend. Make every
                     errorTextForUser = err.message;
                   }
                   
-                  setChatError(errorTextForUser);
+                  setToast({ text: errorTextForUser, type: 'error' });
                   setChatMessages(prev => prev.map(msg => msg.id === targetAiMessageUiId ? { ...msg, isLoading: false, isError: true, finalAnswerText: errorTextForUser, text: errorTextForUser, parts: [{text: errorTextForUser}], sources: null } : msg ));
               } finally {
                   setIsChatLoading(false);
@@ -865,7 +904,7 @@ Your goal is to be a helpful, knowledgeable, and entertaining friend. Make every
               let userPromptIndex = -1;
               const aiMessageIndex = messagesSnapshot.findIndex(m => m.id === aiMessageIdToRegenerate);
 
-              if (aiMessageIndex === -1) { setChatError("Cannot regenerate: Original AI message not found."); return; }
+              if (aiMessageIndex === -1) { setToast({ text: "Cannot regenerate: Original AI message not found.", type: 'error' }); return; }
               const modelUsedForOriginal = messagesSnapshot[aiMessageIndex].modelUsed || selectedModel;
 
               for (let i = aiMessageIndex - 1; i >= 0; i--) {
@@ -875,7 +914,7 @@ Your goal is to be a helpful, knowledgeable, and entertaining friend. Make every
                   }
               }
 
-              if (userPromptIndex === -1) { setChatError("Cannot regenerate: Original user prompt not found."); return; }
+              if (userPromptIndex === -1) { setToast({ text: "Cannot regenerate: Original user prompt not found.", type: 'error' }); return; }
 
               const historyForApi = getA4fHistory(messagesSnapshot.slice(0, userPromptIndex + 1));
               
@@ -895,13 +934,45 @@ Your goal is to be a helpful, knowledgeable, and entertaining friend. Make every
               await _streamAiResponse(newAiMessageId, historyForApi, modelUsedForOriginal);
           }, [chatMessages, currentChatId, selectedModel]); 
 
-          const handleDeleteAiMessagePair = async (aiMessageId) => { const currentMessages = [...chatMessages]; const aiMessageIndex = currentMessages.findIndex(msg => msg.id === aiMessageId); if (aiMessageIndex === -1) { setChatError("Could not find the AI message to delete."); return; } let idsToDelete = [aiMessageId]; if (aiMessageIndex > 0) { let precedingUserMessage = null; for (let i = aiMessageIndex - 1; i >= 0; i--) { if (currentMessages[i].role === 'model') { break; } if (currentMessages[i].role === 'user') { let interveningUserMessage = false; for (let k = i + 1; k < aiMessageIndex; k++) { if (currentMessages[k].role === 'user') { interveningUserMessage = true; break; } } if (!interveningUserMessage) { precedingUserMessage = currentMessages[i]; } break; } } if (precedingUserMessage) { idsToDelete.push(precedingUserMessage.id); } } setChatMessages(prev => prev.filter(msg => !idsToDelete.includes(msg.id))); };
+          const handleDeleteAiMessagePair = async (aiMessageId) => { const currentMessages = [...chatMessages]; const aiMessageIndex = currentMessages.findIndex(msg => msg.id === aiMessageId); if (aiMessageIndex === -1) { setToast({ text: "Could not find the AI message to delete.", type: 'error' }); return; } let idsToDelete = [aiMessageId]; if (aiMessageIndex > 0) { let precedingUserMessage = null; for (let i = aiMessageIndex - 1; i >= 0; i--) { if (currentMessages[i].role === 'model') { break; } if (currentMessages[i].role === 'user') { let interveningUserMessage = false; for (let k = i + 1; k < aiMessageIndex; k++) { if (currentMessages[k].role === 'user') { interveningUserMessage = true; break; } } if (!interveningUserMessage) { precedingUserMessage = currentMessages[i]; } break; } } if (precedingUserMessage) { idsToDelete.push(precedingUserMessage.id); } } setChatMessages(prev => prev.filter(msg => !idsToDelete.includes(msg.id))); };
           const handleStartEdit = (id, currentText) => { setEditingMessageId(id); setEditText(currentText || ''); };
           const handleCancelEdit = () => { setEditingMessageId(null); setEditText(''); };
           const handleSaveEdit = (id) => { setChatMessages(prev => prev.map(msg => msg.id === id ? { ...msg, finalAnswerText: editText, text: editText, parts: [{ text: editText }] } : msg)); handleCancelEdit(); };
 
           if (authLoading) { return ( <div className="h-full flex items-center justify-center bg-surface-main"> <div className="w-10 h-10 border-4 border-brand-primary border-t-transparent rounded-full animate-spin-continuous"></div> </div> ); }
-          return ( <div className="h-full text-text-primary flex font-sans bg-surface-main"> <div className="flex-grow h-full flex flex-col min-w-0"> <ChatInterface messages={chatMessages} onSendMessage={handleSendChatMessage} isLoading={isChatLoading} onStopGeneration={handleStopGeneration} onRegenerateLastTextMessage={handleRegenerateLastTextMessage} onNewChat={handleNewChat} setChatError={setChatError} currentChatId={currentChatId} onDeleteAiMessagePair={handleDeleteAiMessagePair} selectedUserMessageId={selectedUserMessageId} setSelectedUserMessageId={setSelectedUserMessageId} editingMessageId={editingMessageId} editText={editText} setEditText={setEditText} onSaveEdit={handleSaveEdit} onCancelEdit={handleCancelEdit} onStartEdit={handleStartEdit} selectedModel={selectedModel} setSelectedModel={setSelectedModel} /> </div> </div> );
+          return ( 
+            <div className="h-full text-text-primary flex font-sans bg-surface-main relative">
+                {toast && (
+                    <div className="absolute top-5 left-1/2 -translate-x-1/2 z-50">
+                        <Toast message={toast.text} type={toast.type} onDismiss={() => setToast(null)} />
+                    </div>
+                )}
+                <div className="flex-grow h-full flex flex-col min-w-0">
+                    <ChatInterface 
+                        messages={chatMessages} 
+                        onSendMessage={handleSendChatMessage} 
+                        isLoading={isChatLoading} 
+                        onStopGeneration={handleStopGeneration} 
+                        onRegenerateLastTextMessage={handleRegenerateLastTextMessage} 
+                        onNewChat={handleNewChat} 
+                        setChatError={setChatError} 
+                        currentChatId={currentChatId} 
+                        onDeleteAiMessagePair={handleDeleteAiMessagePair} 
+                        selectedUserMessageId={selectedUserMessageId} 
+                        setSelectedUserMessageId={setSelectedUserMessageId} 
+                        editingMessageId={editingMessageId} 
+                        editText={editText} 
+                        setEditText={setEditText} 
+                        onSaveEdit={handleSaveEdit} 
+                        onCancelEdit={handleCancelEdit} 
+                        onStartEdit={handleStartEdit} 
+                        selectedModel={selectedModel} 
+                        setSelectedModel={setSelectedModel} 
+                        setToast={setToast} 
+                    /> 
+                </div> 
+            </div> 
+          );
       };
       const root = ReactDOM.createRoot(document.getElementById('root'));
       root.render(<React.StrictMode><App /></React.StrictMode>);
