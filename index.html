@@ -56,8 +56,7 @@
               'happy-bounce': 'happyBounce 0.5s ease-out', 'empty-state-glow': 'emptyStateGlow 3.5s infinite alternate ease-in-out',
               'shiny-text': 'shinyText 2.5s linear infinite', 'modal-fade-in': 'modal-fade-in 0.3s ease-out forwards', 
               'modal-fade-out': 'modal-fade-out 0.3s ease-in forwards', 
-              // CHANGE 2: Purana shimmer-bg hata kar naya 'shimmer' add kiya gaya hai
-              'shimmer': 'shimmer 2s linear infinite', 
+              'shimmer': 'shimmer 1.5s ease-in-out infinite', 
               'spin-continuous': 'spinContinuous 2s linear infinite',
             },
             keyframes: {
@@ -74,7 +73,6 @@
               shinyText: { '0%': { backgroundPosition: '200% center' }, '100%': { backgroundPosition: '-200% center' }, },
               'modal-fade-in': { '0%': { opacity: '0', transform: 'scale(0.95)' }, '100%': { opacity: '1', transform: 'scale(1)' }, },
               'modal-fade-out': { '0%': { opacity: '1', transform: 'scale(1)' }, '100%': { opacity: '0', transform: 'scale(0.95)' }, },
-              // CHANGE 2: Nayi shimmer animation ki definition
               'shimmer': { '0%': { backgroundPosition: '200% 100%' }, '100%': { backgroundPosition: '-200% 100%' } },
               spinContinuous: { '0%': { transform: 'rotate(0deg)' }, '100%': { transform: 'rotate(360deg)' } },
               'stream-fade-in': { '0%': { opacity: '0.2' }, '100%': { opacity: '1' } },
@@ -243,32 +241,11 @@ Your goal is to be a helpful, knowledgeable, and entertaining friend. Make every
       const CheckMarkIconSVG = (props) => ( <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" {...props} className={`text-green-500 ${props.className || ''}`}> <path fillRule="evenodd" d="M16.704 4.153a.75.75 0 01.143 1.052l-8 10.5a.75.75 0 01-1.127.075l-4.5-4.5a.75.75 0 011.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 011.05-.143z" clipRule="evenodd" /> </svg> );
       const FileTextIcon = (props) => (<i className={`fa-solid fa-file-lines ${props.className || ''}`}></i>);
       
-      // CHANGE 1: Purana 'ThinkingAnimation' component hata kar yeh naya 'ThinkingIndicator' add kiya gaya hai.
-      // Yeh component sirf 'Thinking...' state handle karta hai.
       const ThinkingIndicator = () => {
         const mainIndicatorContainerClasses = "flex items-center space-x-1.5 p-2.5 bg-gray-50 rounded-lg border border-gray-200 max-w-fit my-2 self-start ml-0";
         const textClasses = "text-sm text-gray-600 font-medium";
-
-        // Text par halki si chamak (shimmer) wali animation
-        const shimmerDiv = (
-          <div
-            className="absolute inset-0 bg-gradient-to-r from-transparent via-white to-transparent opacity-30 animate-shimmer"
-            style={{ backgroundSize: '200% 100%' }}
-          />
-        );
-
-        return (
-          <div className={mainIndicatorContainerClasses}>
-            {/* Yeh spinning circle hai */}
-            <div className="w-3.5 h-3.5 border-2 border-gray-300 border-t-brand-primary rounded-full animate-spin"></div>
-            
-            {/* Yeh "Thinking..." text aur uski animation ke liye hai */}
-            <div className="relative overflow-hidden">
-              <span className={textClasses}>Thinking...</span>
-              {shimmerDiv}
-            </div>
-          </div>
-        );
+        const shimmerDiv = ( <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white to-transparent opacity-30 animate-shimmer" style={{ backgroundSize: '200% 100%' }} /> );
+        return ( <div className={mainIndicatorContainerClasses}> <div className="w-3.5 h-3.5 border-2 border-gray-300 border-t-brand-primary rounded-full animate-spin"></div> <div className="relative overflow-hidden"> <span className={textClasses}>Thinking...</span> {shimmerDiv} </div> </div> );
       };
 
       const NewEmptyStateIconSVG = (props) => ( <svg xmlns="http://www.w3.org/2000/svg" shape-rendering="geometricPrecision" text-rendering="geometricPrecision" image-rendering="optimizeQuality" fill-rule="evenodd" clip-rule="evenodd" viewBox="0 0 512 509.64" {...props}> <path fill="currentColor" fill-rule="nonzero" d="M142.27 316.619l73.655-41.326 1.238-3.589-1.238-1.996-3.589-.001-12.31-.759-42.084-1.138-36.498-1.516-35.361-1.896-8.897-1.895-8.34-10.995.859-5.484 7.482-5.03 10.717.935 23.683 1.617 35.537 2.452 25.782 1.517 38.193 3.968h6.064l.86-2.451-2.073-1.517-1.618-1.517-36.776-24.922-39.81-26.338-20.852-15.166-11.273-7.683-5.687-7.204-2.451-15.721 10.237-11.273 13.75.935 3.513.936 13.928 10.716 29.749 23.027 38.848 28.612 5.687 4.727 2.275-1.617.278-1.138-2.553-4.271-21.13-38.193-22.546-38.848-10.035-16.101-2.654-9.655c-.935-3.968-1.617-7.304-1.617-11.374l11.652-15.823 6.445-2.073 15.545 2.073 6.547 5.687 9.655 22.092 15.646 34.78 24.265 47.291 7.103 14.028 3.791 12.992 1.416 3.968 2.449-.001v-2.275l1.997-26.641 3.69-32.707 3.589-42.084 1.239-11.854 5.863-14.206 11.652-7.683 9.099 4.348 7.482 10.716-1.036 6.926-4.449 28.915-8.72 45.294-5.687 30.331h3.313l3.792-3.791 15.342-20.372 25.782-32.227 11.374-12.789 13.27-14.129 8.517-6.724 16.1-.001 11.854 17.617-5.307 18.199-16.581 21.029-13.75 17.819-19.716 26.54-12.309 21.231 1.138 1.694 2.932-.278 44.536-9.479 24.062-4.347 28.714-4.928 12.992 6.066 1.416 6.167-5.106 12.613-30.71 7.583-36.018 7.204-53.636 12.689-.657.48.758.935 24.164 2.275 10.337.556h25.301l47.114 3.514 12.309 8.139 7.381 9.959-1.238 7.583-18.957 9.655-25.579-6.066-59.702-14.205-20.474-5.106-2.83-.001v1.694l17.061 16.682 31.266 28.233 39.152 36.397 1.997 8.999-5.03 7.102-5.307-.758-34.401-25.883-13.27-11.651-30.053-25.302-1.996-.001v2.654l6.926 10.136 36.574 54.975 1.895 16.859-2.653 5.485-9.479 3.311-10.414-1.895-21.408-30.054-22.092-33.844-17.819-30.331-2.173 1.238-10.515 113.261-4.929 5.788-11.374 4.348-9.478-7.204-5.03-11.652 5.03-23.027 6.066-30.052 4.928-23.886 4.449-29.674 2.654-9.858-.177-.657-2.173.278-22.37 30.71-34.021 45.977-26.919 28.815-6.445 2.553-11.173-5.789 1.037-10.337 6.243-9.2 37.257-47.392 22.47-29.371 14.508-16.961-.101-2.451h-.859l-98.954 64.251-17.618 2.275-7.583-7.103.936-11.652 3.589-3.791 29.749-20.474-.101.102.024.101z"/> </svg> );
@@ -292,9 +269,6 @@ Your goal is to be a helpful, knowledgeable, and entertaining friend. Make every
           const contentRef = useRef(null); const [userCopied, setUserCopied] = useState(false);
           const isEditing = message.id === editingMessageId;
           
-          // CHANGE 3: "Jhatka" effect fix. Yeh line badli gayi hai.
-          // Ab animation class hamesha lagi rehti hai, jis se loading se final state main
-          // aate waqt animation dobara nahi chalti aur jhatka mehsoos nahi hota.
           const messageLineAnimationClasses = 'animate-fade-in-up';
           
           useEffect(() => { 
@@ -337,7 +311,6 @@ Your goal is to be a helpful, knowledgeable, and entertaining friend. Make every
               
               } else if (message.isLoading && !(typeof message.finalAnswerText === 'string' && message.finalAnswerText)) { 
                   bubbleRoleClasses = ''; bubbleBaseClasses = '';
-                  // CHANGE 1: Yahan naye ThinkingIndicator component ko call kiya ja raha hai.
                   contentToShow = <ThinkingIndicator />;
               } else { 
                   if (isEditing) {
@@ -407,30 +380,104 @@ Your goal is to be a helpful, knowledgeable, and entertaining friend. Make every
           }, [messages]);
 
           useEffect(() => { if (contentEditableRef.current) { contentEditableRef.current.style.height = 'auto'; const maxHeight = parseInt(getComputedStyle(contentEditableRef.current).maxHeight, 10); let newHeight = contentEditableRef.current.scrollHeight; if (maxHeight && newHeight > maxHeight) { newHeight = maxHeight; } contentEditableRef.current.style.height = `${newHeight}px`; } }, [inputText, selectedFiles]); 
+
+          // CHANGE 1: Image Resizing Helper Function
+          const resizeImage = (file, maxDimension = 1280, quality = 0.85) => {
+            return new Promise((resolve, reject) => {
+              const reader = new FileReader();
+              reader.readAsDataURL(file);
+              reader.onload = (event) => {
+                const img = new Image();
+                img.src = event.target.result;
+                img.onload = () => {
+                  const canvas = document.createElement('canvas');
+                  let { width, height } = img;
+                  if (width > height) {
+                    if (width > maxDimension) {
+                      height *= maxDimension / width;
+                      width = maxDimension;
+                    }
+                  } else {
+                    if (height > maxDimension) {
+                      width *= maxDimension / height;
+                      height = maxDimension;
+                    }
+                  }
+                  canvas.width = width;
+                  canvas.height = height;
+                  const ctx = canvas.getContext('2d');
+                  ctx.drawImage(img, 0, 0, width, height);
+                  // Get data URL and extract base64 part
+                  const dataUrl = canvas.toDataURL(file.type === 'image/png' ? 'image/png' : 'image/jpeg', quality);
+                  resolve(dataUrl.split(',')[1]);
+                };
+                img.onerror = reject;
+              };
+              reader.onerror = reject;
+            });
+          };
+
           const handleFileChange = (event) => { const files = Array.from(event.target.files); processAndSetFiles(files); if (fileInputRef.current) fileInputRef.current.value = ""; };
           const handlePaste = (event) => { const pastedText = event.clipboardData.getData('text/plain'); const pastedFiles = Array.from(event.clipboardData.files); if (pastedFiles.length > 0) { event.preventDefault(); processAndSetFiles(pastedFiles, true); } else if (pastedText && contentEditableRef.current && document.activeElement === contentEditableRef.current) { event.preventDefault(); document.execCommand('insertText', false, pastedText); setInputText(contentEditableRef.current.innerText);  } };
-          const processAndSetFiles = (filesArray, isFromPaste = false) => { if (!filesArray.length) return false; let filesToProcess = []; let currentTotalSize = selectedFiles.reduce((acc, curr) => acc + (curr.file?.size || 0), 0); let didProcessAnyFile = false; let localErrorMessage = null; for (const file of filesArray) { const isImage = file.type.startsWith('image/'); const isTxt = file.type === 'text/plain' || (file.name && file.name.toLowerCase().endsWith('.txt')); if (!isImage && !isTxt) { if (isFromPaste) console.log(`Pasted unsupported file: ${file.name} (${file.type})`); else localErrorMessage = `File "${file.name}" (type: ${file.type}) is not supported. Only images and .txt files are allowed.`; continue; } if (file.size > MAX_FILE_SIZE_MB * 1024 * 1024) { localErrorMessage = `File "${file.name}" is larger than ${MAX_FILE_SIZE_MB}MB.`; continue; } if (currentTotalSize + file.size > MAX_TOTAL_FILES_SIZE_MB * 1024 * 1024) { localErrorMessage = `Total file size cannot exceed ${MAX_TOTAL_FILES_SIZE_MB}MB.`; break; } filesToProcess.push(file); currentTotalSize += file.size; didProcessAnyFile = true; } if(localErrorMessage){ setChatError(localErrorMessage); } else { setChatError(null); } if (filesToProcess.length > 0) { const placeholderFiles = filesToProcess.map(file => ({ id: Date.now().toString(36) + Math.random().toString(36).substring(2) + file.name, name: file.name, type: file.type, isLoading: true, file: file, })); setSelectedFiles(prev => [...prev, ...placeholderFiles]); placeholderFiles.forEach(placeholder => { const { id, file } = placeholder; const processSingleFile = async () => { try { let apiData; if (file.type.startsWith('image/')) {
-    const base64Data = await new Promise((resolve, reject) => {
-        const reader = new FileReader();
-        reader.readAsDataURL(file);
-        reader.onloadend = () => resolve(reader.result.split(',')[1]);
-        reader.onerror = (error) => reject(error);
-    });
-    apiData = { mimeType: file.type, data: base64Data };
-} else { const textContent = await file.text(); apiData = { textContent: textContent }; } setSelectedFiles(prev => prev.map(p => p.id === id ? { ...p, isLoading: false, apiData: apiData } : p)); } catch (error) { console.error('Error processing file:', error); setChatError(`Error processing file "${file.name}".`); setSelectedFiles(prev => prev.filter(p => p.id !== id)); } }; processSingleFile(); }); return didProcessAnyFile; } return false; };
+          
+          const processAndSetFiles = (filesArray, isFromPaste = false) => { 
+              if (!filesArray.length) return false; 
+              let filesToProcess = []; let currentTotalSize = selectedFiles.reduce((acc, curr) => acc + (curr.file?.size || 0), 0); 
+              let didProcessAnyFile = false; let localErrorMessage = null; 
+              for (const file of filesArray) { 
+                  const isImage = file.type.startsWith('image/'); 
+                  const isTxt = file.type === 'text/plain' || (file.name && file.name.toLowerCase().endsWith('.txt')); 
+                  if (!isImage && !isTxt) { if (isFromPaste) console.log(`Pasted unsupported file: ${file.name} (${file.type})`); else localErrorMessage = `File "${file.name}" (type: ${file.type}) is not supported. Only images and .txt files are allowed.`; continue; } 
+                  if (file.size > MAX_FILE_SIZE_MB * 1024 * 1024) { localErrorMessage = `File "${file.name}" is larger than ${MAX_FILE_SIZE_MB}MB.`; continue; } 
+                  if (currentTotalSize + file.size > MAX_TOTAL_FILES_SIZE_MB * 1024 * 1024) { localErrorMessage = `Total file size cannot exceed ${MAX_TOTAL_FILES_SIZE_MB}MB.`; break; } 
+                  filesToProcess.push(file); currentTotalSize += file.size; didProcessAnyFile = true; 
+              } 
+              if(localErrorMessage){ setChatError(localErrorMessage); } else { setChatError(null); } 
+              if (filesToProcess.length > 0) { 
+                  const placeholderFiles = filesToProcess.map(file => ({ id: Date.now().toString(36) + Math.random().toString(36).substring(2) + file.name, name: file.name, type: file.type, isLoading: true, file: file, })); 
+                  setSelectedFiles(prev => [...prev, ...placeholderFiles]); 
+                  placeholderFiles.forEach(placeholder => { 
+                      const { id, file } = placeholder; 
+                      const processSingleFile = async () => { 
+                          try { 
+                              let apiData; 
+                              if (file.type.startsWith('image/')) {
+                                  const base64Data = await resizeImage(file);
+                                  apiData = { mimeType: file.type, data: base64Data };
+                              } else { 
+                                  const textContent = await file.text(); apiData = { textContent: textContent }; 
+                              } 
+                              setSelectedFiles(prev => prev.map(p => p.id === id ? { ...p, isLoading: false, apiData: apiData } : p)); 
+                          } catch (error) { 
+                              console.error('Error processing file:', error); setChatError(`Error processing file "${file.name}".`); setSelectedFiles(prev => prev.filter(p => p.id !== id)); 
+                          } 
+                      }; 
+                      processSingleFile(); 
+                  }); 
+                  return didProcessAnyFile; 
+              } 
+              return false; 
+          };
+          
           const removeSelectedFile = (fileId) => { setSelectedFiles(prev => prev.filter(f => f.id !== fileId)); };
           const handleInputFromContentEditable = () => { setInputText(contentEditableRef.current?.innerText || ''); };
+          
+          // CHANGE 2: handleSubmit updated for smoother UI
           const handleSubmit = (e) => { 
             if(e) e.preventDefault(); 
             const currentText = contentEditableRef.current?.innerText.trim() || ''; 
             if (!currentText && selectedFiles.length === 0) return; 
             setChatError(null); 
             onSendMessage(currentText, selectedFiles); 
-            if(contentEditableRef.current) contentEditableRef.current.innerText = ''; 
-            setInputText(''); 
-            setSelectedFiles([]); 
-            setTimeout(() => messagesEndRef.current?.scrollIntoView({ behavior: "smooth" }), 0);
+            
+            // Delay clearing the input to make the UI transition smoother
+            setTimeout(() => {
+                if(contentEditableRef.current) contentEditableRef.current.innerText = ''; 
+                setInputText(''); 
+                setSelectedFiles([]);
+            }, 50);
           };
+
           const handleContentEditableKeyDown = (e) => { if (e.key === 'Enter' && !e.shiftKey) { const isLikelyDesktop = window.innerWidth > 768; if (isLikelyDesktop) { e.preventDefault(); if (!isSendButtonActuallyDisabled) { handleSubmit(e); } } } };
           const isAiCurrentlyProcessing = messages.some(m => m.role === 'model' && m.isLoading);
           const currentInputTextFromEditable = contentEditableRef.current?.innerText?.trim() || '';
@@ -649,6 +696,7 @@ Your goal is to be a helpful, knowledgeable, and entertaining friend. Make every
 
           const addMessageToLocalChat = async (role, text, filesForDisplay, aiSpecificData = {}) => { const messageId = Date.now().toString(36) + Math.random().toString(36).substring(2); const messagePartsForDisplay = []; if (text) messagePartsForDisplay.push({ text: text }); const attachedFilesForLocalState = filesForDisplay.map(f => ({ id: f.id, name: f.name, type: f.type, apiData: f.apiData, isLoading: f.isLoading })); const messageData = { id: messageId, role: role, parts: messagePartsForDisplay.length > 0 ? messagePartsForDisplay : [{text: ""}], text: text || "", timestamp: new Date().getTime(), ...(role === 'user' && attachedFilesForLocalState.length > 0 && { uiOnlyAttachedFiles: attachedFilesForLocalState }), ...(role === 'model' && aiSpecificData.modelUsed && { modelUsed: aiSpecificData.modelUsed }), ...(aiSpecificData.searchUsed && { searchUsed: true })}; setChatMessages(prev => [...prev, messageData]); return messageId; };
           
+          // CHANGE 3: _streamAiResponse updated for better error handling
           const _streamAiResponse = async (targetAiMessageUiId, historyForA4f, modelToUse) => {
               setIsChatLoading(true);
               streamTextBuffer.current = "";
@@ -748,8 +796,6 @@ Your goal is to be a helpful, knowledgeable, and entertaining friend. Make every
                       const isInCodeBlock = (finalAnswerForUi.match(/```/g) || []).length % 2 !== 0;
                       if (isInCodeBlock) finalAnswerForUi += "\n```";
                       finalAnswerForUi += (finalAnswerForUi.trim() ? "\n\n---\n" : "") + stopNoticeStr;
-                  // EXPLANATION 1: Yeh woh hissa hai jo aapka error message generate karta hai.
-                  // Agar generation ko roka na gaya ho AUR final text khali ho, to yeh message set hojata hai.
                   } else if (!isStoppingGenerationRef.current && !finalAnswerForUi.trim()) {
                       finalAnswerForUi = "I had some trouble understanding. Could you please clarify? 🤔";
                   }
@@ -757,12 +803,16 @@ Your goal is to be a helpful, knowledgeable, and entertaining friend. Make every
                   setChatMessages(prev => prev.map(msg => msg.id === targetAiMessageUiId ? { ...msg, isLoading: false, finalAnswerText: finalAnswerForUi.trim(), text: finalAnswerForUi.trim(), parts: [{text: finalAnswerForUi.trim()}], sources: null } : msg ));
               } catch (err) {
                   console.error("AI stream error:", err);
-                  let errorTextForUser = "A technical difficulty occurred. Please try again.";
-                  if (err.message) errorTextForUser = err.message;
-
+                  let errorTextForUser = "A network error occurred. Please check your connection and try again.";
+                  if (err.message && !err.message.toLowerCase().includes('failed to fetch')) {
+                    errorTextForUser = err.message;
+                  }
+                  
+                  setChatError(errorTextForUser);
                   setChatMessages(prev => prev.map(msg => msg.id === targetAiMessageUiId ? { ...msg, isLoading: false, isError: true, finalAnswerText: errorTextForUser, text: errorTextForUser, parts: [{text: errorTextForUser}], sources: null } : msg ));
               } finally {
                   setIsChatLoading(false);
+                  isStoppingGenerationRef.current = false;
               }
           };
 
