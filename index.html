@@ -56,9 +56,9 @@
               'happy-bounce': 'happyBounce 0.5s ease-out', 'empty-state-glow': 'emptyStateGlow 3.5s infinite alternate ease-in-out',
               'shiny-text': 'shinyText 2.5s linear infinite', 'modal-fade-in': 'modal-fade-in 0.3s ease-out forwards', 
               'modal-fade-out': 'modal-fade-out 0.3s ease-in forwards', 
-              'shimmer': 'shimmer 2s ease-in-out infinite', 
+              // CHANGE 2: Purana shimmer-bg hata kar naya 'shimmer' add kiya gaya hai
+              'shimmer': 'shimmer 2s linear infinite', 
               'spin-continuous': 'spinContinuous 2s linear infinite',
-              'shimmer-animation': 'shimmer-animation 2.7s linear infinite',
             },
             keyframes: {
               fadeInUp: { '0%': { opacity: '0', transform: 'translateY(10px)' }, '100%': { opacity: '1', transform: 'translateY(0)' }, },
@@ -74,18 +74,13 @@
               shinyText: { '0%': { backgroundPosition: '200% center' }, '100%': { backgroundPosition: '-200% center' }, },
               'modal-fade-in': { '0%': { opacity: '0', transform: 'scale(0.95)' }, '100%': { opacity: '1', transform: 'scale(1)' }, },
               'modal-fade-out': { '0%': { opacity: '1', transform: 'scale(1)' }, '100%': { opacity: '0', transform: 'scale(0.95)' }, },
-              shimmer: { 
-                '0%': { transform: 'translateX(-100%)', opacity: '0' },
-                '50%': { opacity: '1' },
-                '100%': { transform: 'translateX(100%)', opacity: '0' },
-              },
+              // CHANGE 2: Nayi shimmer animation ki definition
+              'shimmer': { '0%': { backgroundPosition: '200% 100%' }, '100%': { backgroundPosition: '-200% 100%' } },
               spinContinuous: { '0%': { transform: 'rotate(0deg)' }, '100%': { transform: 'rotate(360deg)' } },
               'stream-fade-in': { '0%': { opacity: '0.2' }, '100%': { opacity: '1' } },
-              'shimmer-animation': { from: { backgroundPosition: '200% center' }, to: { backgroundPosition: '-200% center' } },
             },
             spacing: { '1.5': '0.375rem', '2.5': '0.625rem', '3.5': '0.875rem', },
             boxShadow: {
-                'card': '0 6px 20px rgba(var(--text-primary), 0.04), 0 3px 8px rgba(var(--text-primary),0.02)', 
                 'header': '0 1px 2px rgba(var(--text-primary), 0.03), 0 1px 1px rgba(var(--text-primary), 0.015)',
                 'input-focus': '0 0 0 1px rgb(var(--focus-ring-color) / 1)', 
                 'chat-window': '0 15px 50px -8px rgba(var(--text-primary), 0.08), 0 8px 25px -8px rgba(var(--text-primary),0.05)',
@@ -101,7 +96,7 @@
         :root {
           --brand-primary: 100 116 139; --brand-secondary: 71 85 105; 
           --focus-ring-color: 148 163 184; --text-button-icon: 71 85 105; 
-          --surface-main: 249 246 238; --surface-card: 255 255 255; --surface-chat-area: 255 247 240; 
+          --surface-main: 249 246 238; --surface-card: 255 255 255; --surface-chat-area: 249 246 238; 
           --surface-input: 255 255 255; --surface-accent: 241 245 249; --surface-bubble-ai: 255 255 255;
           --surface-user-bubble-bg-val: 232 232 232; 
           --text-primary: 17 24 39; --text-secondary: 55 65 81; --text-subtle: 107 114 128; --text-on-primary: 255 255 255; 
@@ -142,12 +137,6 @@
         .markdown-content td { @apply text-text-secondary; } .markdown-content tbody tr:nth-child(even) { @apply bg-gray-50/50; }
         .chat-messages-container::-webkit-scrollbar { width: 0px; } 
         .chat-messages-container { scrollbar-width: none; } 
-        
-        .shimmer-black-text {
-          @apply bg-clip-text text-transparent animate-shimmer-animation;
-          background-image: linear-gradient(90deg, #000, #4a5568, #fff, #4a5568, #000);
-          background-size: 200% auto;
-        }
         
         .hljs { @apply !bg-transparent !text-inherit; }
         .file-pill-container { @apply flex flex-wrap gap-1.5 mb-1.5 p-1 max-h-20 overflow-y-auto border-b border-gray-200; scrollbar-width: thin; scrollbar-color: theme('colors.slate.300') theme('colors.slate.100'); }
@@ -203,7 +192,7 @@
       
       const MODELS = [
           { id: 'provider-5/gpt-4.1-nano', uiName: 'Fast' },
-          { id: 'provider-6/gpt-4.1', uiName: 'Smart' }
+          { id: 'provider-3/gpt-4o-mini', uiName: 'Smart' }
       ];
 
       const MAX_FILE_SIZE_MB = 10; const MAX_TOTAL_FILES_SIZE_MB = 20;
@@ -254,21 +243,39 @@ Your goal is to be a helpful, knowledgeable, and entertaining friend. Make every
       const CheckMarkIconSVG = (props) => ( <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" {...props} className={`text-green-500 ${props.className || ''}`}> <path fillRule="evenodd" d="M16.704 4.153a.75.75 0 01.143 1.052l-8 10.5a.75.75 0 01-1.127.075l-4.5-4.5a.75.75 0 011.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 011.05-.143z" clipRule="evenodd" /> </svg> );
       const FileTextIcon = (props) => (<i className={`fa-solid fa-file-lines ${props.className || ''}`}></i>);
       
-      const ThinkingAnimation = () => {
-          return (
-            <div className="flex items-center my-2 self-start ml-0">
-                <span className="text-sm font-medium text-text-subtle">
-                    Thinking...
-                </span>
+      // CHANGE 1: Purana 'ThinkingAnimation' component hata kar yeh naya 'ThinkingIndicator' add kiya gaya hai.
+      // Yeh component sirf 'Thinking...' state handle karta hai.
+      const ThinkingIndicator = () => {
+        const mainIndicatorContainerClasses = "flex items-center space-x-1.5 p-2.5 bg-gray-50 rounded-lg border border-gray-200 max-w-fit my-2 self-start ml-0";
+        const textClasses = "text-sm text-gray-600 font-medium";
+
+        // Text par halki si chamak (shimmer) wali animation
+        const shimmerDiv = (
+          <div
+            className="absolute inset-0 bg-gradient-to-r from-transparent via-white to-transparent opacity-30 animate-shimmer"
+            style={{ backgroundSize: '200% 100%' }}
+          />
+        );
+
+        return (
+          <div className={mainIndicatorContainerClasses}>
+            {/* Yeh spinning circle hai */}
+            <div className="w-3.5 h-3.5 border-2 border-gray-300 border-t-brand-primary rounded-full animate-spin"></div>
+            
+            {/* Yeh "Thinking..." text aur uski animation ke liye hai */}
+            <div className="relative overflow-hidden">
+              <span className={textClasses}>Thinking...</span>
+              {shimmerDiv}
             </div>
-          );
+          </div>
+        );
       };
 
       const NewEmptyStateIconSVG = (props) => ( <svg xmlns="http://www.w3.org/2000/svg" shape-rendering="geometricPrecision" text-rendering="geometricPrecision" image-rendering="optimizeQuality" fill-rule="evenodd" clip-rule="evenodd" viewBox="0 0 512 509.64" {...props}> <path fill="currentColor" fill-rule="nonzero" d="M142.27 316.619l73.655-41.326 1.238-3.589-1.238-1.996-3.589-.001-12.31-.759-42.084-1.138-36.498-1.516-35.361-1.896-8.897-1.895-8.34-10.995.859-5.484 7.482-5.03 10.717.935 23.683 1.617 35.537 2.452 25.782 1.517 38.193 3.968h6.064l.86-2.451-2.073-1.517-1.618-1.517-36.776-24.922-39.81-26.338-20.852-15.166-11.273-7.683-5.687-7.204-2.451-15.721 10.237-11.273 13.75.935 3.513.936 13.928 10.716 29.749 23.027 38.848 28.612 5.687 4.727 2.275-1.617.278-1.138-2.553-4.271-21.13-38.193-22.546-38.848-10.035-16.101-2.654-9.655c-.935-3.968-1.617-7.304-1.617-11.374l11.652-15.823 6.445-2.073 15.545 2.073 6.547 5.687 9.655 22.092 15.646 34.78 24.265 47.291 7.103 14.028 3.791 12.992 1.416 3.968 2.449-.001v-2.275l1.997-26.641 3.69-32.707 3.589-42.084 1.239-11.854 5.863-14.206 11.652-7.683 9.099 4.348 7.482 10.716-1.036 6.926-4.449 28.915-8.72 45.294-5.687 30.331h3.313l3.792-3.791 15.342-20.372 25.782-32.227 11.374-12.789 13.27-14.129 8.517-6.724 16.1-.001 11.854 17.617-5.307 18.199-16.581 21.029-13.75 17.819-19.716 26.54-12.309 21.231 1.138 1.694 2.932-.278 44.536-9.479 24.062-4.347 28.714-4.928 12.992 6.066 1.416 6.167-5.106 12.613-30.71 7.583-36.018 7.204-53.636 12.689-.657.48.758.935 24.164 2.275 10.337.556h25.301l47.114 3.514 12.309 8.139 7.381 9.959-1.238 7.583-18.957 9.655-25.579-6.066-59.702-14.205-20.474-5.106-2.83-.001v1.694l17.061 16.682 31.266 28.233 39.152 36.397 1.997 8.999-5.03 7.102-5.307-.758-34.401-25.883-13.27-11.651-30.053-25.302-1.996-.001v2.654l6.926 10.136 36.574 54.975 1.895 16.859-2.653 5.485-9.479 3.311-10.414-1.895-21.408-30.054-22.092-33.844-17.819-30.331-2.173 1.238-10.515 113.261-4.929 5.788-11.374 4.348-9.478-7.204-5.03-11.652 5.03-23.027 6.066-30.052 4.928-23.886 4.449-29.674 2.654-9.858-.177-.657-2.173.278-22.37 30.71-34.021 45.977-26.919 28.815-6.445 2.553-11.173-5.789 1.037-10.337 6.243-9.2 37.257-47.392 22.47-29.371 14.508-16.961-.101-2.451h-.859l-98.954 64.251-17.618 2.275-7.583-7.103.936-11.652 3.589-3.791 29.749-20.474-.101.102.024.101z"/> </svg> );
       const UpArrowSendIcon = () => ( <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4 text-white"> <path fillRule="evenodd" d="M12 20.25a.75.75 0 01-.75-.75V6.31l-5.47 5.47a.75.75 0 01-1.06-1.06l6.75-6.75a.75.75 0 011.06 0l6.75 6.75a.75.75 0 11-1.06 1.06l-5.47-5.47V19.5a.75.75 0 01-.75-.75z" clipRule="evenodd" /> </svg> );
       const PlusIcon = () => ( <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-5 h-5"> <path fillRule="evenodd" d="M12 3.75a.75.75 0 01.75.75v6.75h6.75a.75.75 0 010 1.5h-6.75v6.75a.75.75 0 01-1.5 0v-6.75H4.5a.75.75 0 010-1.5h6.75V4.5a.75.75 0 01.75-.75z" clipRule="evenodd" /> </svg> );
       const NewRefreshIcon = (props) => ( <svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" viewBox="0 0 32 32" {...props}> <path fill="currentColor" d="M 16 4 L 16 6 C 21.535156 6 26 10.464844 26 16 C 26 21.535156 21.535156 26 16 26 C 10.464844 26 6 21.535156 6 16 C 6 12.734375 7.585938 9.851563 10 8.03125 L 10 13 L 12 13 L 12 5 L 4 5 L 4 7 L 8.09375 7 C 5.59375 9.199219 4 12.417969 4 16 C 4 22.617188 9.382813 28 16 28 C 22.617188 28 28 22.617188 28 16 C 28 9.382813 22.617188 4 16 4 Z"></path> </svg> );
-      const NewCloseIconSVG = (props) => ( <svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" viewBox="0 0 24 24" {...props} className={`inline-block ${props.className || 'w-6 h-6'}`}> <path fill="currentColor" d="M13.414,12l6.293-6.293c0.391-0.391,0.391-1.023,0-1.414s-1.023-0.391-1.414,0L12,10.586L5.707,4.293 c-0.391-0.391-1.023-0.391-1.414,0s-0.391,1.023,0,1.414L10.586,12l-6.293,6.293c-0.391,0.391-0.391,1.023,0,1.414 C4.488,19.902,4.744,20,5,20s0.512-0.098,0.707-0.293L12,13.414l6.293,6.293C18.488,19.902,18.744,20,19,20s0.512-0.098,0.707-0.293 c0.391-0.391,0.391-1.023,0-1.414L13.414,12z"/> </svg> );
+      const NewCloseIconSVG = (props) => ( <svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" viewBox="0 0 24 24" {...props} className={`inline-block ${props.className || 'w-6 h-6'}`}> <path fill="currentColor" d="M13.414,12l6.293-6.293c0.391-0.391,0.391-1.023,0-1.414s-1.023-0.391-1.414,0L12,10.586L5.707,4.293 c-0.391-0.391-1.023-0.391-1.414,0s-0.391,1.023,0,1.414L10.586,12l-6.293,6.293c-0.391-0.391-0.391,1.023,0,1.414 C4.488,19.902,4.744,20,5,20s0.512-0.098,0.707-0.293L12,13.414l6.293,6.293C18.488,19.902,18.744,20,19,20s0.512-0.098,0.707-0.293 c0.391-0.391,0.391-1.023,0-1.414L13.414,12z"/> </svg> );
 
       const ChatMessageItemOptions = ({ message, onDeleteAiMessagePair, onStartEdit }) => { 
           const [showOptions, setShowOptions] = useState(false); const optionsRef = useRef(null); const [copied, setCopied] = useState(false);
@@ -284,8 +291,12 @@ Your goal is to be a helpful, knowledgeable, and entertaining friend. Make every
           const isUser = message.role === 'user'; const isError = message.isError === true; 
           const contentRef = useRef(null); const [userCopied, setUserCopied] = useState(false);
           const isEditing = message.id === editingMessageId;
-          const messageLineAnimationClasses = (message.role === 'model' && !isError) ? (message.isLoading ? 'animate-stream-fade-in' : '') : 'animate-fade-in-up opacity-0';
-          const messageLineAnimationStyles = (message.role === 'model' && !isError) ? {} : { animationFillMode: 'forwards' };
+          
+          // CHANGE 3: "Jhatka" effect fix. Yeh line badli gayi hai.
+          // Ab animation class hamesha lagi rehti hai, jis se loading se final state main
+          // aate waqt animation dobara nahi chalti aur jhatka mehsoos nahi hota.
+          const messageLineAnimationClasses = 'animate-fade-in-up';
+          
           useEffect(() => { 
             if (message.role === 'model' && !isError && !isEditing && !message.isLoading && typeof message.finalAnswerText === 'string' && message.finalAnswerText && contentRef.current) {
                 const preElements = contentRef.current.querySelectorAll('pre');
@@ -308,9 +319,9 @@ Your goal is to be a helpful, knowledgeable, and entertaining friend. Make every
           const handleCopyUserText = (textToCopy) => { navigator.clipboard.writeText(textToCopy).then(() => { setUserCopied(true); setTimeout(() => setUserCopied(false), 1500); }).catch(err => console.error('Failed to copy text: ', err)); };
           if (message.role === 'system') { 
             const systemText = message.text || (message.parts?.[0]?.text || ""); const systemMessageStyle = isError ? "px-4 py-2 text-xs text-red-700 bg-red-100 border border-red-300 rounded-full shadow-sm italic" : "px-4 py-2 text-xs text-text-subtle bg-surface-accent border border-border-light rounded-full shadow-sm italic"; 
-            return (<div className="flex justify-center my-4 animate-fade-in-up opacity-0" style={{animationFillMode: 'forwards'}}><div className={systemMessageStyle}>{isError ? <><i className="fas fa-exclamation-triangle mr-1.5"></i> {systemText}</> : systemText }</div></div>);
+            return (<div className="flex justify-center my-4"><div className={systemMessageStyle}>{isError ? <><i className="fas fa-exclamation-triangle mr-1.5"></i> {systemText}</> : systemText }</div></div>);
           }
-          let bubbleBaseClasses = 'px-4 py-3 md:px-4 md:py-3 shadow-card relative'; let bubbleRoleClasses = ''; let bubbleWidthClasses = ''; let contentToShow = null;
+          let bubbleBaseClasses = 'px-4 py-3 md:px-4 md:py-3 relative'; let bubbleRoleClasses = ''; let bubbleWidthClasses = ''; let contentToShow = null;
           const messageTextContent = (message.parts && message.parts[0] && typeof message.parts[0].text === 'string' ? message.parts[0].text : (typeof message.text === 'string' ? message.text : ""));
           if (isUser) { 
             bubbleRoleClasses = 'bg-surface-user-bubble-bg text-text-primary rounded-xl rounded-br-md'; bubbleWidthClasses = 'max-w-[80%] sm:max-w-[75%]'; 
@@ -326,7 +337,8 @@ Your goal is to be a helpful, knowledgeable, and entertaining friend. Make every
               
               } else if (message.isLoading && !(typeof message.finalAnswerText === 'string' && message.finalAnswerText)) { 
                   bubbleRoleClasses = ''; bubbleBaseClasses = '';
-                  contentToShow = <ThinkingAnimation />;
+                  // CHANGE 1: Yahan naye ThinkingIndicator component ko call kiya ja raha hai.
+                  contentToShow = <ThinkingIndicator />;
               } else { 
                   if (isEditing) {
                       contentToShow = (
@@ -354,7 +366,7 @@ Your goal is to be a helpful, knowledgeable, and entertaining friend. Make every
               } 
           }
           
-          return ( <div className={`flex items-start ${isUser ? 'justify-end group' : 'justify-start'} ${messageLineAnimationClasses} mb-1`} style={messageLineAnimationStyles}> <div className={`${bubbleBaseClasses} ${bubbleWidthClasses} ${bubbleRoleClasses}`} onClick={isUser ? () => onSelectUserMessage(message.id === selectedUserMessageId ? null : message.id) : undefined}> {contentToShow} {isUser && selectedUserMessageId === message.id && messageTextContent && ( <button onClick={(e) => { e.stopPropagation(); handleCopyUserText(messageTextContent); }} className="absolute -bottom-3 -right-1 p-1.5 bg-gray-100 text-gray-600 border border-gray-300 rounded-full shadow-md hover:bg-gray-200 transition-all" aria-label="Copy user message"> {userCopied ? <CheckMarkIconSVG className="w-4 h-4" /> : <NewCopyIconSVG className="w-4 h-4 fill-current" />} </button> )} </div> </div> );
+          return ( <div className={`flex items-start ${isUser ? 'justify-end group' : 'justify-start'} ${messageLineAnimationClasses} mb-1`}> <div className={`${bubbleBaseClasses} ${bubbleWidthClasses} ${bubbleRoleClasses}`} onClick={isUser ? () => onSelectUserMessage(message.id === selectedUserMessageId ? null : message.id) : undefined}> {contentToShow} {isUser && selectedUserMessageId === message.id && messageTextContent && ( <button onClick={(e) => { e.stopPropagation(); handleCopyUserText(messageTextContent); }} className="absolute -bottom-3 -right-1 p-1.5 bg-gray-100 text-gray-600 border border-gray-300 rounded-full shadow-md hover:bg-gray-200 transition-all" aria-label="Copy user message"> {userCopied ? <CheckMarkIconSVG className="w-4 h-4" /> : <NewCopyIconSVG className="w-4 h-4 fill-current" />} </button> )} </div> </div> );
       };
       
       const ChatInterface = ({ messages, onSendMessage, isLoading, onStopGeneration, onRegenerateLastTextMessage, onNewChat, setChatError, currentChatId, onDeleteAiMessagePair, selectedUserMessageId, setSelectedUserMessageId, editingMessageId, editText, setEditText, onSaveEdit, onCancelEdit, onStartEdit, selectedModel, setSelectedModel }) => { 
@@ -420,7 +432,7 @@ Your goal is to be a helpful, knowledgeable, and entertaining friend. Make every
             setTimeout(() => messagesEndRef.current?.scrollIntoView({ behavior: "smooth" }), 0);
           };
           const handleContentEditableKeyDown = (e) => { if (e.key === 'Enter' && !e.shiftKey) { const isLikelyDesktop = window.innerWidth > 768; if (isLikelyDesktop) { e.preventDefault(); if (!isSendButtonActuallyDisabled) { handleSubmit(e); } } } };
-          const isAiCurrentlyProcessing = messages.some(m => m.role === 'model' && m.isLoading && !m.isError);
+          const isAiCurrentlyProcessing = messages.some(m => m.role === 'model' && m.isLoading);
           const currentInputTextFromEditable = contentEditableRef.current?.innerText?.trim() || '';
           const isSendButtonActuallyDisabled = (!isAiCurrentlyProcessing && (isLoading || (currentInputTextFromEditable === '' && selectedFiles.length === 0) || selectedFiles.some(f => f.isLoading))); 
           const sendOrStopButtonBaseClasses = "w-8 h-8 flex items-center justify-center font-semibold rounded-full transition-all duration-150 ease-in-out transform active:animate-button-press focus:outline-none";
@@ -493,7 +505,7 @@ Your goal is to be a helpful, knowledgeable, and entertaining friend. Make every
               <form onSubmit={handleSubmit} className="bg-surface-chat-area flex-shrink-0"> 
                 <div className="p-2 md:p-3"> 
                   <div 
-                    className="flex flex-col bg-white rounded-3xl p-2.5 border border-slate-200 shadow-[0_2px_4px_rgba(0,0,0,0.05)] focus-within:border-slate-300 focus-within:shadow-[0_4px_8px_rgba(0,0,0,0.07)] transition-all duration-200 ease-in-out"
+                    className="flex flex-col bg-white rounded-2xl p-2.5 border border-slate-200 shadow-[0_2px_4px_rgba(0,0,0,0.05)] focus-within:border-slate-300 focus-within:shadow-[0_4px_8px_rgba(0,0,0,0.07)] transition-all duration-200 ease-in-out"
                     onClick={(e) => { if (contentEditableRef.current && !contentEditableRef.current.contains(e.target) && e.target.tagName !== 'BUTTON' && !e.target.closest('button') && !e.target.closest('[aria-label="Attach file"]') && !e.target.closest('.relative') ) { contentEditableRef.current.focus(); } }} > 
                     {selectedFiles.some(f => f.type.startsWith('image/')) && ( <div className="image-preview-container-input"> {selectedFiles.filter(f => f.type.startsWith('image/')).map(file => ( <div key={file.id} className="relative w-14 h-14 rounded-md overflow-hidden shadow-sm group border border-gray-200"> {file.isLoading ? ( <div className="w-full h-full flex items-center justify-center bg-gray-100"> <div className="w-4 h-4 border-2 border-gray-300 border-t-brand-primary rounded-full animate-spin"></div> </div> ) : ( <img src={`data:${file.apiData.mimeType};base64,${file.apiData.data}`} alt={file.name} className="w-full h-full object-cover" /> )} <button type="button" onClick={() => removeSelectedFile(file.id)} className="absolute top-0.5 right-0.5 w-5 h-5 bg-black/50 hover:bg-black/70 text-white rounded-full flex items-center justify-center transition-opacity focus:outline-none opacity-100" aria-label="Remove image" > <NewCloseIconSVG className="w-3 h-3"/> </button> </div> ))} </div> )} {selectedFiles.some(f => !f.type.startsWith('image/')) && ( <div className={`file-pill-container ${selectedFiles.some(f => f.type.startsWith('image/')) ? 'mt-1.5' : ''}`}> {selectedFiles.filter(f => !f.type.startsWith('image/')).map(file => ( <div key={file.id} className="file-pill"> {file.isLoading ? <div className="w-3 h-3 border-2 border-gray-300 border-t-brand-primary rounded-full animate-spin mr-1.5"></div> : <FileTextIcon className="file-pill-icon"/>} <span className="file-pill-name">{file.name}</span> <button type="button" onClick={() => removeSelectedFile(file.id)} className="file-pill-remove"> <i className="fas fa-times"></i> </button> </div> ))} </div> )} <div ref={contentEditableRef} contentEditable={!(isLoading || isAiCurrentlyProcessing)} onInput={handleInputFromContentEditable} onPaste={handlePaste} onKeyDown={handleContentEditableKeyDown} data-placeholder={"Ask AlphaGPT..."} className={`content-editable-input w-full flex-1 text-sm md:text-[15px] focus:outline-none resize-none overflow-y-auto relative`} style={{ maxHeight: '100px', minHeight: '40px' }} suppressContentEditableWarning={true} > </div> 
                      <div className="flex justify-between items-end w-full pt-2.5 mt-auto">
@@ -503,7 +515,7 @@ Your goal is to be a helpful, knowledgeable, and entertaining friend. Make every
                               <PlusIcon />
                            </button>
                            <div ref={modelSelectorRef} className="relative">
-                              <button type="button" onClick={() => setIsModelSelectorOpen(prev => !prev)} disabled={isLoading || isAiCurrentlyProcessing} className="flex items-center space-x-1.5 h-8 px-3 text-xs font-medium text-gray-600 bg-gray-100 border border-gray-300 rounded-full hover:bg-gray-200 transition-colors disabled:opacity-50 focus:outline-none">
+                              <button type="button" onClick={() => setIsModelSelectorOpen(prev => !prev)} disabled={isLoading || isAiCurrentlyProcessing} className="flex items-center space-x-1.5 h-7 px-2.5 text-xs font-medium text-gray-600 bg-gray-100 border border-gray-300 rounded-full hover:bg-gray-200 transition-colors disabled:opacity-50 focus:outline-none">
                                  <i className={`fas fa-bolt fa-xs ${MODELS.find(m => m.id === selectedModel)?.uiName === 'Smart' ? 'text-purple-500' : 'text-green-500'}`}></i>
                                  <span>{MODELS.find(m => m.id === selectedModel)?.uiName || 'Model'}</span>
                                  <i className="fas fa-chevron-down fa-2xs text-gray-500"></i>
@@ -635,7 +647,7 @@ Your goal is to be a helpful, knowledgeable, and entertaining friend. Make every
               });
           }, []); 
 
-          const addMessageToLocalChat = async (role, text, filesForDisplay, aiSpecificData = {}) => { const messageId = Date.now().toString(36) + Math.random().toString(36).substring(2); const messagePartsForDisplay = []; if (text) messagePartsForDisplay.push({ text: text }); const attachedFilesForLocalState = filesForDisplay.map(f => ({ id: f.id, name: f.name, type: f.type, apiData: f.apiData, isLoading: f.isLoading })); const messageData = { id: messageId, role: role, parts: messagePartsForDisplay.length > 0 ? messagePartsForDisplay : [{text: ""}], text: text || "", timestamp: new Date().getTime(), ...(role === 'user' && attachedFilesForLocalState.length > 0 && { uiOnlyAttachedFiles: attachedFilesForLocalState }), ...(role === 'model' && aiSpecificData.modelUsed && { modelUsed: aiSpecificData.modelUsed }), }; setChatMessages(prev => [...prev, messageData]); return messageId; };
+          const addMessageToLocalChat = async (role, text, filesForDisplay, aiSpecificData = {}) => { const messageId = Date.now().toString(36) + Math.random().toString(36).substring(2); const messagePartsForDisplay = []; if (text) messagePartsForDisplay.push({ text: text }); const attachedFilesForLocalState = filesForDisplay.map(f => ({ id: f.id, name: f.name, type: f.type, apiData: f.apiData, isLoading: f.isLoading })); const messageData = { id: messageId, role: role, parts: messagePartsForDisplay.length > 0 ? messagePartsForDisplay : [{text: ""}], text: text || "", timestamp: new Date().getTime(), ...(role === 'user' && attachedFilesForLocalState.length > 0 && { uiOnlyAttachedFiles: attachedFilesForLocalState }), ...(role === 'model' && aiSpecificData.modelUsed && { modelUsed: aiSpecificData.modelUsed }), ...(aiSpecificData.searchUsed && { searchUsed: true })}; setChatMessages(prev => [...prev, messageData]); return messageId; };
           
           const _streamAiResponse = async (targetAiMessageUiId, historyForA4f, modelToUse) => {
               setIsChatLoading(true);
@@ -715,9 +727,12 @@ Your goal is to be a helpful, knowledgeable, and entertaining friend. Make every
                                   }
                                   
                                   if (chunkText) {
-                                      streamTextBuffer.current += chunkText;
-                                      performUiUpdateInStream(true);
-                                      await new Promise(resolve => setTimeout(resolve, 2));
+                                      for (const char of chunkText) {
+                                        if (isStoppingGenerationRef.current) break;
+                                        streamTextBuffer.current += char;
+                                        performUiUpdateInStream(true);
+                                        await new Promise(resolve => setTimeout(resolve, 15));
+                                      }
                                   }
                               } catch (e) {
                                   console.error('Error parsing stream line:', line, e);
@@ -733,6 +748,8 @@ Your goal is to be a helpful, knowledgeable, and entertaining friend. Make every
                       const isInCodeBlock = (finalAnswerForUi.match(/```/g) || []).length % 2 !== 0;
                       if (isInCodeBlock) finalAnswerForUi += "\n```";
                       finalAnswerForUi += (finalAnswerForUi.trim() ? "\n\n---\n" : "") + stopNoticeStr;
+                  // EXPLANATION 1: Yeh woh hissa hai jo aapka error message generate karta hai.
+                  // Agar generation ko roka na gaya ho AUR final text khali ho, to yeh message set hojata hai.
                   } else if (!isStoppingGenerationRef.current && !finalAnswerForUi.trim()) {
                       finalAnswerForUi = "I had some trouble understanding. Could you please clarify? 🤔";
                   }
@@ -768,20 +785,19 @@ Your goal is to be a helpful, knowledgeable, and entertaining friend. Make every
               await addMessageToLocalChat('user', messageText, filesToSendFromInput); 
               
               const aiPlaceholderUiId = Date.now().toString() + '_model_resp_temp_ui'; 
-              const initialLoadingText = "Thinking..."; 
-
+              
               const preliminaryAiPlaceholder = { 
                   id: aiPlaceholderUiId, 
                   role: 'model', 
                   text: '', 
                   parts: [{text:''}], 
                   finalAnswerText: "", 
-                  loadingText: initialLoadingText, 
                   timestamp: new Date().getTime(), 
                   isLoading: true, 
                   isError: false, 
                   sources: null, 
-                  modelUsed: selectedModel 
+                  modelUsed: selectedModel,
+                  searchUsed: true,
               }; 
               setChatMessages(prev => { 
                   const cleanPrev = prev.filter(m => m.id !== 'loading_chat_indicator' && m.id !== 'error_loading_messages'); 
@@ -820,8 +836,8 @@ Your goal is to be a helpful, knowledgeable, and entertaining friend. Make every
                   ? {
                       id: newAiMessageId,
                       role: 'model', text: '', parts: [{text: ''}], finalAnswerText: "",
-                      loadingText: "Thinking...", timestamp: new Date().getTime(), isLoading: true,
-                      isError: false, sources: null, modelUsed: modelUsedForOriginal
+                      timestamp: new Date().getTime(), isLoading: true,
+                      isError: false, sources: null, modelUsed: modelUsedForOriginal, searchUsed: true,
                     }
                   : msg
               ));
