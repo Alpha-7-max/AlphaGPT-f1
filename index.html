@@ -174,11 +174,9 @@
     <script type="importmap">
       {
         "imports": {
-          "@google/genai": "https://esm.sh/@google/generative-ai@^0.11.3",
           "react": "https://esm.sh/react@^18.2.0", "react/": "https://esm.sh/react@^18.2.0/",
           "react-dom/client": "https://esm.sh/react-dom@^18.2.0/client",
-          "marked": "https://esm.sh/marked@^12.0.2", "highlight.js": "https://esm.sh/highlight.js@^11.9.0",
-          "browser-image-compression": "https://esm.sh/browser-image-compression@2.0.2"
+          "marked": "https://esm.sh/marked@^12.0.2", "highlight.js": "https://esm.sh/highlight.js@^11.9.0"
         }
       }
     </script>
@@ -188,10 +186,8 @@
     <script type="text/babel" data-type="module">
       import React, { useState, useCallback, useEffect, useRef } from 'react';
       import ReactDOM from 'react-dom/client';
-      import { GoogleGenerativeAI } from '@google/genai';
       import { marked } from 'marked';
       import hljs from 'highlight.js';
-      import imageCompression from 'browser-image-compression';
 
       const renderer = new marked.Renderer();
       renderer.link = (href, title, text) => { 
@@ -202,29 +198,15 @@
       };
       marked.setOptions({ gfm: true, breaks: true, smartypants: true, renderer });
       
-      const FIXED_MODEL_ID = 'gemini-2.5-flash-preview-04-17';
-      const FIXED_MODEL_CONFIG = { id: 'gemini-2.5-flash-preview-04-17', uiName: 'Smart', temperature: 0.8 };
-
-      const API_KEYS = {
-        [FIXED_MODEL_ID]: "AIzaSyCP0_JSlzsnNKczFe-dBTZyoyKBwvvP6UE",
-      };
+      const A4F_API_KEY = 'ddc-a4f-eae251b9f298445eb27a6901f921c528';
+      const A4F_BASE_URL = 'https://api.a4f.co/v1/chat/completions';
+      
+      const MODELS = [
+          { id: 'provider-5/gpt-4.1-nano', uiName: 'Fast' },
+          { id: 'provider-6/gpt-4.1', uiName: 'Smart' }
+      ];
 
       const MAX_FILE_SIZE_MB = 10; const MAX_TOTAL_FILES_SIZE_MB = 20;
-      
-      const genAIInstances = {};
-      for (const modelId in API_KEYS) {
-        if (Object.hasOwnProperty.call(API_KEYS, modelId)) {
-          const key = API_KEYS[modelId];
-          try {
-            if (!key || key.startsWith("YOUR_GEMINI_API_KEY")) {
-              console.error(`CRITICAL ERROR: Gemini API Key for model ${modelId} is not set or is still the placeholder.`);
-            }
-            genAIInstances[modelId] = new GoogleGenerativeAI(key);
-          } catch (e) {
-            console.error(`CRITICAL ERROR: Failed to initialize GoogleGenerativeAI for model ${modelId}. Check API Key and network.`, e);
-          }
-        }
-      }
       
       function getSystemInstruction() { return `You are AlphaGPT. Your persona is a friendly, creative, and funny "Dostana" (friend-like) assistant.
 
@@ -271,13 +253,11 @@ Your goal is to be a helpful, knowledgeable, and entertaining friend. Make every
       const NewCopyIconSVG = (props) => ( <svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlnsXlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 115.77 122.88" style={{enableBackground:"new 0 0 115.77 122.88"}} xmlSpace="preserve" {...props} > <style type="text/css">{`.st0{fill-rule:evenodd;clip-rule:evenodd;}`}</style> <g><path className="st0" d="M89.62,13.96v7.73h12.19h0.01v0.02c3.85,0.01,7.34,1.57,9.86,4.1c2.5,2.51,4.06,5.98,4.07,9.82h0.02v0.02 v73.27v0.01h-0.02c-0.01,3.84-1.57,7.33-4.1,9.86c-2.51,2.5-5.98,4.06-9.82,4.07v0.02h-0.02h-61.7H40.1v-0.02 c-3.84-0.01-7.34-1.57-9.86-4.1c-2.5-2.51-4.06-5.98-4.07-9.82h-0.02v-0.02V92.51H13.96h-0.01v-0.02c-3.84-0.01-7.34-1.57-9.86-4.1 c-2.5-2.51-4.06-5.98-4.07-9.82H0v-0.02V13.96v-0.01h0.02c0.01-3.85,1.58-7.34,4.1-9.86c2.51-2.5,5.98-4.06,9.82-4.07V0h0.02h61.7 h0.01v0.02c3.85,0.01,7.34,1.57,9.86,4.1c2.5,2.51,4.06,5.98,4.07,9.82h0.02V13.96L89.62,13.96z M79.04,21.69v-7.73v-0.02h0.02 c0-0.91-0.39-1.75-1.01-2.37c-0.61-0.61-1.46-1-2.37-1v0.02h-0.01h-61.7h-0.02v-0.02c-0.91,0-1.75,0.39-2.37,1.01 c-0.61,0.61-1,1.46-1,2.37h0.02v0.01v64.59v0.02h-0.02c0,0.91,0.39,1.75,1.01,2.37c0.61,0.61,1.46,1,2.37,1v-0.02h0.01h12.19V35.65 v-0.01h0.02c0.01-3.85,1.58-7.34,4.1-9.86c2.51-2.5,5.98-4.06,9.82-4.07v-0.02h0.02H79.04L79.04,21.69z M105.18,108.92V35.65v-0.02 h0.02c0-0.91-0.39-1.75-1.01-2.37c-0.61-0.61-1.46-1-2.37-1v0.02h-0.01h-61.7h-0.02v-0.02c-0.91,0-1.75,0.39-2.37,1.01 c-0.61,0.61-1,1.46-1,2.37h0.02v0.01v73.27v0.02h-0.02c0,0.91,0.39,1.75,1.01,2.37c0.61,0.61,1.46,1,2.37,1v-0.02h0.01h61.7h0.02 v0.02c0.91,0,1.75-0.39,2.37-1.01c0.61-0.61,1-1.46,1-2.37h-0.02V108.92L105.18,108.92z"/></g> </svg> );
       const CheckMarkIconSVG = (props) => ( <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" {...props} className={`text-green-500 ${props.className || ''}`}> <path fillRule="evenodd" d="M16.704 4.153a.75.75 0 01.143 1.052l-8 10.5a.75.75 0 01-1.127.075l-4.5-4.5a.75.75 0 011.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 011.05-.143z" clipRule="evenodd" /> </svg> );
       const FileTextIcon = (props) => (<i className={`fa-solid fa-file-lines ${props.className || ''}`}></i>);
-      const FileImageIcon = (props) => (<i className={`fa-solid fa-file-image ${props.className || ''}`}></i>);
-      const GlobeIcon = (props) => ( <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" fill="currentColor" viewBox="0 0 16 16" {...props} className={`relative z-10 ${props.className || 'w-4 h-4'}`}> <path d="M0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8m7.5-6.923c-.67.204-1.335.82-1.887 1.855A8 8 0 0 0 5.145 4H7.5zM4.09 4a9.3 9.3 0 0 1 .64-1.539 7 7 0 0 1 .597-.933A7.03 7.03 0 0 0 2.255 4zm-.582 3.5c.03-.877.138-1.718.312-2.5H1.674a7 7 0 0 0-.656 2.5zM4.847 5a12.5 12.5 0 0 0-.338 2.5H7.5V5zM8.5 5v2.5h2.99a12.5 12.5 0 0 0-.337-2.5zM4.51 8.5a12.5 12.5 0 0 0 .337 2.5H7.5V8.5zm3.99 0V11h2.653c.187-.765.306-1.608.338-2.5zM5.145 12q.208.58.468 1.068c.552 1.035 1.218 1.65 1.887 1.855V12zm.182 2.472a7 7 0 0 1-.597-.933A9.3 9.3 0 0 1 4.09 12H2.255a7 7 0 0 0 3.072 2.472M3.82 11a13.7 13.7 0 0 1-.312-2.5h-2.49c.062.89.291 1.733.656 2.5zm6.853 3.472A7 7 0 0 0 13.745 12H11.91a9.3 9.3 0 0 1-.64 1.539 7 7 0 0 1-.597.933M8.5 12v2.923c.67-.204 1.335.82 1.887-1.855q.26-.487.468-1.068zm3.68-1h2.146c.365-.767.594-1.61.656-2.5h-2.49a13.7 13.7 0 0 1-.312 2.5m2.802-3.5a7 7 0 0 0-.656-2.5H12.18c.174.782.282 1.623.312 2.5zM11.27 2.461c.247.464.462.98.64 1.539h1.835a7 7 0 0 0-3.072-2.472c.218.284.418.598.597.933M10.855 4a8 8 0 0 0-.468-1.068C9.835 1.897 9.17 1.282 8.5 1.077V4z"/> </svg> );
       
       const ThinkingAnimation = () => {
           return (
             <div className="flex items-center my-2 self-start ml-0">
-                <span className="text-sm font-medium shimmer-black-text">
+                <span className="text-sm font-medium text-text-subtle">
                     Thinking...
                 </span>
             </div>
@@ -290,41 +270,6 @@ Your goal is to be a helpful, knowledgeable, and entertaining friend. Make every
       const NewRefreshIcon = (props) => ( <svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" viewBox="0 0 32 32" {...props}> <path fill="currentColor" d="M 16 4 L 16 6 C 21.535156 6 26 10.464844 26 16 C 26 21.535156 21.535156 26 16 26 C 10.464844 26 6 21.535156 6 16 C 6 12.734375 7.585938 9.851563 10 8.03125 L 10 13 L 12 13 L 12 5 L 4 5 L 4 7 L 8.09375 7 C 5.59375 9.199219 4 12.417969 4 16 C 4 22.617188 9.382813 28 16 28 C 22.617188 28 28 22.617188 28 16 C 28 9.382813 22.617188 4 16 4 Z"></path> </svg> );
       const NewCloseIconSVG = (props) => ( <svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" viewBox="0 0 24 24" {...props} className={`inline-block ${props.className || 'w-6 h-6'}`}> <path fill="currentColor" d="M13.414,12l6.293-6.293c0.391-0.391,0.391-1.023,0-1.414s-1.023-0.391-1.414,0L12,10.586L5.707,4.293 c-0.391-0.391-1.023-0.391-1.414,0s-0.391,1.023,0,1.414L10.586,12l-6.293,6.293c-0.391,0.391-0.391,1.023,0,1.414 C4.488,19.902,4.744,20,5,20s0.512-0.098,0.707-0.293L12,13.414l6.293,6.293C18.488,19.902,18.744,20,19,20s0.512-0.098,0.707-0.293 c0.391-0.391,0.391-1.023,0-1.414L13.414,12z"/> </svg> );
 
-      const Favicon = ({ domainUri, size = 16 }) => {
-        const [imgError, setImgError] = useState(false);
-        const genericIcon = <i className={`fas fa-link fa-sm text-gray-400`} style={{ fontSize: `${size*0.6}px`, width: `${size}px`, height: `${size}px`, display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}></i>;
-        
-        let hostname = '';
-        if (domainUri) {
-            try {
-                hostname = new URL(domainUri).hostname;
-            } catch (e) {
-                hostname = domainUri.replace(/^https?:\/\//, '').split('/')[0];
-            }
-        }
-
-        useEffect(() => {
-            setImgError(false);
-        }, [domainUri]);
-
-        if (!hostname || imgError) {
-            return genericIcon;
-        }
-        
-        const faviconUrl = `https://www.google.com/s2/favicons?domain=${encodeURIComponent(hostname)}&sz=${size}`;
-
-        return (
-            <img 
-                src={faviconUrl} 
-                alt="" 
-                width={size} 
-                height={size} 
-                className="flex-shrink-0 mr-2 rounded-sm" 
-                onError={() => setImgError(true)} 
-            />
-        );
-      };
-
       const ChatMessageItemOptions = ({ message, onDeleteAiMessagePair, onStartEdit }) => { 
           const [showOptions, setShowOptions] = useState(false); const optionsRef = useRef(null); const [copied, setCopied] = useState(false);
           useEffect(() => { const handleClickOutside = (event) => { if (optionsRef.current && !optionsRef.current.contains(event.target) && !event.target.closest('.ai-message-options-trigger')) { setShowOptions(false); } }; document.addEventListener('mousedown', handleClickOutside); return () => document.removeEventListener('mousedown', handleClickOutside); }, []);
@@ -335,45 +280,6 @@ Your goal is to be a helpful, knowledgeable, and entertaining friend. Make every
           return ( <div className="relative"> <button onClick={(e) => { e.stopPropagation(); setShowOptions(prev => !prev); }} className="ai-message-options-trigger p-1.5 rounded-full text-text-subtle hover:text-brand-primary hover:bg-interactive-hover/70 transition-all duration-150 focus:outline-none focus:ring-1 focus:ring-brand-primary/50" aria-label="AI Message Options"> <i className="fas fa-ellipsis-v fa-sm"></i> </button> {showOptions && ( <div ref={optionsRef} className="absolute left-0 bottom-full mb-1 w-32 bg-white border border-border-default rounded-md shadow-xl z-20 p-1 animate-scale-in-subtle origin-bottom-left"> <button onClick={handleCopyText} className="w-full text-left px-2.5 py-1.5 text-xs text-text-secondary hover:bg-interactive-hover/70 rounded-md flex items-center space-x-1.5 transition-colors"> {copied ? <CheckMarkIconSVG className="w-4 h-4 mr-1.5" /> : <NewCopyIconSVG className="w-4 h-4 mr-1.5 fill-current" />} <span>{copied ? "Copied!" : "Copy"}</span> </button> <button onClick={handleEdit} className="w-full text-left px-2.5 py-1.5 text-xs text-text-secondary hover:bg-interactive-hover/70 rounded-md flex items-center space-x-1.5 transition-colors"> <i className="fas fa-pencil-alt fa-fw mr-1.5"></i> <span>Edit</span> </button> <button onClick={handleDelete} className="w-full text-left px-2.5 py-1.5 text-xs text-red-600 hover:bg-red-500/10 rounded-md flex items-center space-x-1.5 transition-colors"> <i className="fas fa-trash-alt fa-fw mr-1.5"></i> <span>Delete</span> </button> </div> )} </div> );
       };
       
-      const SourcesDisplay = ({ sources }) => {
-        if (!sources || sources.length === 0) return null;
-
-        return (
-            <div className="mt-4 pt-3 border-t border-border-light/80">
-                <h4 className="text-xs font-semibold text-text-subtle mb-2 uppercase tracking-wider flex items-center">
-                    <GlobeIcon className="w-3.5 h-3.5 mr-1.5" />
-                    SOURCES
-                </h4>
-                <div className="flex flex-col space-y-2 text-xs sources-list-container max-h-40 overflow-y-auto pr-2">
-                    {sources.map((source, index) => {
-                        let displayTitle = source.title || source.uri;
-                        try {
-                            if (!source.title) {
-                                displayTitle = new URL(source.uri).hostname.replace('www.', '');
-                            }
-                        } catch (e) { /* use uri as is */ }
-                        
-                        return (
-                            <a
-                                key={`${source.uri}-${index}`}
-                                href={source.uri}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="flex items-center text-text-secondary hover:text-link-blue transition-colors group"
-                                title={source.title || source.uri}
-                            >
-                                <Favicon domainUri={source.uri} size={14} />
-                                <span className="truncate group-hover:underline decoration-link-blue/50">
-                                    {displayTitle}
-                                </span>
-                            </a>
-                        );
-                    })}
-                </div>
-            </div>
-        );
-      };
-
       const ChatMessageItem = ({ message, selectedUserMessageId, onSelectUserMessage, editingMessageId, editText, setEditText, onSaveEdit, onCancelEdit }) => { 
           const isUser = message.role === 'user'; const isError = message.isError === true; 
           const contentRef = useRef(null); const [userCopied, setUserCopied] = useState(false);
@@ -411,10 +317,10 @@ Your goal is to be a helpful, knowledgeable, and entertaining friend. Make every
             const userFilesToDisplay = message.attachedFiles || (message.uiOnlyAttachedFiles || []);
             contentToShow = ( <> {userFilesToDisplay && userFilesToDisplay.length > 0 && ( <div className={`grid gap-1 ${messageTextContent ? 'mb-1.5' : ''} ${userFilesToDisplay.filter(f => f.type?.startsWith('image/')).length > 1 ? 'grid-cols-2 sm:grid-cols-3' : 'grid-cols-1'}`}> {userFilesToDisplay.map((file, index) => { if (file.type?.startsWith('image/') && file.apiData?.data && file.apiData?.mimeType) { const imageSrc = `data:${file.apiData.mimeType};base64,${file.apiData.data}`; return ( <div key={file.id || file.name + index} className="rounded-lg overflow-hidden group relative max-w-full w-full"> <img src={imageSrc} alt={file.name || 'image preview'} className="block w-full max-h-60 object-contain rounded-lg" /> </div> ); } else if (file.type?.startsWith('text/')) { return ( <div key={file.id || file.name + index} className="bg-brand-primary/10 border border-brand-primary/20 p-2 rounded-lg text-xs flex items-center space-x-2 max-w-full w-fit shadow-sm my-1"> <FileTextIcon className="text-brand-primary text-sm" /> <span className="truncate max-w-[120px] sm:max-w-[150px] text-text-primary font-medium"> {file.name} </span> </div> ); } return null; })} </div> )} {messageTextContent && <p className="text-base font-normal whitespace-pre-wrap break-words">{messageTextContent}</p>} </> );
           } else if (message.role === 'model') { 
-              bubbleRoleClasses = `bg-white text-text-secondary rounded-lg border border-slate-200`; 
+              bubbleRoleClasses = `bg-white text-text-secondary rounded-xl border border-slate-200`; 
               bubbleWidthClasses = 'max-w-full w-full'; 
               if(isError) { 
-                  bubbleRoleClasses = `bg-red-50 border border-red-300 text-red-700 rounded-lg`; 
+                  bubbleRoleClasses = `bg-red-50 border border-red-300 text-red-700 rounded-xl`; 
                   const errorContent = typeof message.finalAnswerText === 'string' && message.finalAnswerText ? message.finalAnswerText : messageTextContent;
                   contentToShow = ( <div className="text-sm break-words"> <div className="flex items-center mb-1"><i className="fas fa-exclamation-triangle text-red-500 mr-2"></i><strong className="font-semibold">Error</strong></div>{errorContent.replace(/^Error:\s*/, '')} </div>); 
               
@@ -442,7 +348,6 @@ Your goal is to be a helpful, knowledgeable, and entertaining friend. Make every
                       contentToShow = (
                           <div ref={contentRef}>
                               <div className={`markdown-content break-words`} dangerouslySetInnerHTML={{ __html: marked.parse(textForMarkdown || '') }} />
-                              {message.sources && message.sources.length > 0 && <SourcesDisplay sources={message.sources} />}
                           </div>
                       );
                   }
@@ -452,10 +357,24 @@ Your goal is to be a helpful, knowledgeable, and entertaining friend. Make every
           return ( <div className={`flex items-start ${isUser ? 'justify-end group' : 'justify-start'} ${messageLineAnimationClasses} mb-1`} style={messageLineAnimationStyles}> <div className={`${bubbleBaseClasses} ${bubbleWidthClasses} ${bubbleRoleClasses}`} onClick={isUser ? () => onSelectUserMessage(message.id === selectedUserMessageId ? null : message.id) : undefined}> {contentToShow} {isUser && selectedUserMessageId === message.id && messageTextContent && ( <button onClick={(e) => { e.stopPropagation(); handleCopyUserText(messageTextContent); }} className="absolute -bottom-3 -right-1 p-1.5 bg-gray-100 text-gray-600 border border-gray-300 rounded-full shadow-md hover:bg-gray-200 transition-all" aria-label="Copy user message"> {userCopied ? <CheckMarkIconSVG className="w-4 h-4" /> : <NewCopyIconSVG className="w-4 h-4 fill-current" />} </button> )} </div> </div> );
       };
       
-      const ChatInterface = ({ messages, onSendMessage, isLoading, onStopGeneration, onRegenerateLastTextMessage, onNewChat, setChatError, currentChatId, onDeleteAiMessagePair, selectedUserMessageId, setSelectedUserMessageId, editingMessageId, editText, setEditText, onSaveEdit, onCancelEdit, onStartEdit }) => { 
+      const ChatInterface = ({ messages, onSendMessage, isLoading, onStopGeneration, onRegenerateLastTextMessage, onNewChat, setChatError, currentChatId, onDeleteAiMessagePair, selectedUserMessageId, setSelectedUserMessageId, editingMessageId, editText, setEditText, onSaveEdit, onCancelEdit, onStartEdit, selectedModel, setSelectedModel }) => { 
           const [inputText, setInputText] = useState(''); const [selectedFiles, setSelectedFiles] = useState([]);
+          const [isModelSelectorOpen, setIsModelSelectorOpen] = useState(false);
+          const modelSelectorRef = useRef(null);
           const fileInputRef = useRef(null); const messagesEndRef = useRef(null); const chatContainerRef = useRef(null); const contentEditableRef = useRef(null);
           const isAtBottomRef = useRef(true);
+
+          useEffect(() => {
+            const handleClickOutside = (event) => {
+                if (modelSelectorRef.current && !modelSelectorRef.current.contains(event.target)) {
+                    setIsModelSelectorOpen(false);
+                }
+            };
+            document.addEventListener('mousedown', handleClickOutside);
+            return () => {
+                document.removeEventListener('mousedown', handleClickOutside);
+            };
+          }, []);
 
           useEffect(() => {
             const container = chatContainerRef.current;
@@ -478,15 +397,15 @@ Your goal is to be a helpful, knowledgeable, and entertaining friend. Make every
           useEffect(() => { if (contentEditableRef.current) { contentEditableRef.current.style.height = 'auto'; const maxHeight = parseInt(getComputedStyle(contentEditableRef.current).maxHeight, 10); let newHeight = contentEditableRef.current.scrollHeight; if (maxHeight && newHeight > maxHeight) { newHeight = maxHeight; } contentEditableRef.current.style.height = `${newHeight}px`; } }, [inputText, selectedFiles]); 
           const handleFileChange = (event) => { const files = Array.from(event.target.files); processAndSetFiles(files); if (fileInputRef.current) fileInputRef.current.value = ""; };
           const handlePaste = (event) => { const pastedText = event.clipboardData.getData('text/plain'); const pastedFiles = Array.from(event.clipboardData.files); if (pastedFiles.length > 0) { event.preventDefault(); processAndSetFiles(pastedFiles, true); } else if (pastedText && contentEditableRef.current && document.activeElement === contentEditableRef.current) { event.preventDefault(); document.execCommand('insertText', false, pastedText); setInputText(contentEditableRef.current.innerText);  } };
-          const processAndSetFiles = (filesArray, isFromPaste = false) => { if (!filesArray.length) return false; let filesToProcess = []; let currentTotalSize = selectedFiles.reduce((acc, curr) => acc + (curr.file?.size || 0), 0); let didProcessAnyFile = false; let localErrorMessage = null; for (const file of filesArray) { const isImage = file.type.startsWith('image/'); const isTxt = file.type === 'text/plain' || (file.name && file.name.toLowerCase().endsWith('.txt')); if (!isImage && !isTxt) { if (isFromPaste) console.log(`Pasted unsupported file: ${file.name} (${file.type})`); else localErrorMessage = `File "${file.name}" (type: ${file.type}) is not supported. Only images and .txt files are allowed.`; continue; } if (file.size > MAX_FILE_SIZE_MB * 1024 * 1024) { localErrorMessage = `File "${file.name}" is larger than ${MAX_FILE_SIZE_MB}MB.`; continue; } if (currentTotalSize + file.size > MAX_TOTAL_FILES_SIZE_MB * 1024 * 1024) { localErrorMessage = `Total file size cannot exceed ${MAX_TOTAL_FILES_SIZE_MB}MB.`; break; } filesToProcess.push(file); currentTotalSize += file.size; didProcessAnyFile = true; } if(localErrorMessage){ setChatError(localErrorMessage); } else { setChatError(null); } if (filesToProcess.length > 0) { const placeholderFiles = filesToProcess.map(file => ({ id: Date.now().toString(36) + Math.random().toString(36).substring(2) + file.name, name: file.name, type: file.type, isLoading: true, file: file, })); setSelectedFiles(prev => [...prev, ...placeholderFiles]); placeholderFiles.forEach(placeholder => { const { id, file } = placeholder; const processSingleFile = async () => { try { let apiData; if (file.type.startsWith('image/')) { const compressionOptions = {
-    maxSizeMB: 1,          
-    maxWidthOrHeight: 1920,   
-    useWebWorker: true,       
-    maxIteration: 10,         
-    initialQuality: 0.8,      
-};
-const compressedFile = await imageCompression(file, compressionOptions);
-const base64Data = await new Promise((resolve, reject) => { const reader = new FileReader(); reader.readAsDataURL(compressedFile); reader.onloadend = () => resolve(reader.result.split(',')[1]); reader.onerror = (error) => reject(error); }); apiData = { mimeType: compressedFile.type, data: base64Data }; } else { const textContent = await file.text(); apiData = { textContent: textContent }; } setSelectedFiles(prev => prev.map(p => p.id === id ? { ...p, isLoading: false, apiData: apiData } : p)); } catch (error) { console.error('Error processing file:', error); setChatError(`Error processing file "${file.name}".`); setSelectedFiles(prev => prev.filter(p => p.id !== id)); } }; processSingleFile(); }); return didProcessAnyFile; } return false; };
+          const processAndSetFiles = (filesArray, isFromPaste = false) => { if (!filesArray.length) return false; let filesToProcess = []; let currentTotalSize = selectedFiles.reduce((acc, curr) => acc + (curr.file?.size || 0), 0); let didProcessAnyFile = false; let localErrorMessage = null; for (const file of filesArray) { const isImage = file.type.startsWith('image/'); const isTxt = file.type === 'text/plain' || (file.name && file.name.toLowerCase().endsWith('.txt')); if (!isImage && !isTxt) { if (isFromPaste) console.log(`Pasted unsupported file: ${file.name} (${file.type})`); else localErrorMessage = `File "${file.name}" (type: ${file.type}) is not supported. Only images and .txt files are allowed.`; continue; } if (file.size > MAX_FILE_SIZE_MB * 1024 * 1024) { localErrorMessage = `File "${file.name}" is larger than ${MAX_FILE_SIZE_MB}MB.`; continue; } if (currentTotalSize + file.size > MAX_TOTAL_FILES_SIZE_MB * 1024 * 1024) { localErrorMessage = `Total file size cannot exceed ${MAX_TOTAL_FILES_SIZE_MB}MB.`; break; } filesToProcess.push(file); currentTotalSize += file.size; didProcessAnyFile = true; } if(localErrorMessage){ setChatError(localErrorMessage); } else { setChatError(null); } if (filesToProcess.length > 0) { const placeholderFiles = filesToProcess.map(file => ({ id: Date.now().toString(36) + Math.random().toString(36).substring(2) + file.name, name: file.name, type: file.type, isLoading: true, file: file, })); setSelectedFiles(prev => [...prev, ...placeholderFiles]); placeholderFiles.forEach(placeholder => { const { id, file } = placeholder; const processSingleFile = async () => { try { let apiData; if (file.type.startsWith('image/')) {
+    const base64Data = await new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onloadend = () => resolve(reader.result.split(',')[1]);
+        reader.onerror = (error) => reject(error);
+    });
+    apiData = { mimeType: file.type, data: base64Data };
+} else { const textContent = await file.text(); apiData = { textContent: textContent }; } setSelectedFiles(prev => prev.map(p => p.id === id ? { ...p, isLoading: false, apiData: apiData } : p)); } catch (error) { console.error('Error processing file:', error); setChatError(`Error processing file "${file.name}".`); setSelectedFiles(prev => prev.filter(p => p.id !== id)); } }; processSingleFile(); }); return didProcessAnyFile; } return false; };
           const removeSelectedFile = (fileId) => { setSelectedFiles(prev => prev.filter(f => f.id !== fileId)); };
           const handleInputFromContentEditable = () => { setInputText(contentEditableRef.current?.innerText || ''); };
           const handleSubmit = (e) => { 
@@ -524,9 +443,7 @@ const base64Data = await new Promise((resolve, reject) => { const reader = new F
             ) : null }
               {messages.map((msg, idx) => { 
                   const isThisMessageAiAndFinalized = msg.role === 'model' && !msg.isLoading && !msg.isError && 
-                                                   ( (typeof msg.finalAnswerText === 'string' && msg.finalAnswerText) || 
-                                                     (msg.searchUsed && msg.analysisSteps && msg.analysisSteps.length > 0 && msg.analysisSteps.every(s => s.completed)) 
-                                                   );
+                                                   ( (typeof msg.finalAnswerText === 'string' && msg.finalAnswerText) );
                   
                   let isEffectivelyLastAiMessageForButtons = false;
                   if (isThisMessageAiAndFinalized) {
@@ -578,7 +495,37 @@ const base64Data = await new Promise((resolve, reject) => { const reader = new F
                   <div 
                     className="flex flex-col bg-white rounded-3xl p-2.5 border border-slate-200 shadow-[0_2px_4px_rgba(0,0,0,0.05)] focus-within:border-slate-300 focus-within:shadow-[0_4px_8px_rgba(0,0,0,0.07)] transition-all duration-200 ease-in-out"
                     onClick={(e) => { if (contentEditableRef.current && !contentEditableRef.current.contains(e.target) && e.target.tagName !== 'BUTTON' && !e.target.closest('button') && !e.target.closest('[aria-label="Attach file"]') && !e.target.closest('.relative') ) { contentEditableRef.current.focus(); } }} > 
-                    {selectedFiles.some(f => f.type.startsWith('image/')) && ( <div className="image-preview-container-input"> {selectedFiles.filter(f => f.type.startsWith('image/')).map(file => ( <div key={file.id} className="relative w-14 h-14 rounded-md overflow-hidden shadow-sm group border border-gray-200"> {file.isLoading ? ( <div className="w-full h-full flex items-center justify-center bg-gray-100"> <div className="w-4 h-4 border-2 border-gray-300 border-t-brand-primary rounded-full animate-spin"></div> </div> ) : ( <img src={`data:${file.apiData.mimeType};base64,${file.apiData.data}`} alt={file.name} className="w-full h-full object-cover" /> )} <button type="button" onClick={() => removeSelectedFile(file.id)} className="absolute top-0.5 right-0.5 w-5 h-5 bg-black/50 hover:bg-black/70 text-white rounded-full flex items-center justify-center transition-opacity focus:outline-none opacity-100" aria-label="Remove image" > <NewCloseIconSVG className="w-3 h-3"/> </button> </div> ))} </div> )} {selectedFiles.some(f => !f.type.startsWith('image/')) && ( <div className={`file-pill-container ${selectedFiles.some(f => f.type.startsWith('image/')) ? 'mt-1.5' : ''}`}> {selectedFiles.filter(f => !f.type.startsWith('image/')).map(file => ( <div key={file.id} className="file-pill"> {file.isLoading ? <div className="w-3 h-3 border-2 border-gray-300 border-t-brand-primary rounded-full animate-spin mr-1.5"></div> : <FileTextIcon className="file-pill-icon"/>} <span className="file-pill-name">{file.name}</span> <button type="button" onClick={() => removeSelectedFile(file.id)} className="file-pill-remove"> <i className="fas fa-times"></i> </button> </div> ))} </div> )} <div ref={contentEditableRef} contentEditable={!(isLoading || isAiCurrentlyProcessing)} onInput={handleInputFromContentEditable} onPaste={handlePaste} onKeyDown={handleContentEditableKeyDown} data-placeholder={"Ask AlphaGPT..."} className={`content-editable-input w-full flex-1 text-sm md:text-[15px] focus:outline-none resize-none overflow-y-auto relative`} style={{ maxHeight: '100px', minHeight: '40px' }} suppressContentEditableWarning={true} > </div> <div className="flex justify-between items-end w-full pt-2.5 mt-auto"> <div className="flex items-center"> <input type="file" ref={fileInputRef} onChange={handleFileChange} className="hidden" multiple accept="image/*,.txt,text/plain" disabled={isLoading || isAiCurrentlyProcessing} /> <button type="button" onClick={() => fileInputRef.current?.click()} className="w-8 h-8 flex items-center justify-center text-gray-500 hover:text-gray-700 rounded-full hover:bg-gray-200/70 border border-gray-300 transition-colors duration-150 disabled:opacity-50 flex-shrink-0 focus:outline-none" aria-label="Attach file" disabled={isLoading || isAiCurrentlyProcessing} > <PlusIcon /> </button> </div> <div className="flex items-end space-x-2"> <button type={isAiCurrentlyProcessing ? "button" : "submit"} onClick={isAiCurrentlyProcessing ? onStopGeneration : undefined } disabled={isSendButtonActuallyDisabled} className={`${sendOrStopButtonBaseClasses} ${sendOrStopButtonDynamicClasses}`} style={{ overflow: 'hidden' }} aria-label={isAiCurrentlyProcessing ? "Stop generation" : "Send message"} > {isAiCurrentlyProcessing ? ( <i className="fas fa-stop text-sm"></i> ) : ( <UpArrowSendIcon /> )} </button> </div> </div> 
+                    {selectedFiles.some(f => f.type.startsWith('image/')) && ( <div className="image-preview-container-input"> {selectedFiles.filter(f => f.type.startsWith('image/')).map(file => ( <div key={file.id} className="relative w-14 h-14 rounded-md overflow-hidden shadow-sm group border border-gray-200"> {file.isLoading ? ( <div className="w-full h-full flex items-center justify-center bg-gray-100"> <div className="w-4 h-4 border-2 border-gray-300 border-t-brand-primary rounded-full animate-spin"></div> </div> ) : ( <img src={`data:${file.apiData.mimeType};base64,${file.apiData.data}`} alt={file.name} className="w-full h-full object-cover" /> )} <button type="button" onClick={() => removeSelectedFile(file.id)} className="absolute top-0.5 right-0.5 w-5 h-5 bg-black/50 hover:bg-black/70 text-white rounded-full flex items-center justify-center transition-opacity focus:outline-none opacity-100" aria-label="Remove image" > <NewCloseIconSVG className="w-3 h-3"/> </button> </div> ))} </div> )} {selectedFiles.some(f => !f.type.startsWith('image/')) && ( <div className={`file-pill-container ${selectedFiles.some(f => f.type.startsWith('image/')) ? 'mt-1.5' : ''}`}> {selectedFiles.filter(f => !f.type.startsWith('image/')).map(file => ( <div key={file.id} className="file-pill"> {file.isLoading ? <div className="w-3 h-3 border-2 border-gray-300 border-t-brand-primary rounded-full animate-spin mr-1.5"></div> : <FileTextIcon className="file-pill-icon"/>} <span className="file-pill-name">{file.name}</span> <button type="button" onClick={() => removeSelectedFile(file.id)} className="file-pill-remove"> <i className="fas fa-times"></i> </button> </div> ))} </div> )} <div ref={contentEditableRef} contentEditable={!(isLoading || isAiCurrentlyProcessing)} onInput={handleInputFromContentEditable} onPaste={handlePaste} onKeyDown={handleContentEditableKeyDown} data-placeholder={"Ask AlphaGPT..."} className={`content-editable-input w-full flex-1 text-sm md:text-[15px] focus:outline-none resize-none overflow-y-auto relative`} style={{ maxHeight: '100px', minHeight: '40px' }} suppressContentEditableWarning={true} > </div> 
+                     <div className="flex justify-between items-end w-full pt-2.5 mt-auto">
+                        <div className="flex items-center space-x-2">
+                           <input type="file" ref={fileInputRef} onChange={handleFileChange} className="hidden" multiple accept="image/*,.txt,text/plain" disabled={isLoading || isAiCurrentlyProcessing} />
+                           <button type="button" onClick={() => fileInputRef.current?.click()} className="w-8 h-8 flex items-center justify-center text-gray-500 hover:text-gray-700 rounded-full hover:bg-gray-200/70 border border-gray-300 transition-colors duration-150 disabled:opacity-50 flex-shrink-0 focus:outline-none" aria-label="Attach file" disabled={isLoading || isAiCurrentlyProcessing}>
+                              <PlusIcon />
+                           </button>
+                           <div ref={modelSelectorRef} className="relative">
+                              <button type="button" onClick={() => setIsModelSelectorOpen(prev => !prev)} disabled={isLoading || isAiCurrentlyProcessing} className="flex items-center space-x-1.5 h-8 px-3 text-xs font-medium text-gray-600 bg-gray-100 border border-gray-300 rounded-full hover:bg-gray-200 transition-colors disabled:opacity-50 focus:outline-none">
+                                 <i className={`fas fa-bolt fa-xs ${MODELS.find(m => m.id === selectedModel)?.uiName === 'Smart' ? 'text-purple-500' : 'text-green-500'}`}></i>
+                                 <span>{MODELS.find(m => m.id === selectedModel)?.uiName || 'Model'}</span>
+                                 <i className="fas fa-chevron-down fa-2xs text-gray-500"></i>
+                              </button>
+                              {isModelSelectorOpen && (
+                                <div className="absolute bottom-full mb-2 w-32 bg-white border border-border-default rounded-md shadow-xl z-20 p-1 animate-scale-in-subtle origin-bottom-left">
+                                    {MODELS.map(model => (
+                                        <button key={model.id} onClick={() => { setSelectedModel(model.id); setIsModelSelectorOpen(false); }} className={`w-full text-left px-2.5 py-1.5 text-xs rounded-md flex items-center space-x-2 transition-colors ${selectedModel === model.id ? 'font-semibold text-brand-primary bg-interactive-hover/70' : 'text-text-secondary hover:bg-interactive-hover/70'}`}>
+                                            <i className={`fas fa-bolt fa-xs ${model.uiName === 'Smart' ? 'text-purple-500' : 'text-green-500'}`}></i>
+                                            <span>{model.uiName}</span>
+                                        </button>
+                                    ))}
+                                </div>
+                              )}
+                           </div>
+                        </div>
+                        <div className="flex items-end space-x-2">
+                           <button type={isAiCurrentlyProcessing ? "button" : "submit"} onClick={isAiCurrentlyProcessing ? onStopGeneration : undefined} disabled={isSendButtonActuallyDisabled} className={`${sendOrStopButtonBaseClasses} ${sendOrStopButtonDynamicClasses}`} style={{ overflow: 'hidden' }} aria-label={isAiCurrentlyProcessing ? "Stop generation" : "Send message"}>
+                                {isAiCurrentlyProcessing ? ( <i className="fas fa-stop text-sm"></i> ) : ( <UpArrowSendIcon /> )}
+                           </button>
+                        </div>
+                     </div>
                   </div> 
                 </div> 
               </form> 
@@ -591,22 +538,72 @@ const base64Data = await new Promise((resolve, reject) => { const reader = new F
           const [selectedUserMessageId, setSelectedUserMessageId] = useState(null);
           const [editingMessageId, setEditingMessageId] = useState(null);
           const [editText, setEditText] = useState('');
+          const [selectedModel, setSelectedModel] = useState(MODELS[0].id);
           const isStoppingGenerationRef = useRef(false); const streamTextBuffer = useRef(""); 
-          const streamSourcesBuffer = useRef([]); 
-
 
           useEffect(() => { if (chatError) { const errorId = Date.now() + '_sys_validation_err'; const newErrorMsg = {id: errorId, role: 'system', text: chatError, isError: true, timestamp: new Date().getTime()}; setChatMessages(prev => { const lastMessage = prev[prev.length -1]; if(lastMessage && lastMessage.id.includes('_sys_validation_err') && lastMessage.text === chatError) return prev; return [...prev, newErrorMsg]; }); } }, [chatError]); 
           const handleNewChat = useCallback(() => { const newSessionId = 'session_chat_' + Date.now().toString(36) + Math.random().toString(36).substring(2); setCurrentChatId(newSessionId); setChatMessages([]); setChatError(null); return newSessionId; }, []); 
-          const getGeminiHistory = (currentMessagesFromState) => { 
-            const geminiMessages = currentMessagesFromState.filter(msg => !( msg.role === 'system' || (msg.role === 'model' && msg.isLoading && !(typeof msg.finalAnswerText === 'string' && msg.finalAnswerText) && (!msg.analysisSteps || msg.analysisSteps.length === 0)) || msg.isError )).map(msg => { let partsForGemini = []; if (msg.role === 'user') { if (msg.parts && Array.isArray(msg.parts)) { partsForGemini = [...msg.parts]; } else if (typeof msg.text === 'string') { partsForGemini = [{text: msg.text}]; } else { partsForGemini = [{text: ''}]; } const filesToConsider = msg.uiOnlyAttachedFiles || msg.attachedFiles || []; filesToConsider.forEach(file => { if (file.type.startsWith('image/') && file.apiData?.mimeType && file.apiData?.data) { partsForGemini.push({ inlineData: file.apiData }); } else if ((file.name?.toLowerCase().endsWith('.txt') || file.type === 'text/plain') && file.apiData?.textContent) { const fileContentMarker = `\n[Content of attached file: ${file.name}]\n`; if (!partsForGemini.some(p => typeof p.text === 'string' && p.text.includes(fileContentMarker))) { partsForGemini.push({ text: `${fileContentMarker}${file.apiData.textContent}\n[End of file: ${file.name}]\n` }); } } }); } else if (msg.role === 'model') { let textContent = ""; if (typeof msg.finalAnswerText === 'string') { textContent = msg.finalAnswerText; } else if (typeof msg.text === 'string') { textContent = msg.text; } partsForGemini = [{text: textContent}]; } return { role: msg.role, parts: partsForGemini }; }).filter(entry => entry.parts && entry.parts.length > 0 && entry.parts.some(p => (p.inlineData || (typeof p.text === 'string' && p.text.trim())) ));
-            if (geminiMessages.length > 0 && geminiMessages[0].role === 'model') { const firstUserIndex = geminiMessages.findIndex(m => m.role === 'user'); if (firstUserIndex === -1) return []; const slicedHistory = geminiMessages.slice(firstUserIndex); if (slicedHistory.length > 1 && slicedHistory[0].role === slicedHistory[1].role) { return [slicedHistory[0]]; } return slicedHistory; } return geminiMessages;
+          
+          const getA4fHistory = (currentMessagesFromState) => {
+            const openAiMessages = currentMessagesFromState
+                .filter(msg => !(
+                    msg.role === 'system' ||
+                    (msg.role === 'model' && msg.isLoading && !(typeof msg.finalAnswerText === 'string' && msg.finalAnswerText)) ||
+                    msg.isError
+                ))
+                .map(msg => {
+                    const role = msg.role === 'model' ? 'assistant' : msg.role;
+                    let content;
+
+                    if (role === 'user') {
+                        let textParts = (msg.parts || []).filter(p => p.text).map(p => p.text).join(' ').trim();
+                        if (!textParts && msg.text) {
+                            textParts = msg.text.trim();
+                        }
+
+                        const filesToConsider = msg.uiOnlyAttachedFiles || msg.attachedFiles || [];
+
+                        const textFilesContent = filesToConsider
+                            .filter(file => (file.name?.toLowerCase().endsWith('.txt') || file.type === 'text/plain') && file.apiData?.textContent)
+                            .map(file => `\n[Content of attached file: ${file.name}]\n${file.apiData.textContent}\n[End of file: ${file.name}]\n`)
+                            .join('');
+
+                        const fullText = (textParts + textFilesContent).trim();
+
+                        const images = filesToConsider
+                            .filter(file => file.type.startsWith('image/') && file.apiData?.mimeType && file.apiData?.data)
+                            .map(file => ({
+                                type: 'image_url',
+                                image_url: { url: `data:${file.apiData.mimeType};base64,${file.apiData.data}` }
+                            }));
+
+                        if (images.length > 0) {
+                            content = [{ type: 'text', text: fullText }];
+                            content.push(...images);
+                        } else {
+                            content = fullText;
+                        }
+                    } else { // assistant
+                        content = msg.finalAnswerText || msg.text || (msg.parts?.[0]?.text || "");
+                    }
+
+                    if (!content || (Array.isArray(content) && content.length === 0) || (typeof content === 'string' && !content.trim())) {
+                        return null;
+                    }
+
+                    return { role, content };
+                })
+                .filter(Boolean);
+
+            const firstUserIndex = openAiMessages.findIndex(m => m.role === 'user');
+            if (firstUserIndex > 0) {
+                return openAiMessages.slice(firstUserIndex);
+            }
+            if (openAiMessages.length === 1 && openAiMessages[0].role === 'assistant'){
+                return [];
+            }
+            return openAiMessages;
           };
-          useEffect(() => { 
-              const hasValidInstance = Object.values(genAIInstances).length > 0;
-              if (!hasValidInstance) {
-                setChatError("Gemini API Key is not configured or client failed to initialize.");
-              }
-          }, []);
           
           const handleStopGeneration = useCallback(() => {
               isStoppingGenerationRef.current = true;
@@ -616,31 +613,21 @@ const base64Data = await new Promise((resolve, reject) => { const reader = new F
                   return prevMessages.map(msg => {
                       if (msg.role === 'model' && msg.isLoading) {
                           let finalStoppedText = streamTextBuffer.current || "";
-                          let finalAnalysisSteps = [];
-
-                          if (msg.searchUsed) { 
-                              finalStoppedText = finalStoppedText.replace(/\[ANALYSIS_STEP\]\.*?\n/g, '').replace(/\[ANALYSIS_END\]\n?/g, '');
-                          } else { 
-                              finalAnalysisSteps = [];
-                          }
-
                           const stopNotice = "*Generation stopped by user.*";
                           if (finalStoppedText.trim() && !finalStoppedText.includes(stopNotice)) {
                               const isInCodeBlock = (finalStoppedText.match(/```/g) || []).length % 2 !== 0;
                               if (isInCodeBlock) finalStoppedText += "\n```";
                               finalStoppedText = finalStoppedText + (finalStoppedText.trim() ? "\n\n---\n" : "") + stopNotice;
-                          } else if (!finalStoppedText.trim() && !finalStoppedText.includes(stopNotice)) {
+                          } else if (!finalStoppedText.trim()) {
                               finalStoppedText = stopNotice;
                           }
 
                           return {
                               ...msg,
                               finalAnswerText: finalStoppedText,
-                              analysisSteps: finalAnalysisSteps,
                               text: finalStoppedText,
                               parts: [{text: finalStoppedText}],
                               isLoading: false,
-                              sources: streamSourcesBuffer.current, 
                           };
                       }
                       return msg;
@@ -648,153 +635,117 @@ const base64Data = await new Promise((resolve, reject) => { const reader = new F
               });
           }, []); 
 
-          const mergeCitations = (existingSources, newSources) => { if (!newSources || newSources.length === 0) return existingSources; const existingUris = new Set((existingSources || []).map(s => s.uri)); const uniqueNewSources = newSources.filter(src => src.uri && !existingUris.has(src.uri)); return [...(existingSources || []), ...uniqueNewSources]; };
-          const addMessageToLocalChat = async (role, text, filesForDisplay, aiSpecificData = {}) => { const messageId = Date.now().toString(36) + Math.random().toString(36).substring(2); const messagePartsForDisplay = []; if (text) messagePartsForDisplay.push({ text: text }); const attachedFilesForLocalState = filesForDisplay.map(f => ({ id: f.id, name: f.name, type: f.type, apiData: f.apiData, isLoading: f.isLoading })); const messageData = { id: messageId, role: role, parts: messagePartsForDisplay.length > 0 ? messagePartsForDisplay : [{text: ""}], text: text || "", timestamp: new Date().getTime(), ...(role === 'user' && attachedFilesForLocalState.length > 0 && { uiOnlyAttachedFiles: attachedFilesForLocalState }), ...(role === 'model' && aiSpecificData.searchUsed !== undefined && { searchUsed: aiSpecificData.searchUsed }), ...(role === 'model' && aiSpecificData.modelUsed && { modelUsed: aiSpecificData.modelUsed }), }; setChatMessages(prev => [...prev, messageData]); return messageId; };
+          const addMessageToLocalChat = async (role, text, filesForDisplay, aiSpecificData = {}) => { const messageId = Date.now().toString(36) + Math.random().toString(36).substring(2); const messagePartsForDisplay = []; if (text) messagePartsForDisplay.push({ text: text }); const attachedFilesForLocalState = filesForDisplay.map(f => ({ id: f.id, name: f.name, type: f.type, apiData: f.apiData, isLoading: f.isLoading })); const messageData = { id: messageId, role: role, parts: messagePartsForDisplay.length > 0 ? messagePartsForDisplay : [{text: ""}], text: text || "", timestamp: new Date().getTime(), ...(role === 'user' && attachedFilesForLocalState.length > 0 && { uiOnlyAttachedFiles: attachedFilesForLocalState }), ...(role === 'model' && aiSpecificData.modelUsed && { modelUsed: aiSpecificData.modelUsed }), }; setChatMessages(prev => [...prev, messageData]); return messageId; };
           
-          const _streamAiResponse = async ( originalPromptPartsForGemini, targetAiMessageUiId, historyForGeminiInit, useSearchForThisTurn, currentLoadingText, isRegeneration = false, modelToUse ) => {
-              const genAI = genAIInstances[modelToUse];
-              if (!genAI) { setChatError(`Gemini AI Client for model ${modelToUse} not initialized. Check API Key.`); setIsChatLoading(false); setChatMessages(prev => prev.map(m => m.id === targetAiMessageUiId ? { ...m, isLoading: false, isError: true, finalAnswerText: "AI Client Error.", text: "AI Client Error.", parts:[{text:"AI Client Error."}] } : m)); return; }
-              
-              setIsChatLoading(true); 
-              streamTextBuffer.current = ""; 
-              streamSourcesBuffer.current = []; 
-              let firstChunkReceived = false; 
-              
+          const _streamAiResponse = async (targetAiMessageUiId, historyForA4f, modelToUse) => {
+              setIsChatLoading(true);
+              streamTextBuffer.current = "";
+              let firstChunkReceived = false;
+
               if (isStoppingGenerationRef.current) { setIsChatLoading(false); return; }
-              
-               setChatMessages(prev => prev.map(m => {
-                  if (m.id === targetAiMessageUiId) {
-                      const currentMsg = prev.find(p => p.id === targetAiMessageUiId);
-                      const stillShowLoadingText = !useSearchForThisTurn || !(currentMsg?.analysisSteps?.some(s=>s.completed));
-                      return {
-                          ...m,
-                          isLoading: true, 
-                          loadingText: stillShowLoadingText ? currentLoadingText : "", 
-                      };
-                  }
-                  return m;
-              }));
-              
-              const performUiUpdateInStream = (isLoading = true) => { 
-                  if (!isStoppingGenerationRef.current || !isLoading) { 
-                      setChatMessages(prevMsgs => prevMsgs.map(msg => { 
-                          if (msg.id === targetAiMessageUiId) { 
-                              let currentTextForAnswer = streamTextBuffer.current;
-                              if (useSearchForThisTurn) { 
-                                  currentTextForAnswer = currentTextForAnswer.replace(/\[ANALYSIS_STEP\].*?\n/g, '').replace(/\[ANALYSIS_END\]\n?/g, '');
-                              }
-                              
-                              const currentAnalysisSteps = msg.analysisSteps || [];
 
-                              return { 
+              setChatMessages(prev => prev.map(m => m.id === targetAiMessageUiId ? { ...m, isLoading: true, loadingText: "Thinking..." } : m));
+
+              const performUiUpdateInStream = (isLoading = true) => {
+                  if (!isStoppingGenerationRef.current || !isLoading) {
+                      setChatMessages(prevMsgs => prevMsgs.map(msg => {
+                          if (msg.id === targetAiMessageUiId) {
+                              return {
                                   ...msg,
-                                  analysisSteps: currentAnalysisSteps, 
-                                  finalAnswerText: currentTextForAnswer,
+                                  finalAnswerText: streamTextBuffer.current,
                                   isLoading: isLoading,
-                                  text: currentTextForAnswer || (useSearchForThisTurn && currentAnalysisSteps.length > 0 && currentAnalysisSteps.every(s=>s.completed) ? "" : ""),
-                                  parts: [{ text: currentTextForAnswer || (useSearchForThisTurn && currentAnalysisSteps.length > 0 && currentAnalysisSteps.every(s=>s.completed) ? "" : "") }],
-                                  sources: streamSourcesBuffer.current, 
-                                  loadingText: isLoading ? "" : "", 
-                              }; 
-                          } 
-                          return msg; 
-                      })); 
-                  } 
+                                  text: streamTextBuffer.current,
+                                  parts: [{ text: streamTextBuffer.current }],
+                                  loadingText: isLoading ? "" : "",
+                              };
+                          }
+                          return msg;
+                      }));
+                  }
               };
-              
-              try { 
-                  const temperatureForThisCall = FIXED_MODEL_CONFIG.temperature;
 
-                  const modelConfig = { 
-                      model: modelToUse, 
-                      systemInstruction: getSystemInstruction(),
-                      generationConfig: {
-                          temperature: temperatureForThisCall,
-                      }
-                  }; 
-                  if (useSearchForThisTurn) { modelConfig.tools = [{ googleSearch: {} }]; } 
-                  const chatModel = genAI.getGenerativeModel(modelConfig); 
-                  const chatSession = chatModel.startChat({ history: historyForGeminiInit }); 
-                  if (isStoppingGenerationRef.current) { setIsChatLoading(false); return; } 
-                  const result = await chatSession.sendMessageStream(originalPromptPartsForGemini);
+              try {
+                  const systemInstruction = { role: 'system', content: getSystemInstruction() };
+                  const messagesPayload = [systemInstruction, ...historyForA4f];
                   
-                  for await (const chunk of result.stream) { 
-                      if (isStoppingGenerationRef.current) break; 
-                      const rawChunkText = chunk.text(); 
-                      if(!firstChunkReceived && rawChunkText?.trim()){ 
-                          firstChunkReceived = true; 
-                          setChatMessages(prev => prev.map(m => m.id === targetAiMessageUiId ? {...m, loadingText: ""} : m));
-                      }
-                      
-                      let chunkTextForProcessing = ""; 
-                      if (typeof rawChunkText === 'string') { 
-                          const lines = rawChunkText.split('\n'); 
-                          const filteredLines = lines.filter(line => !line.trim().startsWith("tool_code") && !line.trim().startsWith("print(google_search.search")); 
-                          chunkTextForProcessing = filteredLines.join('\n');
-                      } 
-                      
-                      if (useSearchForThisTurn && chunk.candidates && chunk.candidates[0]?.groundingMetadata?.groundingChunks) { 
-                          const sourcesDelta = chunk.candidates[0].groundingMetadata.groundingChunks.filter(gc => gc.web && gc.web.uri).map(gc => ({ uri: gc.web.uri, title: gc.web.title || gc.web.uri })); 
-                          if (sourcesDelta && sourcesDelta.length > 0) { 
-                              streamSourcesBuffer.current = mergeCitations(streamSourcesBuffer.current, sourcesDelta); 
-                          } 
-                      } 
-                      
-                      if (chunkTextForProcessing) {
-                          const textParts = chunkTextForProcessing.split(/(\s+|\*+|`+|_|~|---|===|\n)/); 
-                          for (const part of textParts) {
-                              if (isStoppingGenerationRef.current) break;
-                              if (part.length === 0) continue;
-                              
-                              streamTextBuffer.current += part;
-                              performUiUpdateInStream(true); 
-                              
-                              await new Promise(resolve => setTimeout(resolve, 2));
+                  const response = await fetch(A4F_BASE_URL, {
+                      method: 'POST',
+                      headers: {
+                          'Authorization': `Bearer ${A4F_API_KEY}`,
+                          'Content-Type': 'application/json',
+                      },
+                      body: JSON.stringify({
+                          model: modelToUse,
+                          messages: messagesPayload,
+                          stream: true,
+                          temperature: 0.8
+                      }),
+                  });
+
+                  if (!response.ok) {
+                      const errorData = await response.json().catch(() => ({}));
+                      throw new Error(errorData.error?.message || `Request failed with status ${response.status}`);
+                  }
+
+                  const reader = response.body.getReader();
+                  const decoder = new TextDecoder();
+                  let buffer = '';
+
+                  while (true) {
+                      const { done, value } = await reader.read();
+                      if (done || isStoppingGenerationRef.current) break;
+
+                      buffer += decoder.decode(value, { stream: true });
+                      const lines = buffer.split('\n');
+                      buffer = lines.pop(); 
+
+                      for (const line of lines) {
+                          if (line.trim().startsWith('data: ')) {
+                              const jsonStr = line.trim().substring(5);
+                              if (jsonStr === '[DONE]') {
+                                  break;
+                              }
+                              try {
+                                  const chunk = JSON.parse(jsonStr);
+                                  const chunkText = chunk.choices?.[0]?.delta?.content;
+
+                                  if (!firstChunkReceived && chunkText?.trim()){
+                                      firstChunkReceived = true;
+                                      setChatMessages(prev => prev.map(m => m.id === targetAiMessageUiId ? {...m, loadingText: ""} : m));
+                                  }
+                                  
+                                  if (chunkText) {
+                                      streamTextBuffer.current += chunkText;
+                                      performUiUpdateInStream(true);
+                                      await new Promise(resolve => setTimeout(resolve, 2));
+                                  }
+                              } catch (e) {
+                                  console.error('Error parsing stream line:', line, e);
+                              }
                           }
                       }
-                      if (isStoppingGenerationRef.current) break; 
+                      if (isStoppingGenerationRef.current) break;
                   }
-                  
+
                   let finalAnswerForUi = streamTextBuffer.current;
-                  let analysisStepsForUi = [];
-
-                  if (useSearchForThisTurn) {
-                      finalAnswerForUi = finalAnswerForUi.replace(/\[ANALYSIS_STEP\].*?\n/g, '').replace(/\[ANALYSIS_END\]\n?/g, '').trim();
-                  } else {
-                      finalAnswerForUi = finalAnswerForUi.trim();
-                  }
-                  
-                  const stopNoticeStr = "*Generation stopped by user.*"; 
-                  if (isStoppingGenerationRef.current && !finalAnswerForUi.includes(stopNoticeStr)) { 
-                      const isInCodeBlock = (finalAnswerForUi.match(/```/g) || []).length % 2 !== 0; 
-                      if (isInCodeBlock) finalAnswerForUi += "\n```"; 
-                      finalAnswerForUi += (finalAnswerForUi.trim() ? "\n\n---\n" : "") + stopNoticeStr; 
-                  } else if (!isStoppingGenerationRef.current && !finalAnswerForUi.trim() && analysisStepsForUi.length === 0 ) { 
-                      if (useSearchForThisTurn) { 
-                          finalAnswerForUi = "I'm having a little trouble searching right now, or perhaps clear information isn't available on this topic. You could try regenerating the message, or ask your question a bit differently or more clearly. Thank you! 🙏"; 
-                      } else { 
-                          finalAnswerForUi = "I think I had some trouble understanding. Could you please clarify your question? 🤔"; 
-                          analysisStepsForUi = [];
-                      } 
-                  } else if (!isStoppingGenerationRef.current && !finalAnswerForUi.trim() && analysisStepsForUi.length > 0 && useSearchForThisTurn) { 
-                     // All fake steps shown, no actual text, this is fine.
-                  }
-                  
-                  setChatMessages(prev => prev.map(msg => msg.id === targetAiMessageUiId ? { ...msg, isLoading: false, analysisSteps: analysisStepsForUi, finalAnswerText: finalAnswerForUi, text: finalAnswerForUi, parts: [{text: finalAnswerForUi}], sources: streamSourcesBuffer.current } : msg ));
-              } catch (err) { 
-                  console.error("AI stream error in _streamAiResponse:", err); 
-                  let errorTextForUser = "A technical difficulty occurred. Please try again."; 
-                  if (err.message?.toLowerCase().includes("api key not valid")) errorTextForUser = "It seems there's an issue with the API key."; 
-                  else if (err.message?.toLowerCase().includes("candidate was blocked")) errorTextForUser = "I cannot provide this response due to safety policies."; 
-                  else if (err.message?.toLowerCase().includes("quota")) errorTextForUser = "The API usage limit has been reached."; 
-                  
-                  let errorAnalysisSteps = [];
-                  if(useSearchForThisTurn){ 
+                  const stopNoticeStr = "*Generation stopped by user.*";
+                  if (isStoppingGenerationRef.current && !finalAnswerForUi.includes(stopNoticeStr)) {
+                      const isInCodeBlock = (finalAnswerForUi.match(/```/g) || []).length % 2 !== 0;
+                      if (isInCodeBlock) finalAnswerForUi += "\n```";
+                      finalAnswerForUi += (finalAnswerForUi.trim() ? "\n\n---\n" : "") + stopNoticeStr;
+                  } else if (!isStoppingGenerationRef.current && !finalAnswerForUi.trim()) {
+                      finalAnswerForUi = "I had some trouble understanding. Could you please clarify? 🤔";
                   }
 
-                  setChatMessages(prev => prev.map(msg => msg.id === targetAiMessageUiId ? { ...msg, isLoading: false, isError: true, finalAnswerText: errorTextForUser, text: errorTextForUser, parts: [{text: errorTextForUser}], analysisSteps: errorAnalysisSteps, sources: null } : msg ));
-              } finally { 
-                  setIsChatLoading(false); 
+                  setChatMessages(prev => prev.map(msg => msg.id === targetAiMessageUiId ? { ...msg, isLoading: false, finalAnswerText: finalAnswerForUi.trim(), text: finalAnswerForUi.trim(), parts: [{text: finalAnswerForUi.trim()}], sources: null } : msg ));
+              } catch (err) {
+                  console.error("AI stream error:", err);
+                  let errorTextForUser = "A technical difficulty occurred. Please try again.";
+                  if (err.message) errorTextForUser = err.message;
+
+                  setChatMessages(prev => prev.map(msg => msg.id === targetAiMessageUiId ? { ...msg, isLoading: false, isError: true, finalAnswerText: errorTextForUser, text: errorTextForUser, parts: [{text: errorTextForUser}], sources: null } : msg ));
+              } finally {
+                  setIsChatLoading(false);
               }
           };
 
@@ -803,11 +754,20 @@ const base64Data = await new Promise((resolve, reject) => { const reader = new F
               if (filesToSendFromInput.some(f => f.isLoading)) { setChatError("Please wait for all files to finish loading."); return; }
               isStoppingGenerationRef.current = false; 
               setChatError(null); 
-              if (!genAIInstances[FIXED_MODEL_ID]) { setChatError(`Gemini API client for model ${FIXED_MODEL_ID} is not configured.`); return; } 
               
-              const userMessageUiId = await addMessageToLocalChat('user', messageText, filesToSendFromInput); 
+              const tempUserMessage = {
+                id: 'temp_user_' + Date.now(),
+                role: 'user',
+                text: messageText,
+                parts: messageText ? [{ text: messageText }] : [],
+                timestamp: new Date().getTime(),
+                uiOnlyAttachedFiles: filesToSendFromInput,
+              };
+              const historyForA4f = getA4fHistory([...chatMessages, tempUserMessage]);
+
+              await addMessageToLocalChat('user', messageText, filesToSendFromInput); 
+              
               const aiPlaceholderUiId = Date.now().toString() + '_model_resp_temp_ui'; 
-              const needsSearch = true; 
               const initialLoadingText = "Thinking..."; 
 
               const preliminaryAiPlaceholder = { 
@@ -816,109 +776,58 @@ const base64Data = await new Promise((resolve, reject) => { const reader = new F
                   text: '', 
                   parts: [{text:''}], 
                   finalAnswerText: "", 
-                  analysisSteps: [], 
                   loadingText: initialLoadingText, 
                   timestamp: new Date().getTime(), 
                   isLoading: true, 
                   isError: false, 
                   sources: null, 
-                  searchUsed: needsSearch, 
-                  modelUsed: FIXED_MODEL_ID 
+                  modelUsed: selectedModel 
               }; 
-              setChatMessages(prev => { const cleanPrev = prev.filter(m => m.id !== 'loading_chat_indicator' && m.id !== 'error_loading_messages'); return [...cleanPrev, preliminaryAiPlaceholder]; }); 
+              setChatMessages(prev => { 
+                  const cleanPrev = prev.filter(m => m.id !== 'loading_chat_indicator' && m.id !== 'error_loading_messages'); 
+                  return [...cleanPrev, preliminaryAiPlaceholder]; 
+              }); 
               
-              if (needsSearch) {
-                  if(isStoppingGenerationRef.current) { 
-                     handleStopGeneration(); 
-                     return;
+              await _streamAiResponse(aiPlaceholderUiId, historyForA4f, selectedModel); 
+          }, [chatMessages, currentChatId, selectedModel]); 
+
+          const handleRegenerateLastTextMessage = useCallback(async (aiMessageIdToRegenerate) => {
+              isStoppingGenerationRef.current = false;
+              setChatError(null);
+
+              const messagesSnapshot = [...chatMessages];
+              let userPromptIndex = -1;
+              const aiMessageIndex = messagesSnapshot.findIndex(m => m.id === aiMessageIdToRegenerate);
+
+              if (aiMessageIndex === -1) { setChatError("Cannot regenerate: Original AI message not found."); return; }
+              const modelUsedForOriginal = messagesSnapshot[aiMessageIndex].modelUsed || selectedModel;
+
+              for (let i = aiMessageIndex - 1; i >= 0; i--) {
+                  if (messagesSnapshot[i].role === 'user') {
+                      userPromptIndex = i;
+                      break;
                   }
               }
-              
-              setChatMessages(prev => prev.map(m => m.id === aiPlaceholderUiId ? {...m, isLoading: true, loadingText: "Thinking..." } : m));
 
-              const currentUserMessagePartsForGemini = []; 
-              if (messageText.trim()) { currentUserMessagePartsForGemini.push({ text: messageText.trim() }); } 
-              filesToSendFromInput.forEach(file => { if (file.type.startsWith('image/') && file.apiData.mimeType && file.apiData.data) { currentUserMessagePartsForGemini.push({ inlineData: file.apiData }); } else if ((file.name.toLowerCase().endsWith('.txt') || file.type === 'text/plain') && file.apiData.textContent) { currentUserMessagePartsForGemini.push({ text: `\n[Content of attached file: ${file.name}]\n${file.apiData.textContent}\n[End of file: ${file.name}]\n` }); } }); 
-              
-              const currentMessagesSnapshot = chatMessages.filter(m => m.id !== userMessageUiId && m.id !== aiPlaceholderUiId); 
-              const baseHistory = getGeminiHistory(currentMessagesSnapshot); 
-              const userMessageObjectForHistory = { role: 'user', parts: currentUserMessagePartsForGemini }; 
-              const historyForGemini = [...baseHistory, userMessageObjectForHistory]; 
-              
-              if (currentUserMessagePartsForGemini.length > 0) { 
-                  await _streamAiResponse( currentUserMessagePartsForGemini, aiPlaceholderUiId, historyForGemini, needsSearch, "Thinking...", false, FIXED_MODEL_ID ); 
-              } else { 
-                  setChatMessages(prev => prev.map(msg => msg.id === aiPlaceholderUiId ? { ...msg, isLoading: false, isError: true, finalAnswerText: "No valid content to send.", text: "No valid content to send.", parts: [{text:"No valid content to send."}]} : msg )); 
-                  setIsChatLoading(false); 
-              } 
-          }, [chatMessages, currentChatId]); 
+              if (userPromptIndex === -1) { setChatError("Cannot regenerate: Original user prompt not found."); return; }
 
-          const handleRegenerateLastTextMessage = useCallback(async (aiMessageIdToRegenerate) => { 
-              isStoppingGenerationRef.current = false; 
-              setChatError(null); 
-              
-              const messagesForCurrentChat = [...chatMessages]; 
-              let userPromptMsgForRegen = null; 
-              let historyUpToUserPrompt = []; 
-              let aiMsgIndex = messagesForCurrentChat.findIndex(m => m.id === aiMessageIdToRegenerate && m.role === 'model'); 
-              
-              if (aiMsgIndex === -1) { setChatError("Cannot regenerate: Original AI message not found."); return; } 
-              
-              const modelUsedForOriginalResponse = messagesForCurrentChat[aiMsgIndex].modelUsed || FIXED_MODEL_ID; 
-              if (!genAIInstances[modelUsedForOriginalResponse]) { setChatError(`API Client for model ${modelUsedForOriginalResponse} not found for regeneration.`); return; }
-              
-              for (let i = aiMsgIndex - 1; i >= 0; i--) { if (messagesForCurrentChat[i].role === 'user') { let interveningUserMessage = false; for (let j = i + 1; j < aiMsgIndex; j++) { if (messagesForCurrentChat[j].role === 'user') { interveningUserMessage = true; break; } } if (!interveningUserMessage) { userPromptMsgForRegen = messagesForCurrentChat[i]; historyUpToUserPrompt = getGeminiHistory(messagesForCurrentChat.slice(0, i)); break; } } } 
-              
-              if (!userPromptMsgForRegen) { setChatError("Cannot regenerate: Original user prompt not found."); return; } 
-              
-              const needsSearch = true; 
-              const initialLoadingText = "Thinking..."; 
+              const historyForApi = getA4fHistory(messagesSnapshot.slice(0, userPromptIndex + 1));
               
               const newAiMessageId = Date.now().toString() + '_model_regen_ui';
-              const oldAiMessageIndex = chatMessages.findIndex(m => m.id === aiMessageIdToRegenerate);
 
-              setChatMessages(prev => {
-                  let newMessages = [...prev];
-                  if(oldAiMessageIndex !== -1) {
-                    // Replace the old message directly
-                    newMessages[oldAiMessageIndex] = {
-                        id: newAiMessageId, 
-                        role: 'model', text: '', parts: [{text: ''}], finalAnswerText: "",
-                        analysisSteps: [],
-                        loadingText: initialLoadingText, timestamp: new Date().getTime(), isLoading: true,
-                        isError: false, sources: null, searchUsed: needsSearch, modelUsed: modelUsedForOriginalResponse
-                    };
-                  } else { // Fallback if old message somehow not found (should ideally not happen)
-                     newMessages.push({
-                        id: newAiMessageId, role: 'model', text: '', parts: [{text: ''}], finalAnswerText: "",
-                        analysisSteps: [],
-                        loadingText: initialLoadingText, timestamp: new Date().getTime(), isLoading: true,
-                        isError: false, sources: null, searchUsed: needsSearch, modelUsed: modelUsedForOriginalResponse
-                     });
-                  }
-                  return newMessages;
-              });
-
-              if (needsSearch) {
-                   if(isStoppingGenerationRef.current) {
-                     handleStopGeneration();
-                     return;
-                  }
-              }
-              setChatMessages(prev => prev.map(m => m.id === newAiMessageId ? {...m, isLoading: true, loadingText: "Thinking..." } : m));
+              setChatMessages(prev => prev.map(msg => 
+                  msg.id === aiMessageIdToRegenerate 
+                  ? {
+                      id: newAiMessageId,
+                      role: 'model', text: '', parts: [{text: ''}], finalAnswerText: "",
+                      loadingText: "Thinking...", timestamp: new Date().getTime(), isLoading: true,
+                      isError: false, sources: null, modelUsed: modelUsedForOriginal
+                    }
+                  : msg
+              ));
               
-              const promptPartsForRegen = []; 
-              if(userPromptMsgForRegen.parts && Array.isArray(userPromptMsgForRegen.parts)){ promptPartsForRegen.push(...userPromptMsgForRegen.parts.filter(p => p.text || p.inlineData)); } else if (typeof userPromptMsgForRegen.text === 'string') { promptPartsForRegen.push({text: userPromptMsgForRegen.text}); } else { promptPartsForRegen.push({text: ''});} 
-              const filesFromUserMessage = userPromptMsgForRegen.uiOnlyAttachedFiles || userPromptMsgForRegen.attachedFiles || []; 
-              filesFromUserMessage.forEach(fileMeta => { if(fileMeta.type?.startsWith('image/') && fileMeta.apiData) { if (!promptPartsForRegen.some(p => p.inlineData && p.inlineData.data === fileMeta.apiData.data)) { promptPartsForRegen.push({ inlineData: fileMeta.apiData }); } } else if ((fileMeta.name?.toLowerCase().endsWith('.txt') || fileMeta.type === 'text/plain') && fileMeta.apiData?.textContent) { const fileContentMarker = `\n[Content of attached file: ${fileMeta.name}]\n`; if (!promptPartsForRegen.some(p => typeof p.text === 'string' && p.text.includes(fileContentMarker))) { promptPartsForRegen.push({ text: `${fileContentMarker}${fileMeta.apiData.textContent}\n[End of file: ${fileMeta.name}]\n` }); } } }); 
-              
-              if (promptPartsForRegen.length > 0 && promptPartsForRegen.some(p => (p.inlineData || (typeof p.text === 'string' && p.text.trim())))) { 
-                  await _streamAiResponse( promptPartsForRegen, newAiMessageId, historyUpToUserPrompt, needsSearch, "Thinking...", true, modelUsedForOriginalResponse ); 
-              } else { 
-                  setChatMessages(prev => prev.map(msg => msg.id === newAiMessageId ? { ...msg, isLoading: false, isError: true, finalAnswerText: "No content found to regenerate.", text: "No content found to regenerate.", parts: [{text: "No content found to regenerate."}]} : msg )); 
-                  setIsChatLoading(false); 
-              } 
-          }, [chatMessages, currentChatId]); 
+              await _streamAiResponse(newAiMessageId, historyForApi, modelUsedForOriginal);
+          }, [chatMessages, currentChatId, selectedModel]); 
 
           const handleDeleteAiMessagePair = async (aiMessageId) => { const currentMessages = [...chatMessages]; const aiMessageIndex = currentMessages.findIndex(msg => msg.id === aiMessageId); if (aiMessageIndex === -1) { setChatError("Could not find the AI message to delete."); return; } let idsToDelete = [aiMessageId]; if (aiMessageIndex > 0) { let precedingUserMessage = null; for (let i = aiMessageIndex - 1; i >= 0; i--) { if (currentMessages[i].role === 'model') { break; } if (currentMessages[i].role === 'user') { let interveningUserMessage = false; for (let k = i + 1; k < aiMessageIndex; k++) { if (currentMessages[k].role === 'user') { interveningUserMessage = true; break; } } if (!interveningUserMessage) { precedingUserMessage = currentMessages[i]; } break; } } if (precedingUserMessage) { idsToDelete.push(precedingUserMessage.id); } } setChatMessages(prev => prev.filter(msg => !idsToDelete.includes(msg.id))); };
           const handleStartEdit = (id, currentText) => { setEditingMessageId(id); setEditText(currentText || ''); };
@@ -926,7 +835,7 @@ const base64Data = await new Promise((resolve, reject) => { const reader = new F
           const handleSaveEdit = (id) => { setChatMessages(prev => prev.map(msg => msg.id === id ? { ...msg, finalAnswerText: editText, text: editText, parts: [{ text: editText }] } : msg)); handleCancelEdit(); };
 
           if (authLoading) { return ( <div className="h-full flex items-center justify-center bg-surface-main"> <div className="w-10 h-10 border-4 border-brand-primary border-t-transparent rounded-full animate-spin-continuous"></div> </div> ); }
-          return ( <div className="h-full text-text-primary flex font-sans bg-surface-main"> <div className="flex-grow h-full flex flex-col min-w-0"> <ChatInterface messages={chatMessages} onSendMessage={handleSendChatMessage} isLoading={isChatLoading} onStopGeneration={handleStopGeneration} onRegenerateLastTextMessage={handleRegenerateLastTextMessage} onNewChat={handleNewChat} setChatError={setChatError} currentChatId={currentChatId} onDeleteAiMessagePair={handleDeleteAiMessagePair} selectedUserMessageId={selectedUserMessageId} setSelectedUserMessageId={setSelectedUserMessageId} editingMessageId={editingMessageId} editText={editText} setEditText={setEditText} onSaveEdit={handleSaveEdit} onCancelEdit={handleCancelEdit} onStartEdit={handleStartEdit} /> </div> </div> );
+          return ( <div className="h-full text-text-primary flex font-sans bg-surface-main"> <div className="flex-grow h-full flex flex-col min-w-0"> <ChatInterface messages={chatMessages} onSendMessage={handleSendChatMessage} isLoading={isChatLoading} onStopGeneration={handleStopGeneration} onRegenerateLastTextMessage={handleRegenerateLastTextMessage} onNewChat={handleNewChat} setChatError={setChatError} currentChatId={currentChatId} onDeleteAiMessagePair={handleDeleteAiMessagePair} selectedUserMessageId={selectedUserMessageId} setSelectedUserMessageId={setSelectedUserMessageId} editingMessageId={editingMessageId} editText={editText} setEditText={setEditText} onSaveEdit={handleSaveEdit} onCancelEdit={handleCancelEdit} onStartEdit={handleStartEdit} selectedModel={selectedModel} setSelectedModel={setSelectedModel} /> </div> </div> );
       };
       const root = ReactDOM.createRoot(document.getElementById('root'));
       root.render(<React.StrictMode><App /></React.StrictMode>);
